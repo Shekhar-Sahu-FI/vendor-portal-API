@@ -57,6 +57,14 @@ export const ENV_CONFIG = {
     return process.env.AUTH_PASSWORD || '';
   },
 
+  get SUPPLIER_USERNAME(): string {
+    return process.env.SUPPLIER_USERNAME || '';
+  },
+
+  get SUPPLIER_PASSWORD(): string {
+    return process.env.SUPPLIER_PASSWORD || '';
+  },
+
   get API_TIMEOUT(): number {
     return parseInt(process.env.API_TIMEOUT || '15000', 10);
   },

@@ -70,6 +70,7 @@ export class ApiWorkflowHelper {
     let createdId: any;
     let saveResponse: any;
     let getResponse: any;
+    let verifyError: any;
 
     await test.step('Save Record', async () => {
       saveResponse = await api.save(payload);
@@ -80,20 +81,30 @@ export class ApiWorkflowHelper {
       expect(createdId, "Expect created ID to be defined.").toBeDefined();
     });
 
-    await test.step('Get Record by ID & Verify', async () => {
-      getResponse = await api.getById(createdId);
-      await expectSuccess(getResponse);
+    try {
+      await test.step('Get Record by ID & Verify', async () => {
+        getResponse = await api.getById(createdId);
+        await expectSuccess(getResponse);
 
-      if (verifyCallback) {
-        await verifyCallback(getResponse.body, payload);
-      }
-    });
+        if (verifyCallback) {
+          await verifyCallback(getResponse.body, payload);
+        }
+      });
+    } catch (error) {
+      verifyError = error;
+    }
 
-    await test.step('Delete Record', async () => {
-      const deleteResponse = await api.deleteRecord(createdId);
-      await expectDeleted(deleteResponse);
-      expect(deleteResponse.body.success, "Expect response status to be true.").toBe(true);
-    });
+    if (createdId) {
+      await test.step('Delete Record', async () => {
+        const deleteResponse = await api.deleteRecord(createdId);
+        await expectDeleted(deleteResponse);
+        expect(deleteResponse.body.success, "Expect response status to be true.").toBe(true);
+      });
+    }
+
+    if (verifyError) {
+      throw verifyError;
+    }
 
     return getResponse;
   }
