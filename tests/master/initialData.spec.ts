@@ -94,9 +94,8 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed City Master initial data', async ({ cityApi, workflow, lookup }) => {
         await workflow.seedInitialData(cityApi, cityData, "City Master", async (payload) => {
-            const country = await lookup.getRecord("country", payload.countryName);
-            const state = await lookup.getRecord("state", payload.stateName);
-            return { ...payload, countryId: country?.id, stateId: state?.id };
+            const state = await lookup.getState(payload.stateName, payload.countryName);
+            return { ...payload, countryId: state?.countryId, stateId: state?.id };
         });
     });
 
@@ -109,33 +108,77 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed Company Master initial data', async ({ companyApi, workflow, lookup }) => {
         await workflow.seedInitialData(companyApi, companyData, "Company Master", async (payload) => {
-            const country = await lookup.getRecord("country", payload.countryName);
-            const state = await lookup.getRecord("state", payload.stateName);
+            const state = await lookup.getState(payload.stateName, payload.countryName);
             const city = await lookup.getRecord("city", payload.cityName);
-            return { ...payload, countryId: country?.id, stateId: state?.id, cityId: city?.id };
+            return { ...payload, countryId: state?.countryId, stateId: state?.id, cityId: city?.id };
         });
     });
 
     test('should seed Company Location Master initial data', async ({ companyLocationApi, workflow, lookup }) => {
         await workflow.seedInitialData(companyLocationApi, companyLocationData, "Company Location Master", async (payload) => {
             const company = await lookup.getRecord("company", payload.companyName);
-            const country = await lookup.getRecord("country", payload.countryName);
-            const state = await lookup.getRecord("state", payload.stateName);
+            const state = await lookup.getState(payload.stateName, payload.countryName);
             const city = await lookup.getRecord("city", payload.cityName);
-            return { ...payload, companyId: company?.id, countryId: country?.id, stateId: state?.id, cityId: city?.id };
+            return { ...payload, companyId: company?.id, countryId: state?.countryId, stateId: state?.id, cityId: city?.id };
         });
     });
 
-    test('should seed Division Master initial data', async ({ divisionApi, workflow }) => {
-        await workflow.seedInitialData(divisionApi, divisionData, "Division Master");
+    test('should seed Division Master initial data', async ({ divisionApi, workflow, lookup }) => {
+        await workflow.seedInitialData(divisionApi, divisionData, "Division Master", async (payload) => {
+            const companyDetail = [];
+            for (const companyObj of payload.companyDetail) {
+                const company = await lookup.getRecord("company", companyObj.companyName);
+                companyDetail.push({
+                    companyId: company.id,
+                    statusId: 1
+                });
+            }
+            return {
+                ...payload,
+                companyDetail
+            };
+        });
     });
 
-    test('should seed Department Master initial data', async ({ departmentApi, workflow }) => {
-        await workflow.seedInitialData(departmentApi, departmentData, "Department Master");
+    test('should seed Department Master initial data', async ({ departmentApi, workflow, lookup }) => {
+        await workflow.seedInitialData(departmentApi, departmentData, "Department Master", async (payload) => {
+            const companyDetail = [];
+            for (const companyObj of payload.departmentCompanyDivisionDetail) {
+                const division = await lookup.searchDivision(companyObj.companyName, companyObj.divisionName);
+                if (division) {
+                    companyDetail.push({
+                        companyId: division.companyId,
+                        divisionId: division.id
+                    });
+                }
+            }
+            return {
+                ...payload,
+                departmentCompanyDivisionDetail: companyDetail
+            };
+        });
     });
 
-    test('should seed DocType Master initial data', async ({ docTypeApi, workflow }) => {
-        await workflow.seedInitialData(docTypeApi, docTypeData, "DocType Master");
+    test('should seed DocType Master initial data', async ({ docTypeApi, workflow, lookup }) => {
+        await workflow.seedInitialData(docTypeApi, docTypeData, "DocType Master", async (payload) => {
+            const form = await lookup.getGlobalRecord("form", payload.formName);
+            const companyDetails = [];
+            for (const item of payload.companyDetails) {
+                const division = await lookup.searchDivision(item.companyName, item.divisionName);
+                if (division) {
+                    companyDetails.push({
+                        companyId: division.companyId,
+                        divisionId: division.id,
+                        statusId: 1
+                    });
+                }
+            }
+            return {
+                ...payload,
+                formId: form?.id,
+                companyDetails
+            };
+        });
     });
 
     test('should seed CostCenter Master initial data', async ({ costCenterApi, workflow }) => {

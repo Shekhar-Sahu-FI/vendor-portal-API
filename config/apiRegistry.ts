@@ -49,7 +49,7 @@ export const API_REGISTRY = {
     vendorAttachment: { url: '/api/master/vendor-attachments', matchField: 'fileName' },
     vendorCategory: { url: '/api/master/vendor-categories', matchField: 'vendorCategoryName' },
     vendorRegistration: { url: '/api/master/vendor-registrations', matchField: 'vendorName' },
-    warehouse: { url: '/api/master/warehouses', matchField: 'warehouseName' }
+    warehouse: { url: '/api/master/warehouses', matchField: 'warehouseName' },
   } as Record<string, MasterConfig>,
 
   // =========================================================
@@ -79,7 +79,7 @@ export const API_REGISTRY = {
     expenseNature: { url: '/api/globaldata/expense-natures', matchField: 'expenseNatureName', globaldata: true },
     freightRateType: { url: '/api/globaldata/freight-rate-type', matchField: 'freightRateTypeName', globaldata: true },
     freightType: { url: '/api/globaldata/freight-type', matchField: 'freightTypeName', globaldata: true },
-    form: { url: '/api/globaldata/forms', matchField: 'formName', globaldata: true },
+    form: { url: '/api/globaldata/forms', matchField: 'formCaption', globaldata: true },
     gstCategory: { url: '/api/globaldata/gst-category', matchField: 'gstCategoryName', globaldata: true },
     gstRegType: { url: '/api/globaldata/gst-reg-type', matchField: 'gstRegTypeName', globaldata: true },
     makeMgmtType: { url: '/api/globaldata/make-mgmt-types', matchField: 'makeMgmtTypeName', globaldata: true },

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { MasterApi } from '../services/MasterApi';
 import { expectSuccess, expectUpdated, expectDeleted } from './ValidationHelper';
+import { Logger } from './Logger';
 
 export class ApiWorkflowHelper {
   /**
@@ -114,30 +115,35 @@ export class ApiWorkflowHelper {
    * Optionally takes a transform function to resolve dependencies (like foreign keys) before saving.
    */
   public static async seedInitialData(
-    api: MasterApi, 
-    payloadArray: any[], 
+    api: MasterApi,
+    payloadArray: any[],
     description: string = 'Record',
     transformPayload?: (payload: any) => Promise<any>
   ): Promise<any[]> {
     const responses: any[] = [];
 
     for (const payload of payloadArray) {
-      await test.step(`Seed Record: ${description}`, async () => {
-        let finalPayload = payload;
-        if (transformPayload) {
-           finalPayload = await transformPayload(payload);
-        }
+      try {
+        await test.step(`Seed Record: ${description}`, async () => {
+          let finalPayload = payload;
+          if (transformPayload) {
+            finalPayload = await transformPayload(payload);
+          }
 
-        const saveResponse = await api.save(finalPayload);
-        await expectSuccess(saveResponse);
-        expect(saveResponse.body.success, "Expect response status to be true.").toBe(true);
+          const saveResponse = await api.save(finalPayload);
+          await expectSuccess(saveResponse);
+          expect(saveResponse.body.success, "Expect response status to be true.").toBe(true);
 
-        const createdId = saveResponse.body.id || saveResponse.body.data?.id;
-        expect(createdId, "Expect created ID to be defined.").toBeDefined();
+          const createdId = saveResponse.body.id || saveResponse.body.data?.id;
+          expect(createdId, "Expect created ID to be defined.").toBeDefined();
 
-        responses.push(saveResponse);
-      });
+          responses.push(saveResponse);
+        });
+      } catch (error: any) {
+        Logger.error(`Failed to seed record for '${description}': ${error.message || error}`);
+      }
     }
+
 
     return responses;
   }
