@@ -8,7 +8,7 @@ const TOKEN_DIR = path.resolve(process.cwd(), '.auth');
 
 
 interface TokenCache {
-  token: string;
+  token: string | null;
   tokenExpiry: number;
 }
 

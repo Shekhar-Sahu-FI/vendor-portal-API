@@ -3,6 +3,7 @@ import { RequestHelper } from '../helpers/RequestHelper';
 import { AuthManager } from '../helpers/AuthManager';
 import { LookupHelper } from '../helpers/LookupHelper';
 import { PayloadHelper } from '../helpers/PayloadHelper';
+import { TransactionPayloadHelper } from '../helpers/TransactionPayloadHelper';
 import { MasterApi } from '../services/MasterApi';
 import { ApiWorkflowHelper } from '../helpers/ApiWorkflowHelper';
 
@@ -12,6 +13,7 @@ export interface ApiFixtures {
   requestHelper: RequestHelper;
   lookup: LookupHelper;
   payloadHelper: typeof PayloadHelper;
+  transactionPayloadHelper: typeof TransactionPayloadHelper;
   masterApiFactory: (masterName: string) => MasterApi;
   unitApi: MasterApi;
   verifyUnit: (retrieved: any, original: any) => void;
@@ -28,12 +30,13 @@ export interface ApiFixtures {
   verifyCategory: (retrieved: any, original: any) => void;
   csReasonApi: MasterApi;
   verifyCsReason: (retrieved: any, original: any) => void;
+  documentSeriesApi: MasterApi;
   businessTypeApi: MasterApi;
   verifyBusinessType: (retrieved: any, original: any) => void;
   prReasonApi: MasterApi;
   verifyPrReason: (retrieved: any, original: any) => void;
 
-    currencyApi: MasterApi;
+  currencyApi: MasterApi;
   cSReasonApi: MasterApi;
   regionApi: MasterApi;
   tNCHeadApi: MasterApi;
@@ -65,7 +68,8 @@ export interface ApiFixtures {
   supplierCsReasonApi: MasterApi;
   supplierBusinessTypeApi: MasterApi;
   supplierPrReasonApi: MasterApi;
-  
+  PRApi: MasterApi;
+
   workflow: typeof ApiWorkflowHelper;
 }
 
@@ -105,6 +109,11 @@ export const test = base.extend<ApiFixtures>({
   payloadHelper: async ({ }, use) => {
     // Provide PayloadHelper class reference
     await use(PayloadHelper);
+  },
+
+  transactionPayloadHelper: async ({ }, use) => {
+    // Provide TransactionPayloadHelper class reference
+    await use(TransactionPayloadHelper);
   },
 
   masterApiFactory: async ({ requestHelper }, use) => {
@@ -218,6 +227,10 @@ export const test = base.extend<ApiFixtures>({
     await use(verifyFn);
   },
 
+  documentSeriesApi: async ({ masterApiFactory }, use) => {
+    await use(masterApiFactory('documentSeries'));
+  },
+
   businessTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('businessType')),
   verifyBusinessType: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -239,7 +252,8 @@ export const test = base.extend<ApiFixtures>({
     await use(verifyFn);
   },
 
-    currencyApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('currency')),
+  currencyApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('currency')),
+  PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
   cSReasonApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('csReason')),
   regionApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('region')),
   tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncHead')),

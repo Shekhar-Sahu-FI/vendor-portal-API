@@ -59,7 +59,27 @@ export class MasterApi extends BaseApi {
    * Search/Query master records
    * POST /api/<masterName>/search
    */
-  public async search<T = any>(queryPayload: any): Promise<ApiResponse<T>> {
-    return this.post<T>('/search', queryPayload);
+  public async search<T = any>(payload: any): Promise<ApiResponse<T>> {
+    return this.post<T>('/search', payload);
+  }
+
+  /**
+   * Retrieve doctypes by form ID
+   * GET /api/<masterName>/forms/<formId>
+   */
+  public async getDocTypesByFormId<T = any>(formId: string | number): Promise<ApiResponse<T>> {
+    return super.get<T>(`/forms/${formId}`);
+  }
+  /**
+   * Get a master record by specific operation param
+   * GET /api/<masterName>/get?<operationParam>=<value>
+   */
+  public async getByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`/get?${operationParam}=${encodeURIComponent(value)}`);
+  }
+
+  public async searchByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`?${operationParam}=${encodeURIComponent(value)}`);
   }
 }
+

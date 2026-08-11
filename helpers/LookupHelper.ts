@@ -27,15 +27,14 @@ export class LookupHelper {
       }
     }
 
-    const config = API_REGISTRY.getConfig(normalizedMaster);
+    const config = API_REGISTRY.getConfig(masterName);
     if (config?.globaldata) {
       return this.getGlobalRecord(masterName, recordName);
     }
 
     Logger.info(`[CACHE MISS] Lookup for master '${masterName}' with name '${recordName}'. Initiating API query...`);
 
-    const masterApi = new MasterApi(this.requestHelper, normalizedMaster);
-
+    const masterApi = new MasterApi(this.requestHelper, masterName);
     // We send a search request. Typical ERPs support filtering by name in search payload.
     const response = await masterApi.getKeywordSearch(recordName);
 
@@ -278,7 +277,7 @@ export class LookupHelper {
 
     Logger.info(`[CACHE MISS] Lookup for global '${globalName}' with name '${recordName}'. Initiating API query...`);
 
-    const config = API_REGISTRY.getConfig(normalizedGlobal);
+    const config = API_REGISTRY.getConfig(globalName);
     if (!config) {
       throw new Error(`Global data '${globalName}' not configured`);
     }
@@ -336,8 +335,6 @@ export class LookupHelper {
     return matchedItem;
   }
 
-
-
   /**
    * Helper to extract ID values dynamically from various possible keys (id, unitId, item_id, etc.)
    */
@@ -364,4 +361,138 @@ export class LookupHelper {
 
     return null;
   }
+
+  /**
+   * Resolves a DocType by filtering through formId
+   */
+  public async getDocTypeByFormId(docTypeName: string, formId: number): Promise<any> {
+    const masterName = "docType";
+    const normalizedRecord = docTypeName.toLowerCase().trim();
+    const cacheKey = "docType_" + formId;
+
+    if (this.recordCache.has(cacheKey)) {
+      const masterCache = this.recordCache.get(cacheKey)!;
+      if (masterCache.has(normalizedRecord)) {
+        Logger.info(`[CACHE HIT] Lookup for docType '${docTypeName}' with formId '${formId}' resolved`);
+        return masterCache.get(normalizedRecord);
+      }
+    }
+
+    Logger.info(`[CACHE MISS] Lookup for docType '${docTypeName}' with formId '${formId}'. Initiating query...`);
+    const masterApi = new MasterApi(this.requestHelper, masterName);
+    const response = await masterApi.getDocTypesByFormId(formId);
+
+    if (!response.ok) {
+      throw new Error(`Lookup failed for docType '${docTypeName}' and formId '${formId}'. API status: ${response.status}`);
+    }
+
+    const items = Array.isArray(response.body)
+      ? response.body
+      : (response.body && typeof response.body === 'object' && Array.isArray((response.body as any).data))
+        ? (response.body as any).data
+        : [];
+
+    if (items.length === 0) {
+      throw new Error(`Lookup failed: Record '${docTypeName}' not found in formId '${formId}' search results.`);
+    }
+
+    let matchedItem: any = null;
+    const matchField = masterApi.matchField;
+    for (const item of items) {
+      const nameVal = item[matchField] || item.name || item.Name;
+      if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
+        matchedItem = item;
+        break;
+      }
+    }
+
+    if (!matchedItem && items.length > 0) {
+      matchedItem = items[0];
+    }
+
+    if (!matchedItem) {
+      throw new Error(`Lookup failed: Could not match docType '${docTypeName}' in formId '${formId}' data.`);
+    }
+
+    if (!this.recordCache.has(cacheKey)) {
+      this.recordCache.set(cacheKey, new Map());
+    }
+    this.recordCache.get(cacheKey)!.set(normalizedRecord, matchedItem);
+
+    Logger.success(`[RESOLVED] docType: '${docTypeName}' -> Record resolved`);
+    return matchedItem;
+  }
+
+  public async searchRecord(masterName: string, operationParam: string, recordName: string): Promise<any> {
+    const normalizedMaster = masterName.toLowerCase().trim();
+    const normalizedRecord = recordName.toLowerCase().trim();
+
+    // Check memory cache first
+    if (this.recordCache.has(normalizedMaster)) {
+      const masterCache = this.recordCache.get(normalizedMaster)!;
+      if (masterCache.has(normalizedRecord)) {
+        const item = masterCache.get(normalizedRecord)!;
+        Logger.info(`[CACHE HIT] Lookup for master '${masterName}' with name '${recordName}' resolved to record`);
+        return item;
+      }
+    }
+
+    const config = API_REGISTRY.getConfig(masterName);
+    if (config?.globaldata) {
+      return this.getGlobalRecord(masterName, recordName);
+    }
+
+    Logger.info(`[CACHE MISS] Lookup for master '${masterName}' with name '${recordName}'. Initiating API query...`);
+
+    const masterApi = new MasterApi(this.requestHelper, masterName);
+    // We send a search request. Typical ERPs support filtering by name in search payload.
+    const response = await masterApi.searchByOperation(operationParam, recordName);
+
+    if (!response.ok) {
+      throw new Error(`Lookup failed for master '${masterName}' and record name '${recordName}'. Search API status: ${response.status}`);
+    }
+
+    const items = Array.isArray(response.body)
+      ? response.body
+      : (response.body && typeof response.body === 'object' && Array.isArray((response.body as any).data))
+        ? (response.body as any).data
+        : [];
+
+    if (items.length === 0) {
+      throw new Error(`Lookup failed: Record '${recordName}' not found in master '${masterName}' search results.`);
+    }
+
+    // Attempt to locate an exact match using the configured match field
+    let matchedItem: any = null;
+    const matchField = masterApi.matchField;
+    for (const item of items) {
+      const nameVal = item[matchField] || item.name || item.Name;
+      if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
+        matchedItem = item;
+        break;
+      }
+    }
+
+    // Fallback to first item if no exact match is found
+    if (!matchedItem && items.length > 0) {
+      matchedItem = items[0];
+    }
+
+    if (!matchedItem) {
+      throw new Error(`Lookup failed: Could not match record '${recordName}' in master '${masterName}' data.`);
+    }
+
+    // Store in cache
+    if (!this.recordCache.has(normalizedMaster)) {
+      this.recordCache.set(normalizedMaster, new Map());
+    }
+    this.recordCache.get(normalizedMaster)!.set(normalizedRecord, matchedItem);
+
+    Logger.success(`[RESOLVED] Master '${masterName}': '${recordName}' -> Record resolved`);
+    return matchedItem;
+  }
 }
+
+
+
+

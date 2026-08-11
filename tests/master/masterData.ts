@@ -112,235 +112,213 @@ export const groupData = [
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "RM",
-        "groupCode": "RM",
-        "groupName": "Steel Materials",
-        "categoryName": "Raw Metal Materials"
+        "code": "G1",
+        "groupCode": "G1",
+        "groupName": "Group One One",
+        "categoryName": "Category One"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "CH",
-        "groupCode": "CH",
-        "groupName": "Industrial Solvents",
-        "categoryName": "Industrial Chemicals"
+        "code": "G2",
+        "groupCode": "G2",
+        "groupName": "Group One Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "EL",
-        "groupCode": "",
-        "groupName": "Cables and Wires",
-        "categoryName": "Electrical Components"
+        "code": "G3",
+        "groupCode": "G3",
+        "groupName": "Group Two One",
+        "categoryName": "Category One"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "MP",
-        "groupCode": "MP",
-        "groupName": "Bearings and Bushes",
-        "categoryName": "Mechanical Parts"
+        "code": "G4",
+        "groupCode": "G4",
+        "groupName": "Group Two Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "TL",
-        "groupCode": "TL",
-        "groupName": "Hand Tools",
-        "categoryName": "Industrial Tools"
+        "code": "G5",
+        "groupCode": "G5",
+        "groupName": "Group Three One",
+        "categoryName": "Category One"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "SF",
-        "groupCode": "SF",
-        "groupName": "Personal Protective Equipment",
-        "categoryName": "Safety Equipment"
+        "code": "G6",
+        "groupCode": "G6",
+        "groupName": "Group Three Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "OS",
-        "groupCode": "OS",
-        "groupName": "Stationery Items",
-        "categoryName": "Office Supplies"
+        "code": "G7",
+        "groupCode": "G7",
+        "groupName": "Group Four One",
+        "categoryName": "Category One"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "PK",
-        "groupCode": "PK",
-        "groupName": "Corrugated Packaging",
-        "categoryName": "Packaging Materials"
+        "code": "G8",
+        "groupCode": "G8",
+        "groupName": "Group Four Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "IT",
-        "groupCode": "IT",
-        "groupName": "Computer Peripherals",
-        "categoryName": "IT Hardware"
+        "code": "G9",
+        "groupCode": "G9",
+        "groupName": "Group Five One",
+        "categoryName": "Category One"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "MS",
-        "groupCode": "MS",
-        "groupName": "Cleaning and Maintenance Items",
-        "categoryName": "Maintenance Supplies"
+        "code": "GA",
+        "groupCode": "GA",
+        "groupName": "Group Five Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "HY",
-        "groupCode": "HY",
-        "groupName": "Hydraulic Components",
-        "categoryName": "Hydraulic & Pneumatic Items"
+        "code": "GB",
+        "groupCode": "GB",
+        "groupName": "Group Six One",
+        "categoryName": "Category One"
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "GC",
+        "groupCode": "GC",
+        "groupName": "Group Six Two",
+        "categoryName": "Category Two"
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "GG",
+        "groupCode": "GG",
+        "groupName": "Group Seven One",
+        "categoryName": "Category One"
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "GD",
+        "groupCode": "GD",
+        "groupName": "Group Seven Two",
+        "categoryName": "Category Two"
     },
     {
         "statusId": 2,
-        "statusRemarks": "inactive group",
-        "code": "IN",
-        "groupCode": "IN",
-        "groupName": "Inactive Group",
-        "categoryName": "Hydraulic & Pneumatic Items"
+        "statusRemarks": "inactive",
+        "code": "GF",
+        "groupCode": "GF",
+        "groupName": "Group Eight Two",
+        "categoryName": "Category Two"
     }
 ]
-
-
 
 export const subgroupData = [
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "SS",
-        "subgroupCode": "",
-        "subgroupName": "MS Sheets",
+        "code": "S1",
+        "subgroupCode": "S1",
+        "subgroupName": "Subgroup One One",
         "hsnSacCode": "7208",
-        "groupName": "Steel Materials",
-        "unitName": "Kilogram",
+        "groupName": "Group One",
+        "unitName": "Unit One",
         "gstCategoryId": 1
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "IS",
-        "subgroupCode": "",
-        "subgroupName": "Cleaning Solvents",
-        "hsnSacCode": "3814",
-        "groupName": "Industrial Solvents",
-        "unitName": "Liter",
+        "code": "S2",
+        "subgroupCode": "S2",
+        "subgroupName": "Subgroup One Two",
+        "hsnSacCode": "7209",
+        "groupName": "Group Two",
+        "unitName": "Unit Two",
         "gstCategoryId": 2
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "CS",
-        "subgroupCode": "",
-        "subgroupName": "Power Cables",
-        "hsnSacCode": "8544",
-        "groupName": "Cables and Wires",
-        "unitName": "Meter",
+        "code": "S3",
+        "subgroupCode": "S3",
+        "subgroupName": "Subgroup Two One",
+        "hsnSacCode": "7210",
+        "groupName": "Group One",
+        "unitName": "Unit Three",
         "gstCategoryId": 3
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "BS",
-        "subgroupCode": "",
-        "subgroupName": "Ball Bearings",
-        "hsnSacCode": "8482",
-        "groupName": "Bearings and Bushes",
-        "unitName": "Piece",
+        "code": "S4",
+        "subgroupCode": "S4",
+        "subgroupName": "Subgroup Two Two",
+        "hsnSacCode": "7211",
+        "groupName": "Group Two",
+        "unitName": "Unit Four",
+        "gstCategoryId": 3
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "S5",
+        "subgroupCode": "S5",
+        "subgroupName": "Subgroup Three One",
+        "hsnSacCode": "7212",
+        "groupName": "Group One",
+        "unitName": "Unit Five",
+        "gstCategoryId": 2
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "S6",
+        "subgroupCode": "S6",
+        "subgroupName": "Subgroup Three Two",
+        "hsnSacCode": "7213",
+        "groupName": "Group Two",
+        "unitName": "Unit Six",
+        "gstCategoryId": 2
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "code": "S7",
+        "subgroupCode": "S7",
+        "subgroupName": "Subgroup Four One",
+        "hsnSacCode": "7214",
+        "groupName": "Group One",
+        "unitName": "Unit Seven",
         "gstCategoryId": 1
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "code": "HS",
-        "subgroupCode": "",
-        "subgroupName": "Spanners",
-        "hsnSacCode": "8204",
-        "groupName": "Hand Tools",
-        "unitName": "Piece",
-        "gstCategoryId": 2
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "PS",
-        "subgroupCode": "",
-        "subgroupName": "Safety Helmets",
-        "hsnSacCode": "6506",
-        "groupName": "Personal Protective Equipment",
-        "unitName": "Piece",
-        "gstCategoryId": 3
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "ST",
-        "subgroupCode": "",
-        "subgroupName": "Office Stationery",
-        "hsnSacCode": "4820",
-        "groupName": "Stationery Items",
-        "unitName": "Box",
+        "code": "S8",
+        "subgroupCode": "S8",
+        "subgroupName": "Subgroup Four Two",
+        "hsnSacCode": "7215",
+        "groupName": "Group Two",
+        "unitName": "Unit One",
         "gstCategoryId": 1
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "CB",
-        "subgroupCode": "",
-        "subgroupName": "Corrugated Boxes",
-        "hsnSacCode": "4819",
-        "groupName": "Corrugated Packaging",
-        "unitName": "Carton",
-        "gstCategoryId": 2
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "PR",
-        "subgroupCode": "PR",
-        "subgroupName": "Computer Printers",
-        "hsnSacCode": "8443",
-        "groupName": "Computer Peripherals",
-        "unitName": "Piece",
-        "gstCategoryId": 3
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "CL",
-        "subgroupCode": "",
-        "subgroupName": "Cleaning Chemicals",
-        "hsnSacCode": "3402",
-        "groupName": "Cleaning and Maintenance Items",
-        "unitName": "Liter",
-        "gstCategoryId": 1
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "code": "HC",
-        "subgroupCode": "",
-        "subgroupName": "Hydraulic Cylinders",
-        "hsnSacCode": "8412",
-        "groupName": "Hydraulic Components",
-        "unitName": "Piece",
-        "gstCategoryId": 2
-    },
-    {
-        "statusId": 2,
-        "statusRemarks": "inactive subgroup",
-        "code": "IN",
-        "subgroupCode": "",
-        "subgroupName": "Inactive Sub Group",
-        "hsnSacCode": "9999",
-        "groupName": "Hydraulic Components",
-        "unitName": "kilogram",
-        "gstCategoryId": 3
     }
 ];
 
@@ -2665,241 +2643,191 @@ export const costCenterData = [
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Manufacturing Operations",
-        "alias": "MFGOPS",
+        "costCenterName": "Cost Center One",
+        "alias": "CCONE",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company One",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company Two",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company Three",
+                "divisionName": "Division One Company One Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Production Planning",
-        "alias": "PRODPLAN",
+        "costCenterName": "Cost Center Two",
+        "alias": "CCTWO",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company One",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company Two",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Manufacturing Division"
+                "companyName": "Company Three",
+                "divisionName": "Division One Company One Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Engineering Projects",
-        "alias": "ENGPROJ",
+        "costCenterName": "Cost Center Three",
+        "alias": "CCTHR",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Engineering Projects Division"
+                "companyName": "Company Two",
+                "divisionName": "Division Two Company Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Engineering Projects Division"
+                "companyName": "Company Three",
+                "divisionName": "Division Two Company Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Project Execution",
-        "alias": "PROJEXE",
+        "costCenterName": "Cost Center Four",
+        "alias": "CCFOR",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Engineering Projects Division"
+                "companyName": "Company Two",
+                "divisionName": "Division Two Company Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Engineering Projects Division"
+                "companyName": "Company Three",
+                "divisionName": "Division Two Company Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Chemical Operations",
-        "alias": "CHEMOPS",
+        "costCenterName": "Cost Center Five",
+        "alias": "CCFIV",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Chemical Processing Division"
+                "companyName": "Company Three",
+                "divisionName": "Division Four Company Three Only"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Process Control",
-        "alias": "PROCCTL",
+        "costCenterName": "Cost Center Six",
+        "alias": "CCSIX",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Chemical Processing Division"
+                "companyName": "Company Three",
+                "divisionName": "Division Four Company Three Only"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Supply Chain Management",
-        "alias": "SCM",
+        "costCenterName": "Cost Center Seven",
+        "alias": "CCSEV",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company One",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Two",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Three",
+                "divisionName": "Division One Company One Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Procurement",
-        "alias": "PROC",
+        "costCenterName": "Cost Center Eight",
+        "alias": "CCEIG",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company One",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Two",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Three",
+                "divisionName": "Division One Company One Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Warehouse",
-        "alias": "WHOUSE",
+        "costCenterName": "Cost Center Nine",
+        "alias": "CCNIN",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company One",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Two",
+                "divisionName": "Division One Company One Two Three"
             },
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Supply Chain Division"
+                "companyName": "Company Three",
+                "divisionName": "Division One Company One Two Three"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "costCenterName": "Inventory Control",
-        "alias": "INVCTRL",
+        "costCenterName": "Cost Center Ten",
+        "alias": "CCTEN",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Shakti Industrial Solutions Pvt Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Metro Engineering Works Pvt Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Supply Chain Division"
-            },
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Supply Chain Division"
-            }
-        ]
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "costCenterName": "Export Operations",
-        "alias": "EXPORT",
-        "parentCostCenterId": null,
-        "costCenterCompanyDivisionDetail": [
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Export Division"
-            }
-        ]
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "costCenterName": "International Logistics",
-        "alias": "INTLOG",
-        "parentCostCenterId": null,
-        "costCenterCompanyDivisionDetail": [
-            {
-                "companyName": "Global Manufacturing Inc",
-                "divisionName": "Export Division"
+                "companyName": "Company One",
+                "divisionName": "Division Three Company One Only"
             }
         ]
     },
     {
         "statusId": 2,
         "statusRemarks": "inactive cost center",
-        "costCenterName": "Inactive Cost Center",
-        "alias": "INACT",
+        "costCenterName": "inactive",
+        "alias": "inc",
         "parentCostCenterId": null,
         "costCenterCompanyDivisionDetail": [
             {
-                "companyName": "Bharat Petro Chemicals Ltd",
-                "divisionName": "Inactive"
+                "companyName": "Company Three",
+                "divisionName": "Division Four Company Three Only"
             }
         ]
     }
@@ -3082,7 +3010,7 @@ export const userData = [
         "divisionTypeId": 1,
         "departmentTypeId": 1,
         "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Metro Engineering Works Pvt Ltd" }
+            { "roleName": "Purchase Manager", "companyName": "Company One" }
         ],
         "userDivisionDetail": [],
         "userDepartmentDetail": [],
@@ -3104,14 +3032,14 @@ export const userData = [
         "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Approving Authority", "companyName": "Shakti Industrial Solutions Pvt Ltd Total" }
+            { "roleName": "Approving Authority", "companyName": "Company Two" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Manufacturing Division" }
+            { "divisionName": "Division One Company One Two Three" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Production" },
-            { "departmentName": "Quality Assurance" }
+            { "departmentName": "Department One Division One Two Three" },
+            { "departmentName": "Department Two Division Two Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3131,15 +3059,15 @@ export const userData = [
         "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Compliance Auditor", "companyName": "Global Manufacturing Inc Total" }
+            { "roleName": "Compliance Auditor", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Supply Chain Division" }
+            { "divisionName": "Division Two Company Two Three" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Procurement" },
-            { "departmentName": "Stores" },
-            { "departmentName": "Inventory Control" }
+            { "departmentName": "Department Three Division Three" },
+            { "departmentName": "Department One Division One Two Three" },
+            { "departmentName": "Department Two Division Two Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3159,7 +3087,7 @@ export const userData = [
         "divisionTypeId": null,
         "departmentTypeId": null,
         "userRoleDetail": [
-            { "roleName": "Vendor Portal User", "companyName": "Global Manufacturing Inc Total" }
+            { "roleName": "Vendor Portal User", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [],
         "userDepartmentDetail": [],
@@ -3181,13 +3109,13 @@ export const userData = [
         "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Legacy Procurement Officer", "companyId": "Shakti Industrial Solutions Pvt Ltd Total" }
+            { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Engineering Projects Division" }
+            { "divisionName": "Division Three Company One Only" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Projects" }
+            { "departmentName": "Department Three Division Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3207,12 +3135,12 @@ export const userData = [
         "divisionTypeId": 1,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyId": "Shakti Industrial Solutions Pvt Ltd Total" }
+            { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
         ],
         "userDivisionDetail": [],
         "userDepartmentDetail": [
-            { "departmentName": "Design Engineering" },
-            { "departmentName": "Project Planning" }
+            { "departmentName": "Department One Division One Two Three" },
+            { "departmentName": "Department Two Division Two Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3232,14 +3160,14 @@ export const userData = [
         "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Bharat Petro Chemicals Ltd Total" },
-            { "roleName": "Compliance Auditor", "companyName": "Global Manufacturing Inc Total" }
+            { "roleName": "Purchase Manager", "companyName": "Company Three" },
+            { "roleName": "Compliance Auditor", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Supply Chain Division" }
+            { "divisionName": "Division Two Company Two Three" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Procurement" }
+            { "departmentName": "Department Three Division Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3259,15 +3187,15 @@ export const userData = [
         "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Global Manufacturing Inc Total" }
+            { "roleName": "Purchase Manager", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Export Division" }
+            { "divisionName": "Division One Company One Two Three" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Export Sales" },
-            { "departmentName": "Export Documentation" },
-            { "departmentName": "International Logistics" }
+            { "departmentName": "Department Three Division Three" },
+            { "departmentName": "Department One Division One Two Three" },
+            { "departmentName": "Department Two Division Two Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3287,7 +3215,7 @@ export const userData = [
         "divisionTypeId": 1,
         "departmentTypeId": 1,
         "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyName": "Global Manufacturing Inc Total" }
+            { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [],
         "userDepartmentDetail": [],
@@ -3727,5 +3655,106 @@ export const vendorAttachmentData = [
         "maxFileSize": 5000,
         "filesSupported": "pdf",
         "isMandatory": false
+    }
+];
+
+export const documentSeriesData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "pattern": "PR-{{YYYY}}-{{MM}}-{{N}}",
+        "padding": 3,
+        "frequencyId": 1,
+        "numberStartFrom": 1,
+        "effectiveDate": "2026-06-01",
+        "documentSeriesFormDetail": [
+            { "formName": "Purchase Request" }
+        ],
+        "documentSeriesCompanyDetail": [
+            { "companyName": "Company One", "statusId": 1 },
+            { "companyName": "Company Two", "statusId": 1 },
+            { "companyName": "Company Three", "statusId": 1 }
+        ],
+        "documentSeriesDivisionDetail": [
+            { "divisionName": "Division One Company One Two Three", "statusId": 1 },
+            { "divisionName": "Division Two Company Two Three", "statusId": 1 },
+            { "divisionName": "Division Three Company One Only", "statusId": 1 },
+            { "divisionName": "Division Four Company Three Only", "statusId": 1 }
+        ],
+        "documentSeriesDocTypeDetail": [
+            { "docTypeName": "PR - Standard - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PR - Engineering - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PR - Chemical - Division Four Company Three Only", "statusId": 1 },
+            { "docTypeName": "PR - Supply Chain - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PR - Export - Division Four Company Three Only", "statusId": 1 }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "pattern": "PO-{{FY4}}-{{MM}}-{{N}}",
+        "padding": 4,
+        "frequencyId": 2,
+        "numberStartFrom": 100,
+        "effectiveDate": "2026-02-01",
+        "documentSeriesFormDetail": [
+            { "formName": "Purchase Order" }
+        ],
+        "documentSeriesCompanyDetail": [
+            { "companyName": "Company One", "statusId": 1 },
+            { "companyName": "Company Two", "statusId": 1 },
+            { "companyName": "Company Three", "statusId": 1 }
+        ],
+        "documentSeriesDivisionDetail": [
+            { "divisionName": "Division One Company One Two Three", "statusId": 1 },
+            { "divisionName": "Division Two Company Two Three", "statusId": 1 },
+            { "divisionName": "Division Three Company One Only", "statusId": 1 },
+            { "divisionName": "Division Four Company Three Only", "statusId": 1 }
+        ],
+        "documentSeriesDocTypeDetail": [
+            { "docTypeName": "PO - Standard - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PO - Engineering - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PO - Chemical - Division Four Company Three Only", "statusId": 1 },
+            { "docTypeName": "PO - Supply Chain - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "PO - Export - Division Four Company Three Only", "statusId": 1 },
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "pattern": "RFQ/{{FY2}}/{{MMM}}/{{N}}",
+        "padding": 5,
+        "frequencyId": 3,
+        "numberStartFrom": 1000,
+        "effectiveDate": "2026-06-01",
+        "documentSeriesFormDetail": [
+            { "formName": "Request For Quotation" }
+        ],
+        "documentSeriesDocTypeDetail": [
+            { "docTypeName": "RFQ - Standard - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "RFQ - Raw Material - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "RFQ - Engineering - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "RFQ - Chemical - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "RFQ - Export - Division One Company One Two Three", "statusId": 1 }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "pattern": "CS-{{YYYY}}-{{N}}",
+        "padding": 2,
+        "frequencyId": 1,
+        "numberStartFrom": 1,
+        "effectiveDate": "2026-06-01",
+        "documentSeriesFormDetail": [
+            { "formName": "Comparative Statement" }
+        ],
+        "documentSeriesDocTypeDetail": [
+            { "docTypeName": "CS - Standard - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "CS - Technical - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "CS - Commercial - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "CS - Engineering - Division One Company One Two Three", "statusId": 1 },
+            { "docTypeName": "CS - Final Approval - Division One Company One Two Three", "statusId": 1 }
+        ]
     }
 ];

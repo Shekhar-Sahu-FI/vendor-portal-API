@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures/apiFixtures';
-import { unitData, groupData, subgroupData, makeData, businessTypeData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData } from './masterData';
+import { unitData, groupData, subgroupData, makeData, businessTypeData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData } from './masterData';
 
 
 test.describe('Initial Data Setup', () => {
@@ -13,8 +13,8 @@ test.describe('Initial Data Setup', () => {
             const category = await lookup.getRecord("category", payload.categoryName);
             return {
                 ...payload,
-                categoryId: category.id,
-                groupCode: category.code + payload.code
+                categoryId: category?.id,
+                groupCode: category?.code + payload.code
             };
         });
     });
@@ -25,9 +25,9 @@ test.describe('Initial Data Setup', () => {
             const unit = await lookup.getRecord("unit", payload.unitName);
             return {
                 ...payload,
-                groupId: group.id,
-                subgroupCode: group.groupCode + payload.code,
-                stockUnitId: unit.id
+                groupId: group?.id,
+                subgroupCode: group?.groupCode + payload.code,
+                stockUnitId: unit?.id
             };
         });
     });
@@ -77,7 +77,39 @@ test.describe('Initial Data Setup', () => {
         await workflow.seedInitialData(itemApi, itemData, "Item Master", async (payload) => {
             const unit = await lookup.getRecord("unit", payload.unitName);
             const subgroup = await lookup.getRecord("subgroup", payload.subgroupName);
-            return { ...payload, stockUnitId: unit?.id, subgroupId: subgroup?.id };
+
+            const unitConversionDetail = [];
+            if (payload.unitConversionDetail) {
+                for (const ucd of payload.unitConversionDetail) {
+                    const toUnit = await lookup.getRecord("unit", ucd.tounitName);
+                    const { tounitName, ...restUcd } = ucd;
+                    unitConversionDetail.push({
+                        ...restUcd,
+                        toUnitId: toUnit?.id
+                    });
+                }
+            }
+
+            const itemSelectedMakeDetail = [];
+            if (payload.itemSelectedMakeDetail) {
+                for (const make of payload.itemSelectedMakeDetail) {
+                    const makeRecord = await lookup.getRecord("make", make.makeName);
+                    const { makeName, ...restMake } = make;
+                    itemSelectedMakeDetail.push({
+                        ...restMake,
+                        makeId: makeRecord?.id
+                    });
+                }
+            }
+
+            return {
+                ...payload,
+                unitId: unit?.id,
+                subgroupId: subgroup?.id,
+                itemCode: subgroup?.subgroupCode + payload.code,
+                unitConversionDetail,
+                itemSelectedMakeDetail
+            };
         });
     });
 
@@ -181,21 +213,119 @@ test.describe('Initial Data Setup', () => {
         });
     });
 
-    test('should seed CostCenter Master initial data', async ({ costCenterApi, workflow }) => {
-        await workflow.seedInitialData(costCenterApi, costCenterData, "CostCenter Master");
+    test('should seed CostCenter Master initial data', async ({ costCenterApi, workflow, lookup }) => {
+        await workflow.seedInitialData(costCenterApi, costCenterData, "CostCenter Master", async (payload) => {
+            const companyDetail = [];
+            for (const companyObj of payload.costCenterCompanyDivisionDetail) {
+                const division = await lookup.searchDivision(companyObj.companyName, companyObj.divisionName);
+                if (division) {
+                    companyDetail.push({
+                        companyId: division.companyId,
+                        divisionId: division.id
+                    });
+                }
+            }
+            return {
+                ...payload,
+                costCenterCompanyDivisionDetail: companyDetail
+            };
+        });
     });
 
-    test('should seed Role Master initial data', async ({ roleApi, workflow }) => {
-        await workflow.seedInitialData(roleApi, roleData, "Role Master");
+    test('should seed Role Master initial data', async ({ roleApi, workflow, lookup }) => {
+        await workflow.seedInitialData(roleApi, roleData, "Role Master", async (payload) => {
+            const formRights = [];
+            if (payload.formRights) {
+                for (const formRight of payload.formRights) {
+                    const form = await lookup.getGlobalRecord("form", formRight.formName);
+                    if (form) {
+                        const { formName, ...rest } = formRight;
+                        formRights.push({ ...rest, formId: form.id });
+                    }
+                }
+            }
+
+            const reportRights: any = [];
+            if (false) {
+                for (const reportRight of payload.reportRights) {
+                    if (reportRight.reportName) {
+                        const report = await lookup.getGlobalRecord("report", reportRight.reportName);
+                        if (report) {
+                            reportRights.push({ reportId: report.id });
+                        }
+                    } else if (reportRight.reportId) {
+                        reportRights.push({ reportId: reportRight.reportId });
+                    }
+                }
+            }
+
+            return {
+                ...payload,
+                formRights,
+                reportRights
+            };
+        });
     });
 
     test('should seed User Master initial data', async ({ userApi, workflow, lookup }) => {
         await workflow.seedInitialData(userApi, userData, "User Master", async (payload) => {
+            let contactNo = payload.contactNo;
+            let contactNoCountryId = payload.contactNoCountryId;
+
             if (payload.countryName) {
                 const country = await lookup.getRecord("country", payload.countryName);
-                return { ...payload, countryId: country?.id };
+                if (country) {
+                    const index = userData.indexOf(payload);
+                    const phoneCodeStr = String(country.phoneCode || "");
+                    const repeatCount = Math.max(0, Number(country.minContactNoLength || 10) - phoneCodeStr.length);
+                    contactNo = country.phoneCode + String(index).repeat(repeatCount) || null;
+                    contactNoCountryId = country.id;
+                }
             }
-            return payload;
+
+            const userRoleDetail = [];
+            if (payload.userRoleDetail && payload.userRoleDetail.length > 0) {
+                for (const roleDetail of payload.userRoleDetail) {
+                    const role = await lookup.getRecord("role", roleDetail.roleName);
+                    const company = await lookup.getRecord("company", roleDetail.companyName);
+                    userRoleDetail.push({
+                        ...roleDetail,
+                        roleId: role?.id,
+                        companyId: company?.id
+                    });
+                }
+            }
+
+            const userDivisionDetail = [];
+            if (payload.userDivisionDetail && payload.userDivisionDetail.length > 0) {
+                for (const divDetail of payload.userDivisionDetail) {
+                    const division = await lookup.getRecord("division", divDetail.divisionName);
+                    userDivisionDetail.push({
+                        ...divDetail,
+                        divisionId: division?.id
+                    });
+                }
+            }
+
+            const userDepartmentDetail = [];
+            if (payload.userDepartmentDetail && payload.userDepartmentDetail.length > 0) {
+                for (const deptDetail of payload.userDepartmentDetail) {
+                    const department = await lookup.getRecord("department", deptDetail.departmentName);
+                    userDepartmentDetail.push({
+                        ...deptDetail,
+                        departmentId: department?.id
+                    });
+                }
+            }
+
+            return {
+                ...payload,
+                contactNo,
+                contactNoCountryId,
+                userRoleDetail,
+                userDivisionDetail,
+                userDepartmentDetail
+            };
         });
     });
 
@@ -210,9 +340,69 @@ test.describe('Initial Data Setup', () => {
     test('should seed Expense Head Master initial data', async ({ expenseHeadApi, workflow }) => {
         await workflow.seedInitialData(expenseHeadApi, expenseHeadData, "Expense Head Master");
     });
-
+    
     test('should seed VendorAttachment Master initial data', async ({ vendorAttachmentApi, workflow }) => {
         await workflow.seedInitialData(vendorAttachmentApi, vendorAttachmentData, "VendorAttachment Master");
     });
 
+    test('should seed Document Series initial data', async ({ documentSeriesApi, workflow, lookup }) => {
+        await workflow.seedInitialData(documentSeriesApi, documentSeriesData, "Document Series", async (payload) => {
+            const documentSeriesFormDetail = [];
+            if (payload.documentSeriesFormDetail) {
+                for (const formDetail of payload.documentSeriesFormDetail) {
+                    const form = await lookup.getRecord("form", formDetail.formName);
+                    const { formName, ...restForm } = formDetail;
+                    documentSeriesFormDetail.push({
+                        ...restForm,
+                        formId: form?.id
+                    });
+                }
+            }
+
+            const documentSeriesCompanyDetail = [];
+            if (payload.documentSeriesCompanyDetail) {
+                for (const companyDetail of payload.documentSeriesCompanyDetail) {
+                    const company = await lookup.getRecord("company", companyDetail.companyName);
+                    const { companyName, ...restCompany } = companyDetail;
+                    documentSeriesCompanyDetail.push({
+                        ...restCompany,
+                        companyId: company?.id
+                    });
+                }
+            }
+
+            const documentSeriesDivisionDetail = [];
+            if (payload.documentSeriesDivisionDetail) {
+                for (const divisionDetail of payload.documentSeriesDivisionDetail) {
+                    const division = await lookup.getRecord("division", divisionDetail.divisionName);
+                    const { divisionName, ...restDivision } = divisionDetail;
+                    documentSeriesDivisionDetail.push({
+                        ...restDivision,
+                        divisionId: division?.id
+                    });
+                }
+            }
+
+            const documentSeriesDocTypeDetail = [];
+            if (payload.documentSeriesDocTypeDetail) {
+                const formId = documentSeriesFormDetail[0]?.formId;
+                for (const docTypeDetail of payload.documentSeriesDocTypeDetail) {
+                    const docType = await lookup.getDocTypeByFormId(docTypeDetail.docTypeName, formId);
+                    const { docTypeName, ...restDocType } = docTypeDetail;
+                    documentSeriesDocTypeDetail.push({
+                        ...restDocType,
+                        docTypeId: docType?.id
+                    });
+                }
+            }
+
+            return {
+                ...payload,
+                documentSeriesFormDetail,
+                documentSeriesCompanyDetail,
+                documentSeriesDivisionDetail,
+                documentSeriesDocTypeDetail
+            };
+        });
+    });
 });
