@@ -336,6 +336,24 @@ export class LookupHelper {
   }
 
   /**
+   * Resolves contact number and country ID based on country name.
+   */
+  public async getContactNoAndCountryId(countryName: string = "India", index: number = 8): Promise<{ contactNo: string | null; contactNoCountryId: number | null }> {
+
+    const country = await this.getRecord("country", countryName);
+    if (!country) {
+      return { contactNo: null, contactNoCountryId: null };
+    }
+    const phoneCodeStr = String(country.phoneCode || "");
+    const repeatCount = Math.max(0, Number(country.minContactNoLength || 10) - phoneCodeStr.length);
+    const contactNo = country.phoneCode + String(index).repeat(repeatCount) || null;
+    return {
+      contactNo,
+      contactNoCountryId: country.id
+    };
+  }
+
+  /**
    * Helper to extract ID values dynamically from various possible keys (id, unitId, item_id, etc.)
    */
   private extractIdValue(item: any, masterName: string): string | number | null {

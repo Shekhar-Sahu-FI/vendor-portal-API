@@ -269,19 +269,9 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed User Master initial data', async ({ userApi, workflow, lookup }) => {
         await workflow.seedInitialData(userApi, userData, "User Master", async (payload) => {
-            let contactNo = payload.contactNo;
-            let contactNoCountryId = payload.contactNoCountryId;
-
-            if (payload.countryName) {
-                const country = await lookup.getRecord("country", payload.countryName);
-                if (country) {
-                    const index = userData.indexOf(payload);
-                    const phoneCodeStr = String(country.phoneCode || "");
-                    const repeatCount = Math.max(0, Number(country.minContactNoLength || 10) - phoneCodeStr.length);
-                    contactNo = country.phoneCode + String(index).repeat(repeatCount) || null;
-                    contactNoCountryId = country.id;
-                }
-            }
+            const contactInfo = await lookup.getContactNoAndCountryId(payload.countryName, userData.indexOf(payload));
+            const contactNo = contactInfo.contactNo || payload.contactNo;
+            const contactNoCountryId = contactInfo.contactNoCountryId || payload.contactNoCountryId;
 
             const userRoleDetail = [];
             if (payload.userRoleDetail && payload.userRoleDetail.length > 0) {
