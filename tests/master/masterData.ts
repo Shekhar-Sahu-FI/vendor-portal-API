@@ -412,7 +412,7 @@ export const businessTypeData = [
     },
     {
         "statusId": 2,
-        "statusRemarks": "",
+        "statusRemarks": "sadasd",
         "businessTypeName": "inactive"
     }
 ];

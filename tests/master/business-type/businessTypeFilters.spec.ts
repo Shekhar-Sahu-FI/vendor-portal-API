@@ -8,9 +8,9 @@ test.describe('BusinessType Master API Filters and Sorting Tests', () => {
     const listRes = await businessTypeApi.list({ pageSize: 1 });
     expect(listRes.ok, "Expected to retrieve at least one record from the DB for filtering verification.").toBe(true);
 
-    const items = listRes.body?.items || listRes.body?.data?.items || listRes.body;
+    const items = listRes.body?.items || (Array.isArray(listRes.body?.data) ? listRes.body.data : listRes.body?.data?.items) || listRes.body;
     expect(items, "Response body should contain items array").toBeDefined();
-    
+
     // Skip test or fail cleanly if database has no records
     if (!Array.isArray(items) || items.length === 0) {
       console.warn("Skipping filter validation because no Business Type records exist in the database.");

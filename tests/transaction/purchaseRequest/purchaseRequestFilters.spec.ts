@@ -8,7 +8,7 @@ test.describe('Purchase Request API Filters and Sorting Tests', () => {
     const listRes = await PRApi.list({ pageSize: 1 });
     expect(listRes.ok, "Expected to retrieve at least one record from the DB for filtering verification.").toBe(true);
 
-    const items = listRes.body?.items || listRes.body?.data?.items || listRes.body;
+    const items = listRes.body?.items || (Array.isArray(listRes.body?.data) ? listRes.body.data : listRes.body?.data?.items) || listRes.body;
     expect(items, "Response body should contain items array").toBeDefined();
     
     // Skip test or fail cleanly if database has no records
