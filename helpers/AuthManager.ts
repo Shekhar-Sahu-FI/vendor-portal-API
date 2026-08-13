@@ -5,30 +5,37 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const TOKEN_DIR = path.resolve(process.cwd(), '.auth');
-const TOKEN_FILE_PATH = path.join(TOKEN_DIR, 'token.json');
+
 
 interface TokenCache {
-  token: string;
+  token: string | null;
   tokenExpiry: number;
 }
 
 export class AuthManager {
-  private static instance: AuthManager;
+  private static instances: Record<string, AuthManager> = {};
   private token: string | null = null;
   private tokenExpiry: number = 0; // Timestamp in milliseconds
   private isLoggingIn: boolean = false;
   private loginPromise: Promise<string> | null = null;
+  private role: string;
 
-  private constructor() { }
+  private constructor(role: string = 'admin') {
+    this.role = role;
+  }
+
+  private getTokenFilePath(): string {
+    return path.join(TOKEN_DIR, `token-${this.role}.json`);
+  }
 
   /**
-   * Get Singleton Instance of AuthManager
+   * Get Singleton Instance of AuthManager per role
    */
-  public static getInstance(): AuthManager {
-    if (!AuthManager.instance) {
-      AuthManager.instance = new AuthManager();
+  public static getInstance(role: string = 'admin'): AuthManager {
+    if (!AuthManager.instances[role]) {
+      AuthManager.instances[role] = new AuthManager(role);
     }
-    return AuthManager.instance;
+    return AuthManager.instances[role];
   }
 
   /**
@@ -36,8 +43,9 @@ export class AuthManager {
    */
   private loadTokenFromDisk(): TokenCache | null {
     try {
-      if (fs.existsSync(TOKEN_FILE_PATH)) {
-        const data = fs.readFileSync(TOKEN_FILE_PATH, 'utf-8');
+      const tokenPath = this.getTokenFilePath();
+      if (fs.existsSync(tokenPath)) {
+        const data = fs.readFileSync(tokenPath, 'utf-8');
         return JSON.parse(data) as TokenCache;
       }
     } catch (err: any) {
@@ -54,7 +62,7 @@ export class AuthManager {
       if (!fs.existsSync(TOKEN_DIR)) {
         fs.mkdirSync(TOKEN_DIR, { recursive: true });
       }
-      fs.writeFileSync(TOKEN_FILE_PATH, JSON.stringify(cache, null, 2), 'utf-8');
+      fs.writeFileSync(this.getTokenFilePath(), JSON.stringify(cache, null, 2), 'utf-8');
     } catch (err: any) {
       Logger.warn(`Failed to save token to disk: ${err.message}`);
     }
@@ -107,12 +115,13 @@ export class AuthManager {
    * Invalidate the current cached token (e.g. on 401 Unauthorized response)
    */
   public invalidateToken(): void {
-    Logger.warn('Invalidating cached authentication token.');
+    Logger.warn(`Invalidating cached authentication token for role ${this.role}.`);
     this.token = null;
     this.tokenExpiry = 0;
     try {
-      if (fs.existsSync(TOKEN_FILE_PATH)) {
-        fs.unlinkSync(TOKEN_FILE_PATH);
+      const tokenPath = this.getTokenFilePath();
+      if (fs.existsSync(tokenPath)) {
+        fs.unlinkSync(tokenPath);
       }
     } catch (err: any) {
       Logger.warn(`Failed to delete token file: ${err.message}`);
@@ -125,11 +134,12 @@ export class AuthManager {
   private async login(requestContext: APIRequestContext): Promise<string> {
     const url = `${ENV_CONFIG.BASE_URL}/api/auth/login`;
     const payload = {
-      username: ENV_CONFIG.AUTH_USERNAME,
-      password: ENV_CONFIG.AUTH_PASSWORD,
+      username: this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_USERNAME : ENV_CONFIG.AUTH_USERNAME,
+      password: this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_PASSWORD : ENV_CONFIG.AUTH_PASSWORD,
     };
+    console.log("login info:", payload)
 
-    Logger.info(`Logging in to: ${url}`);
+    Logger.info(`Logging in to: ${url} as role: ${this.role}`);
     const startTime = Date.now();
 
     try {

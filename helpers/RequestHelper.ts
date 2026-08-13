@@ -13,9 +13,10 @@ export interface ApiResponse<T = any> {
 }
 
 export class RequestHelper {
-  private authManager = AuthManager.getInstance();
-
-  constructor(private readonly requestContext: APIRequestContext) {}
+  constructor(
+    private readonly requestContext: APIRequestContext,
+    private authManager: AuthManager = AuthManager.getInstance()
+  ) {}
 
   public async get<T = any>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.execute<T>('GET', url, { headers });

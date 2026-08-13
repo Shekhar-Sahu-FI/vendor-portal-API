@@ -59,7 +59,56 @@ export class MasterApi extends BaseApi {
    * Search/Query master records
    * POST /api/<masterName>/search
    */
-  public async search<T = any>(queryPayload: any): Promise<ApiResponse<T>> {
-    return this.post<T>('/search', queryPayload);
+  public async search<T = any>(payload: any): Promise<ApiResponse<T>> {
+    return this.post<T>('/search', payload);
+  }
+
+  /**
+   * Retrieve doctypes by form ID
+   * GET /api/<masterName>/forms/<formId>
+   */
+  public async getDocTypesByFormId<T = any>(formId: string | number): Promise<ApiResponse<T>> {
+    return super.get<T>(`/forms/${formId}`);
+  }
+  /**
+   * Get a master record by specific operation param
+   * GET /api/<masterName>/get?<operationParam>=<value>
+   */
+  public async getByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`/get?${operationParam}=${encodeURIComponent(value)}`);
+  }
+
+  public async searchByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`?${operationParam}=${encodeURIComponent(value)}`);
+  }
+
+  /**
+   * Get/List records with query parameters (GET)
+   * GET /api/<masterName>?<queryParams>
+   */
+  public async list<T = any>(queryParams?: Record<string, any>): Promise<ApiResponse<T>> {
+    const queryString = queryParams ? `?${this.buildQueryString(queryParams)}` : '';
+    return super.get<T>(queryString);
+  }
+
+  private buildQueryString(params: Record<string, any>): string {
+    const parts: string[] = [];
+    const serialize = (obj: any, prefix: string = '') => {
+      if (obj === null || obj === undefined) return;
+      if (typeof obj === 'object') {
+        for (const key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const value = obj[key];
+            const newPrefix = prefix ? `${prefix}.${key}` : key;
+            serialize(value, newPrefix);
+          }
+        }
+      } else {
+        parts.push(`${encodeURIComponent(prefix)}=${encodeURIComponent(String(obj))}`);
+      }
+    };
+    serialize(params);
+    return parts.join('&');
   }
 }
+
