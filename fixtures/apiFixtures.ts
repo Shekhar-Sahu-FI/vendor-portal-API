@@ -59,6 +59,7 @@ export interface ApiFixtures {
   vendorMasterApi: MasterApi;
   expenseHeadApi: MasterApi;
   vendorAttachmentApi: MasterApi;
+  paymentTermsGroupApi: MasterApi;
 
   supplierAuthManager: AuthManager;
   supplierRequestHelper: RequestHelper;
@@ -276,6 +277,7 @@ export const test = base.extend<ApiFixtures>({
   vendorMasterApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorMaster')),
   expenseHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('expenseHead')),
   vendorAttachmentApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorAttachment')),
+  paymentTermsGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('paymentTermsGroup')),
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),

@@ -3758,3 +3758,150 @@ export const documentSeriesData = [
         ]
     }
 ];
+
+export const paymentTermsGroupData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG Standard 100% Adv",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Down Payment",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 0,
+                "remarks": "100% Advance"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG Split 50-50",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Down Payment",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 50,
+                "days": 0,
+                "remarks": "50% Advance"
+            },
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Balance Amount",
+                "payValue": 50,
+                "days": 30,
+                "remarks": "50% after 30 days"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG 30 Days Net",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 30,
+                "remarks": "Net 30"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG 60 Days Net",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 60,
+                "remarks": "Net 60"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG Advance PI",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Down Payment PI",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 0,
+                "remarks": "100% Adv on PI"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG Multi-Installment",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Down Payment",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Basic Amount",
+                "payValue": 30,
+                "days": 0,
+                "remarks": "30% Advance"
+            },
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Balance Amount",
+                "payValue": 30,
+                "days": 30,
+                "remarks": "30% after 30 days"
+            },
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Balance Amount",
+                "payValue": 40,
+                "days": 60,
+                "remarks": "40% after 60 days"
+            }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "paymentTermsGroupName": "PTG Immediate",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 0,
+                "remarks": "Immediate"
+            }
+        ]
+    },
+    {
+        "statusId": 2,
+        "statusRemarks": "Inactive Group",
+        "paymentTermsGroupName": "PTG Inactive",
+        "paymentTermDetails": [
+            {
+                "paymentTypeName": "Against Bill",
+                "baseDateTypeName": "Document Date",
+                "payOnName": "Net Amount",
+                "payValue": 100,
+                "days": 45,
+                "remarks": "Net 45"
+            }
+        ]
+    }
+];
