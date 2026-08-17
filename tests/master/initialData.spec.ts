@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures/apiFixtures';
-import { unitData, groupData, subgroupData, makeData, businessTypeData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData } from './masterData';
+import { unitData, groupData, subgroupData, makeData, businessTypeData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData, paymentTermsGroupData } from './masterData';
 
 
 test.describe('Initial Data Setup', () => {
@@ -392,6 +392,31 @@ test.describe('Initial Data Setup', () => {
                 documentSeriesCompanyDetail,
                 documentSeriesDivisionDetail,
                 documentSeriesDocTypeDetail
+            };
+        });
+    });
+
+    test('should seed Payment Terms Group Master initial data', async ({ paymentTermsGroupApi, workflow, lookup }) => {
+        await workflow.seedInitialData(paymentTermsGroupApi, paymentTermsGroupData, "Payment Terms Group Master", async (payload) => {
+            const paymentTermDetails = [];
+            if (payload.paymentTermDetails) {
+                for (const detail of payload.paymentTermDetails) {
+                    const paymentType = await lookup.getGlobalRecord("paymentType", detail.paymentTypeName);
+                    const baseDateType = await lookup.getGlobalRecord("baseDateType", detail.baseDateTypeName);
+                    const payOn = await lookup.getGlobalRecord("payOn", detail.payOnName);
+                    
+                    const { paymentTypeName, baseDateTypeName, payOnName, ...restDetail } = detail;
+                    paymentTermDetails.push({
+                        ...restDetail,
+                        paymentTypeId: paymentType?.id,
+                        baseDateTypeId: baseDateType?.id,
+                        payOnId: payOn?.id
+                    });
+                }
+            }
+            return {
+                ...payload,
+                paymentTermDetails
             };
         });
     });
