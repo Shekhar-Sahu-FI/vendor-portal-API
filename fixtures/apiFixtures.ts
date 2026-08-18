@@ -15,6 +15,7 @@ export interface ApiFixtures {
   payloadHelper: typeof PayloadHelper;
   transactionPayloadHelper: typeof TransactionPayloadHelper;
   masterApiFactory: (masterName: string) => MasterApi;
+  globalDataApiFactory: (globalDataName: string) => MasterApi;
   unitApi: MasterApi;
   verifyUnit: (retrieved: any, original: any) => void;
   itemApi: MasterApi;
@@ -70,6 +71,10 @@ export interface ApiFixtures {
   supplierBusinessTypeApi: MasterApi;
   supplierPrReasonApi: MasterApi;
   PRApi: MasterApi;
+  POApi: MasterApi;
+  warehouseTypeApi: MasterApi;
+  ownershipApi: MasterApi;
+  warehouseApi: MasterApi;
 
   workflow: typeof ApiWorkflowHelper;
 }
@@ -120,6 +125,12 @@ export const test = base.extend<ApiFixtures>({
   masterApiFactory: async ({ requestHelper }, use) => {
     // Provide a dynamic factory to instantiate generic MasterApi clients on-the-fly
     const factory = (masterName: string) => new MasterApi(requestHelper, masterName);
+    await use(factory);
+  },
+
+  globalDataApiFactory: async ({ requestHelper }, use) => {
+    // Provide a dynamic factory for global data APIs
+    const factory = (globalDataName: string) => new MasterApi(requestHelper, globalDataName);
     await use(factory);
   },
 
@@ -255,6 +266,7 @@ export const test = base.extend<ApiFixtures>({
 
   currencyApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('currency')),
   PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
+  POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
   cSReasonApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('csReason')),
   regionApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('region')),
   tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncHead')),
@@ -278,6 +290,9 @@ export const test = base.extend<ApiFixtures>({
   expenseHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('expenseHead')),
   vendorAttachmentApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorAttachment')),
   paymentTermsGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('paymentTermsGroup')),
+  warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
+  ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
+  warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),

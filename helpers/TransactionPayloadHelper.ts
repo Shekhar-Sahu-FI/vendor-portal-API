@@ -1,4 +1,5 @@
 import { LookupHelper } from './LookupHelper';
+import { DocumentStatus, ExpenditureType, RefDocType } from './globalEnums';
 
 export interface PRItemParam {
   itemName?: string;
@@ -131,7 +132,7 @@ export class TransactionPayloadHelper {
 
     // Return the structured payload matching the exact API requirements
     return {
-      docStatusId: params.docStatusId || 10,
+      docStatusId: params.docStatusId || DocumentStatus.Draft,
       docDate: todayStr,
       docSeriesId: docSeries.id || null,
       docTypeId: docType?.id || 0,
@@ -139,7 +140,7 @@ export class TransactionPayloadHelper {
       companyId: company?.id || 0,
       divisionId: division?.id || 0,
       departmentId: department?.id || 0,
-      expenditureTypeId: params.expenditureTypeId || 1,
+      expenditureTypeId: params.expenditureTypeId || ExpenditureType.Capex,
       refNo: params.refNo || "string",
       refDate: params.refDate || todayStr,
       requestedBy: requestedByUser?.displayName || "string",
@@ -153,7 +154,83 @@ export class TransactionPayloadHelper {
       attachment: [],
       purchaseRequestItemDetail: purchaseRequestItemDetail,
       purchaseRequestInformTo: informTo
+    }
+  }
+  /**
+   * Generates a sample payload for Purchase Order (Direct/Draft)
+   */
+  public static async createPOPayload(lookup: LookupHelper, params: any = {}): Promise<any> {
+    const todayStr = this.formatDateStr(new Date());
+
+    const companyName = params.companyName || "Company One";
+    const divisionName = params.divisionName || "Division One Company One Two Three";
+    const docTypeName = params.docTypeName || "PO - Standard - Division One Company One Two Three";
+    const docSeriesPtn = params.docSeries || 'PO-{{YYYY}}-{{MM}}-{{N}}';
+
+    const company = await lookup.searchRecord("company", "CompanyName.Contains", companyName);
+    const division = await lookup.searchRecord("division", "divisionName.Contains", divisionName);
+    const docSeries = await lookup.searchRecord("docSeries", "Pattern.Contains", docSeriesPtn);
+    const docType = await lookup.searchRecord("docType", "DocTypeName.Contains", docTypeName);
+
+    const vendorLocationId = params.vendorLocationId || 0; // Ideally fetch via lookup if needed
+    const fromLocationId = params.fromLocationId || 0;
+    const toLocationId = params.toLocationId || 0;
+
+    return {
+      displayDocNoYearly: params.displayDocNoYearly || "string",
+      docNoYearly: params.docNoYearly || "",
+      docSeriesId: docSeries?.id || 0,
+      erpSerialNoId: params.erpSerialNoId || null,
+      docDate: todayStr,
+      docStatusId: params.docStatusId || DocumentStatus.Draft, // Draft
+      amendmentNo: params.amendmentNo || 0,
+      amendmentDate: params.amendmentDate || todayStr,
+      mainPoId: params.mainPoId || null,
+      amendmentReason: params.amendmentReason || "string",
+      companyId: company?.id || 0,
+      divisionId: division?.id || 0,
+      docTypeId: docType?.id || 0,
+      expenditureTypeId: params.expenditureTypeId || ExpenditureType.Opex, // Revenue/Opex by default
+      refDocTypeId: params.refDocTypeId || RefDocType.DirectPO, // Direct PO enum
+      quotationId: params.quotationId || null,
+      vendorLocationId: vendorLocationId,
+      contactPersonId: params.contactPersonId || null,
+      validityDate: params.validityDate || todayStr,
+      departmentId: params.departmentId || null,
+      partyRefNo: params.partyRefNo || "string",
+      partyRefDate: params.partyRefDate || todayStr,
+      vehicleTypeId: params.vehicleTypeId || null,
+      paymentModeId: params.paymentModeId || null,
+      dueBasisId: params.dueBasisId || null,
+      dueDays: params.dueDays || 0,
+      freightTypeId: params.freightTypeId || null,
+      freightRateTypeId: params.freightRateTypeId || null,
+      freightAmount: params.freightAmount || 0,
+      priorityId: params.priorityId || null,
+      fromLocationId: fromLocationId,
+      toLocationId: toLocationId,
+      consigneeLocationId: params.consigneeLocationId || null,
+      isRouteApplicable: params.isRouteApplicable ?? false,
+      isManuallyClosing: params.isManuallyClosing ?? false,
+      currencyId: params.currencyId || 0,
+      exchangeRate: params.exchangeRate || 1,
+      basicAmount: params.basicAmount || 0,
+      netAmount: params.netAmount || 0,
+      taxAmount: params.taxAmount || 0,
+      tncGroupId: params.tncGroupId || null,
+      paymentTermsGroupId: params.paymentTermsGroupId || null,
+      expenseGroupId: params.expenseGroupId || null,
+      transportationRouteLevelId: params.transportationRouteLevelId || null,
+      approvalSetupId: params.approvalSetupId || null,
+      remarks: params.remarks || "string",
+      noOfTrips: params.noOfTrips || null,
+      attachment: params.attachment || [],
+      taxDetails: params.taxDetails || [],
+      itemDetail: params.itemDetail || [],
+      termsNConditionDetails: params.termsNConditionDetails || [],
+      transportationRoute: params.transportationRoute || [],
+      paymentTerms: params.paymentTerms || [],
+      expenseDetail: params.expenseDetail || []
     };
   }
-
 }
