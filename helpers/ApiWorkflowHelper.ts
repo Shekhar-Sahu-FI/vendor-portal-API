@@ -45,17 +45,41 @@ export class ApiWorkflowHelper {
       expect(createdId, "Expect created ID to be defined.").toBeDefined();
     });
 
-    await test.step('Update Record', async () => {
-      const updateResponse = await api.update(createdId, updatePayload);
-      await expectUpdated(updateResponse);
-      expect(updateResponse.body.success, "Expect response status to be true.").toBe(true);
+    let getResponse: any;
+    await test.step('Get Record for Update', async () => {
+      getResponse = await api.getById(createdId);
+      await expectSuccess(getResponse);
     });
 
-    await test.step('Delete Record', async () => {
-      const deleteResponse = await api.deleteRecord(createdId);
-      await expectDeleted(deleteResponse);
-      expect(deleteResponse.body.success, "Expect response status to be true.").toBe(true);
-    });
+    const finalUpdatePayload = {
+      ...updatePayload,
+      lastModifiedDateTime: getResponse.body.data?.modifiedDate || getResponse.body.data?.lastModifiedDateTime || getResponse.body.data?.lastModifiedDate || getResponse.body.modifiedDate,
+      lastModifiedDate: getResponse.body.data?.modifiedDate || getResponse.body.data?.lastModifiedDate || getResponse.body.modifiedDate,
+      id: createdId
+    };
+
+    let updateError: any;
+    try {
+      await test.step('Update Record', async () => {
+        const updateResponse = await api.update(createdId, finalUpdatePayload);
+        await expectUpdated(updateResponse);
+        expect(updateResponse.body.success, "Expect response status to be true.").toBe(true);
+      });
+    } catch (error) {
+      updateError = error;
+    }
+
+    if (createdId) {
+      await test.step('Delete Record', async () => {
+        const deleteResponse = await api.deleteRecord(createdId);
+        await expectDeleted(deleteResponse);
+        expect(deleteResponse.body.success, "Expect response status to be true.").toBe(true);
+      });
+    }
+
+    if (updateError) {
+      throw updateError;
+    }
 
     return saveResponse;
   }

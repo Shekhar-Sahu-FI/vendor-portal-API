@@ -1,3 +1,5 @@
+import { Status, WarehouseType } from './globalEnums';
+
 export interface UnitPayload {
   unitName: string;
   alias: string;
@@ -54,11 +56,11 @@ export class PayloadHelper {
   public static unit(overrides?: Partial<UnitPayload>): UnitPayload {
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
-    
+
     const defaults: UnitPayload = {
       unitName: `Unit_${timestamp}_${randomSuffix}`,
       alias: `U_${randomSuffix}`,
-      statusId: 1,
+      statusId: Status.Active,
       description: 'Standard system measurement unit',
     };
 
@@ -79,7 +81,7 @@ export class PayloadHelper {
       categoryId: 1, // Default fallback ID
       subgroupId: 1, // Default fallback ID
       price: 150.50,
-      statusId: 1,
+      statusId: Status.Active,
     };
 
     return this.merge<ItemPayload>(defaults, overrides);
@@ -98,9 +100,35 @@ export class PayloadHelper {
       businessTypeId: 1, // Default fallback ID
       countryId: 1, // Default fallback ID
       email: `contact@vendor-${randomSuffix.toLowerCase()}.com`,
-      statusId: 1,
+      statusId: Status.Active,
     };
 
     return this.merge<VendorPayload>(defaults, overrides);
+  }
+  /**
+   * Generate Warehouse Master Payload requiring Type, Ownership, and Address links.
+   */
+  public static warehouse(overrides?: Partial<any>): any {
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+    const defaults: any = {
+      statusId: Status.Active,
+      statusRemarks: '',
+      warehouseName: `WH_${timestamp}_${randomSuffix}`,
+      locationId: 1, // Default fallback
+      typeId: WarehouseType.InHouse, // Default to In-house
+      ownershipId: null, // Ownership optional for In-house
+      partyId: null,
+      address1: `Line 1 ${randomSuffix}`,
+      address2: `Line 2 ${randomSuffix}`,
+      address3: `Line 3 ${randomSuffix}`,
+      pincode: `123456`,
+      cityId: 1,
+      stateId: 1,
+      countryId: 1
+    };
+
+    return this.merge<any>(defaults, overrides);
   }
 }

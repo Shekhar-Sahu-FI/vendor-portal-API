@@ -2,6 +2,12 @@ import { test, expect } from '../../../fixtures/apiFixtures';
 import { expectValidation, expectValidationMessage } from '../../../helpers/ValidationHelper';
 
 test.describe('Unit Master API Tests', () => {
+
+  test.afterEach(async () => {
+    // Add a few seconds delay after every test for the unit master
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  });
+
   test('should successfully save and delete a unit', async ({ unitApi, workflow }) => {
     const payload = {
       unitName: "qweqwe",
