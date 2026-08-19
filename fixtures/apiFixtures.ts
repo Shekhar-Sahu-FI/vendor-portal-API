@@ -40,15 +40,18 @@ export interface ApiFixtures {
   currencyApi: MasterApi;
   cSReasonApi: MasterApi;
   regionApi: MasterApi;
+  verifyRegion: (retrieved: any, original: any) => void;
   tNCHeadApi: MasterApi;
   tNCGroupApi: MasterApi;
   vendorCategoryApi: MasterApi;
+  verifyVendorCategory: (retrieved: any, original: any) => void;
   priorityApi: MasterApi;
   verifyPriority: (retrieved: any, original: any) => void;
   countryApi: MasterApi;
   stateApi: MasterApi;
   cityApi: MasterApi;
   locationApi: MasterApi;
+  verifyLocation: (retrieved: any, original: any) => void;
   companyApi: MasterApi;
   companyLocationApi: MasterApi;
   divisionApi: MasterApi;
@@ -225,7 +228,7 @@ export const test = base.extend<ApiFixtures>({
     const verifyFn = (retrieved: any, original: any) => {
       const data = retrieved.data || retrieved;
       expect(data.categoryName, "Expect categoryName to match.").toBe(original.categoryName);
-      expect(data.statusId, "Expect statusId to match.").toBe(original.statusId);
+      expect(data.status.id, "Expect statusId to match.").toBe(original.statusId);
     };
     await use(verifyFn);
   },
@@ -235,7 +238,7 @@ export const test = base.extend<ApiFixtures>({
     const verifyFn = (retrieved: any, original: any) => {
       const data = retrieved.data || retrieved;
       expect(data.reasonName, "Expect reasonName to match.").toBe(original.reasonName);
-      expect(data.statusId, "Expect statusId to match.").toBe(original.statusId);
+      expect(data.status.id, "Expect statusId to match.").toBe(original.statusId);
     };
     await use(verifyFn);
   },
@@ -249,7 +252,7 @@ export const test = base.extend<ApiFixtures>({
     const verifyFn = (retrieved: any, original: any) => {
       const data = retrieved.data || retrieved;
       expect(data.businessTypeName, "Expect businessTypeName to match.").toBe(original.businessTypeName);
-      expect(data.statusId, "Expect statusId to match.").toBe(original.statusId);
+      expect(data.status.id, "Expect statusId to match.").toBe(original.statusId);
     };
     await use(verifyFn);
   },
@@ -260,7 +263,7 @@ export const test = base.extend<ApiFixtures>({
       const data = retrieved.data || retrieved;
       expect(data.reasonName, "Expect reasonName to match.").toBe(original.reasonName);
       expect(data.reasonTypeId, "Expect reasonTypeId to match.").toBe(original.reasonTypeId);
-      expect(data.statusId, "Expect statusId to match.").toBe(original.statusId);
+      expect(data.status.id, "Expect statusId to match.").toBe(original.statusId);
     };
     await use(verifyFn);
   },
@@ -270,9 +273,25 @@ export const test = base.extend<ApiFixtures>({
   POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
   cSReasonApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('csReason')),
   regionApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('region')),
+  verifyRegion: async ({ }, use) => {
+    const verifyFn = (retrieved: any, original: any) => {
+      const data = retrieved.data || retrieved;
+      expect(data.regionName, "Expect regionName to match.").toBe(original.regionName);
+      expect(data.status.id || data.status?.id, "Expect statusId to match.").toBe(original.statusId);
+    };
+    await use(verifyFn);
+  },
   tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncHead')),
   tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncGroup')),
   vendorCategoryApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorCategory')),
+  verifyVendorCategory: async ({ }, use) => {
+    const verifyFn = (retrieved: any, original: any) => {
+      const data = retrieved.data || retrieved;
+      expect(data.vendorCategoryName, "Expect vendorCategoryName to match.").toBe(original.vendorCategoryName);
+      expect(data.status.id || data.statusId, "Expect statusId to match.").toBe(original.statusId);
+    };
+    await use(verifyFn);
+  },
   priorityApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('priority')),
   verifyPriority: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -286,6 +305,15 @@ export const test = base.extend<ApiFixtures>({
   stateApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('state')),
   cityApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('city')),
   locationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('location')),
+  verifyLocation: async ({ }, use) => {
+    const verifyFn = (retrieved: any, original: any) => {
+      const data = retrieved.data || retrieved;
+      expect(data.locationName, "Expect locationName to match.").toBe(original.locationName);
+      expect(data.alias, "Expect alias to match.").toBe(original.alias);
+      expect(data.status.id || data.statusId, "Expect statusId to match.").toBe(original.statusId);
+    };
+    await use(verifyFn);
+  },
   companyApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('company')),
   companyLocationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('companyLocation')),
   divisionApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('division')),

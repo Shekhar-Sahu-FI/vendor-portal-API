@@ -4,7 +4,7 @@ import { expectValidation } from '../../../helpers/ValidationHelper';
 test.describe('Make Master - Save Scenarios', () => {
 
     test('MM_SAVE_001: Save make with valid mandatory fields', async ({ makeApi, workflow, verifyMake }) => {
-        const payload = { makeName: 'Sony', alias: 'SNY', statusId: 1 };
+        const payload = { makeName: 'Soni', alias: 'SoNi', statusId: 1 };
         await workflow.saveGetByIdAndDelete(makeApi, payload, verifyMake);
     });
 
@@ -40,7 +40,7 @@ test.describe('Make Master - Save Scenarios', () => {
 
         const payload2 = { makeName: 'Make One', alias: 'DUP2', statusId: 1 };
         const res2 = await makeApi.save(payload2);
-        
+
         await expectValidation(res2, []);
 
         if (id1) await makeApi.deleteRecord(id1);
@@ -53,7 +53,7 @@ test.describe('Make Master - Save Scenarios', () => {
 
         const payload2 = { makeName: 'Make B', alias: 'MONE', statusId: 1 };
         const res2 = await makeApi.save(payload2);
-        
+
         await expectValidation(res2, []);
 
         if (id1) await makeApi.deleteRecord(id1);
@@ -97,7 +97,7 @@ test.describe('Make Master - Save Scenarios', () => {
     test('MM_SAVE_015: Verify response contains generated ID and Code', async ({ makeApi, workflow, verifyMake }) => {
         const payload = { makeName: 'Gen ID Make', alias: 'GID', statusId: 1 };
         const response = await workflow.saveGetByIdAndDelete(makeApi, payload, verifyMake);
-        
+
         // Assert response object has expected output format for save
         expect(response.body.data).toBeDefined();
         if (Array.isArray(response.body.data)) {
@@ -160,7 +160,7 @@ test.describe('Make Master - Save Scenarios', () => {
 
         const payload2 = { makeName: 'make case', alias: 'MC2', statusId: 1 };
         const res2 = await makeApi.save(payload2);
-        
+
         await expectValidation(res2, []);
 
         if (id1) await makeApi.deleteRecord(id1);
@@ -173,7 +173,7 @@ test.describe('Make Master - Save Scenarios', () => {
 
         const payload2 = { makeName: 'Case Make 2', alias: 'ali', statusId: 1 };
         const res2 = await makeApi.save(payload2);
-        
+
         await expectValidation(res2, []);
 
         if (id1) await makeApi.deleteRecord(id1);
