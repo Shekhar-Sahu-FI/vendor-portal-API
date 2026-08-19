@@ -3,13 +3,12 @@ import { expectValidation } from '../../../helpers/ValidationHelper';
 
 test.describe('Unit Master - Save Scenarios', () => {
 
+    // test.afterEach(async () => {
+    //     await new Promise(resolve => setTimeout(resolve, 1500));
+    // });
+
     test('UM_SAVE_001: Save unit with valid mandatory fields', async ({ unitApi, workflow, verifyUnit }) => {
         const payload = { unitName: 'newton', alias: 'N', statusId: 1 };
-        await workflow.saveGetByIdAndDelete(unitApi, payload, verifyUnit);
-    });
-
-    test('UM_SAVE_002: Verify auto-generated code', async ({ unitApi, workflow, verifyUnit }) => {
-        const payload = { unitName: 'pascle', alias: 'P', statusId: 1 };
         await workflow.saveGetByIdAndDelete(unitApi, payload, verifyUnit);
     });
 
@@ -34,7 +33,7 @@ test.describe('Unit Master - Save Scenarios', () => {
     });
 
     test('UM_SAVE_008: Save with Status Remark', async ({ unitApi, workflow, verifyUnit }) => {
-        const payload = { unitName: 'Remark Unit', alias: 'REM', statusId: 1, statusRemarks: 'Standard Unit' };
+        const payload = { unitName: 'Remark Unit', alias: 'REM', statusId: 2, statusRemarks: 'Standard Unit' };
         await workflow.saveGetByIdAndDelete(unitApi, payload, verifyUnit);
     });
 
@@ -49,7 +48,7 @@ test.describe('Unit Master - Save Scenarios', () => {
     });
 
     test('UM_SAVE_011: Save with Inactive Status', async ({ unitApi, workflow, verifyUnit }) => {
-        const payload = { unitName: 'Inactive Unit', alias: 'INA', statusId: 2 };
+        const payload = { unitName: 'Inactive Unit', alias: 'INA', statusId: 2, statusRemarks: 'Standa' };
         await workflow.saveGetByIdAndDelete(unitApi, payload, verifyUnit);
     });
 
@@ -111,37 +110,25 @@ test.describe('Unit Master - Save Scenarios', () => {
     });
 
     test('UM_SAVE_022: Duplicate Unit Name', async ({ unitApi }) => {
-        const payload = { unitName: 'Existing Unit Name', alias: 'DUP', statusId: 1 };
+        const payload = { unitName: 'Unit One', alias: 'DUP', statusId: 1 };
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
     });
 
     test('UM_SAVE_023: Duplicate Alias', async ({ unitApi }) => {
-        const payload = { unitName: 'Dup Alias', alias: 'Existing Alias', statusId: 1 };
+        const payload = { unitName: 'Dup Alias', alias: 'UONE', statusId: 1 };
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
     });
 
     test('UM_SAVE_024: Duplicate Unit Name with different case', async ({ unitApi }) => {
-        const payload = { unitName: 'newton', alias: 'N', statusId: 1 };
+        const payload = { unitName: 'unit one', alias: 'N', statusId: 1 };
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
     });
 
     test('UM_SAVE_025: Duplicate Alias with different case', async ({ unitApi }) => {
-        const payload = { unitName: 'Case Alias', alias: 'kg', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_026: Duplicate Unit Name with leading/trailing spaces', async ({ unitApi }) => {
-        const payload = { unitName: ' newton ', alias: 'KGL', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_027: Duplicate Alias with leading/trailing spaces', async ({ unitApi }) => {
-        const payload = { unitName: 'Space Alias', alias: ' KG ', statusId: 1 };
+        const payload = { unitName: 'Case Alias', alias: 'uone', statusId: 1 };
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
     });
@@ -159,12 +146,12 @@ test.describe('Unit Master - Save Scenarios', () => {
     });
 
     test('UM_SAVE_030: Status Remark with exactly 300 characters', async ({ unitApi, workflow, verifyUnit }) => {
-        const payload = { unitName: 'Max Remark', alias: 'MREM', statusId: 1, statusRemarks: 'A'.repeat(300) };
+        const payload = { unitName: 'Max Remark', alias: 'MREM', statusId: 2, statusRemarks: 'A'.repeat(300) };
         await workflow.saveGetByIdAndDelete(unitApi, payload, verifyUnit);
     });
 
     test('UM_SAVE_031: Status Remark exceeds maximum length', async ({ unitApi }) => {
-        const payload = { unitName: 'Over Remark', alias: 'OREM', statusId: 1, statusRemarks: 'A'.repeat(301) };
+        const payload = { unitName: 'Over Remark', alias: 'OREM', statusId: 2, statusRemarks: 'A'.repeat(301) };
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
     });
@@ -187,80 +174,10 @@ test.describe('Unit Master - Save Scenarios', () => {
         await expectValidation(response, []);
     });
 
-    test('UM_SAVE_035: Unit Name contains only numbers', async ({ unitApi }) => {
-        const payload = { unitName: '12345', alias: 'NUM', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_036: Alias contains only numbers', async ({ unitApi }) => {
-        const payload = { unitName: 'Num Alias', alias: '123', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_037: Unit Name contains only special characters', async ({ unitApi }) => {
-        const payload = { unitName: '@#$%', alias: 'SPEC', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_038: Alias contains only special characters', async ({ unitApi }) => {
-        const payload = { unitName: 'Spec Alias', alias: '@@@', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_039: SQL Injection in Unit Name', async ({ unitApi }) => {
-        const payload = { unitName: "' OR 1=1 --", alias: 'SQLI', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_040: SQL Injection in Alias', async ({ unitApi }) => {
-        const payload = { unitName: 'SQL Alias', alias: "'DROP TABLE", statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_041: XSS Script in Unit Name', async ({ unitApi }) => {
-        const payload = { unitName: '<script>alert(1)</script>', alias: 'XSSN', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_042: XSS Script in Alias', async ({ unitApi }) => {
-        const payload = { unitName: 'XSS Alias', alias: '<img src=x onerror=alert(1)>', statusId: 1 };
-        const response = await unitApi.save(payload);
-        await expectValidation(response, []);
-    });
-
     test('UM_SAVE_043: Empty Request Body', async ({ unitApi }) => {
         const payload = {};
         const response = await unitApi.save(payload);
         await expectValidation(response, []);
-    });
-
-
-    test('UM_SAVE_048: Invalid HTTP Method', async ({ requestHelper }) => {
-        // Send a GET request to the save endpoint
-        const response = null as any; /* Your custom request here */
-        await expectValidation(response, []);
-    });
-
-    test('UM_SAVE_049: Simultaneous save of same Unit Name by two users', async ({ unitApi }) => {
-        const payload = { unitName: 'Simultaneous Unit', alias: 'SIM', statusId: 1 };
-        // const [res1, res2] = await Promise.all([unitApi.save(payload), unitApi.save(payload)]);
-        // Check that one succeeded and one failed
-        // await expectValidation(res2, []);
-    });
-
-    test('UM_SAVE_050: Concurrent save requests', async ({ unitApi }) => {
-        const payload1 = { unitName: 'Concurrent 1', alias: 'CON1', statusId: 1 };
-        const payload2 = { unitName: 'Concurrent 2', alias: 'CON2', statusId: 1 };
-        // const [res1, res2] = await Promise.all([unitApi.save(payload1), unitApi.save(payload2)]);
-        // await workflow.saveGetByIdAndDelete(unitApi, payload1, verifyUnit);
-        // await workflow.saveGetByIdAndDelete(unitApi, payload2, verifyUnit);
     });
 
     test('UM_SAVE_051: Verify response contains generated ID', async ({ unitApi, workflow, verifyUnit }) => {

@@ -16,7 +16,7 @@ export class RequestHelper {
   constructor(
     private readonly requestContext: APIRequestContext,
     private authManager: AuthManager = AuthManager.getInstance()
-  ) {}
+  ) { }
 
   public async get<T = any>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.execute<T>('GET', url, { headers });
@@ -137,6 +137,9 @@ export class RequestHelper {
         }
       }
 
+      // Wait for 1.5 seconds after every API call to prevent rate limiting or DB issues
+      // await new Promise(resolve => setTimeout(resolve, 500));
+
       return {
         ok: response.ok(),
         status: status,
@@ -150,6 +153,9 @@ export class RequestHelper {
     } catch (error: any) {
       const durationMs = Date.now() - startTime;
       Logger.error(`Request execution exception on ${method} ${url}: ${error.message}`, error);
+
+      // Wait for 1.5 seconds after every API call to prevent rate limiting or DB issues
+      // await new Promise(resolve => setTimeout(resolve, 500));
 
       return {
         ok: false,
