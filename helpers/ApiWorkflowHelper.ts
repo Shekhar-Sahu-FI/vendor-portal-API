@@ -53,7 +53,8 @@ export class ApiWorkflowHelper {
 
     const finalUpdatePayload = {
       ...updatePayload,
-      lastModifiedDateTime: getResponse.body.data?.modifiedDate || getResponse.body.data?.lastModifiedDateTime || getResponse.body.modifiedDate,
+      lastModifiedDateTime: getResponse.body.data?.modifiedDate || getResponse.body.data?.lastModifiedDateTime || getResponse.body.data?.lastModifiedDate || getResponse.body.modifiedDate,
+      lastModifiedDate: getResponse.body.data?.modifiedDate || getResponse.body.data?.lastModifiedDate || getResponse.body.modifiedDate,
       id: createdId
     };
 

@@ -44,6 +44,7 @@ export interface ApiFixtures {
   tNCGroupApi: MasterApi;
   vendorCategoryApi: MasterApi;
   priorityApi: MasterApi;
+  verifyPriority: (retrieved: any, original: any) => void;
   countryApi: MasterApi;
   stateApi: MasterApi;
   cityApi: MasterApi;
@@ -273,6 +274,14 @@ export const test = base.extend<ApiFixtures>({
   tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncGroup')),
   vendorCategoryApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorCategory')),
   priorityApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('priority')),
+  verifyPriority: async ({ }, use) => {
+    const verifyFn = (retrieved: any, original: any) => {
+      const data = retrieved.data || retrieved;
+      expect(data.priorityName, "Expect priorityName to match.").toBe(original.priorityName);
+      expect(data.status.id, "Expect statusId to match.").toBe(original.statusId);
+    };
+    await use(verifyFn);
+  },
   countryApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('country')),
   stateApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('state')),
   cityApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('city')),
