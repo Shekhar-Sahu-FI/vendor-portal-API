@@ -1928,32 +1928,32 @@ export const companyData = [
         "companyName": "Company One",
         "headOfficeId": null,
         "alias": "CONE",
-        "address1": "Plot 21 Industrial Area",
-        "address2": "Sector 5",
-        "address3": "Near Steel Plant",
+        "address1": "Plot 45 Textile Park",
+        "address2": "Zone C",
+        "address3": "Behind Grain Market",
         "cityName": "Raipur",
         "stateName": "Chhattisgarh",
         "countryName": "India",
-        "pincode": "492001",
-        "email": "info@shaktiindustrial.com",
-        "website": "www.shaktiindustrial.com",
-        "panNo": "AABCS1234K",
-        "cinNo": "U27100CT2020GTC123456",
-        "gstinNo": "22AABCS1234K1Z5",
-        "printingName": "Company One",
-        "corporateOfficeAddress": "Raipur, Chhattisgarh",
+        "pincode": "495001",
+        "email": "contact@vishalfabtech.com",
+        "website": "www.vishalfabtech.com",
+        "panNo": "AAECV4321L",
+        "cinNo": "U17119CT2019PTC098765",
+        "gstinNo": "22AAECV4321L1Z9",
+        "printingName": "Vishal FabTech",
+        "corporateOfficeAddress": "Bilaspur, Chhattisgarh",
         "corporateOfficeContactNo": null,
         "corporateOfficeContactNoCountryId": null,
-        "corporateOfficeEmail": "corp@shaktiindustrial.com",
-        "regdOfficeAddress": "Raipur, Chhattisgarh",
+        "corporateOfficeEmail": "office@vishalfabtech.com",
+        "regdOfficeAddress": "Bilaspur, Chhattisgarh",
         "regdOfficeContactNo": null,
         "regdOfficeContactNoCountryId": null,
-        "regdOfficeEmail": "regd@shaktiindustrial.com",
+        "regdOfficeEmail": "registered@vishalfabtech.com",
         "dbMasterId": null,
         "timeZonesId": 1,
-        "erpCompanyUniqueId": "ERP001",
-        "tallyCompanyName": "Shakti Industrial Solutions Pvt Ltd",
-        "tallyGodownName": "Main Godown"
+        "erpCompanyUniqueId": "ERP101",
+        "tallyCompanyName": "Vishal FabTech Pvt Ltd",
+        "tallyGodownName": "North Store"
     },
     {
         "statusId": 1,
@@ -1961,32 +1961,32 @@ export const companyData = [
         "companyName": "Company Two",
         "headOfficeId": null,
         "alias": "CTWO",
-        "address1": "MIDC Industrial Estate",
-        "address2": "Andheri East",
-        "address3": "",
+        "address1": "Sipcot Industrial Complex",
+        "address2": "Perambalur Road",
+        "address3": "Block D",
         "cityName": "Mumbai",
         "stateName": "Maharashtra",
         "countryName": "India",
-        "pincode": "400093",
-        "email": "info@metroengg.com",
-        "website": "www.metroengg.com",
-        "panNo": "AACCM5678P",
-        "cinNo": "U28999MH2018PTC854321",
-        "gstinNo": "27AACCM5678P1Z3",
-        "printingName": "Metro Engineering Works",
-        "corporateOfficeAddress": "Mumbai, Maharashtra",
+        "pincode": "641004",
+        "email": "hello@ashwinturbines.com",
+        "website": "www.ashwinturbines.com",
+        "panNo": "AAGCA8765Q",
+        "cinNo": "U29290TN2016PTC456789",
+        "gstinNo": "33AAGCA8765Q1Z2",
+        "printingName": "Ashwin Turbine Components",
+        "corporateOfficeAddress": "Coimbatore, Tamil Nadu",
         "corporateOfficeContactNo": null,
         "corporateOfficeContactNoCountryId": null,
-        "corporateOfficeEmail": "corp@metroengg.com",
-        "regdOfficeAddress": "Mumbai, Maharashtra",
+        "corporateOfficeEmail": "corporate@ashwinturbines.com",
+        "regdOfficeAddress": "Coimbatore, Tamil Nadu",
         "regdOfficeContactNo": null,
         "regdOfficeContactNoCountryId": null,
-        "regdOfficeEmail": "regd@metroengg.com",
+        "regdOfficeEmail": "registered@ashwinturbines.com",
         "dbMasterId": null,
         "timeZonesId": 1,
-        "erpCompanyUniqueId": "ERP002",
-        "tallyCompanyName": "Metro Engineering Works Pvt Ltd",
-        "tallyGodownName": "Central Warehouse"
+        "erpCompanyUniqueId": "ERP102",
+        "tallyCompanyName": "Ashwin Turbine Components Pvt Ltd",
+        "tallyGodownName": "South Depot"
     },
     {
         "statusId": 1,
@@ -1994,67 +1994,67 @@ export const companyData = [
         "companyName": "Company Three",
         "headOfficeId": null,
         "alias": "CTHR",
-        "address1": "GIDC Estate",
-        "address2": "Ankleshwar",
-        "address3": "",
+        "address1": "Growth Centre Phase 2",
+        "address2": "Kandla Road",
+        "address3": "Unit 7",
         "cityName": "Raipur",
         "stateName": "Chhattisgarh",
         "countryName": "India",
-        "pincode": "393002",
-        "email": "info@bharatpetrochem.com",
-        "website": "www.bharatpetrochem.com",
-        "panNo": "AADCB9876R",
-        "cinNo": "U24110GJ2015PLC787123",
-        "gstinNo": "24AADCB9876R1Z8",
-        "printingName": "Bharat Petro Chemicals",
-        "corporateOfficeAddress": "Ankleshwar, Gujarat",
+        "pincode": "370001",
+        "email": "info@nirmalpolymers.com",
+        "website": "www.nirmalpolymers.com",
+        "panNo": "AAHCN3210M",
+        "cinNo": "U25200GJ2014PLC321098",
+        "gstinNo": "24AAHCN3210M1Z6",
+        "printingName": "Nirmal Polymers Ltd",
+        "corporateOfficeAddress": "Bhuj, Gujarat",
         "corporateOfficeContactNo": null,
         "corporateOfficeContactNoCountryId": null,
-        "corporateOfficeEmail": "corp@bharatpetrochem.com",
-        "regdOfficeAddress": "Ankleshwar, Gujarat",
+        "corporateOfficeEmail": "corp.office@nirmalpolymers.com",
+        "regdOfficeAddress": "Bhuj, Gujarat",
         "regdOfficeContactNo": null,
         "regdOfficeContactNoCountryId": null,
-        "regdOfficeEmail": "regd@bharatpetrochem.com",
+        "regdOfficeEmail": "regd.office@nirmalpolymers.com",
         "dbMasterId": null,
         "timeZonesId": 1,
-        "erpCompanyUniqueId": "ERP003",
-        "tallyCompanyName": "Bharat Petro Chemicals Ltd",
-        "tallyGodownName": "Chemical Warehouse"
+        "erpCompanyUniqueId": "ERP103",
+        "tallyCompanyName": "Nirmal Polymers Limited",
+        "tallyGodownName": "Coastal Warehouse"
     },
     {
         "statusId": 2,
         "statusRemarks": "inactive company",
-        "companyName": "inactive",
+        "companyName": "Company Four",
         "headOfficeId": null,
-        "alias": "ETE",
-        "address1": "Industriestrasse 15",
-        "address2": "Munich",
-        "address3": "Bavaria",
-        "cityName": "San Francisco",
-        "stateName": "California",
-        "countryName": "United States",
-        "pincode": "80331",
-        "email": "info@eurotech.de",
-        "website": "www.eurotech.de",
+        "alias": "CFOR",
+        "address1": "Hafenstrasse 22",
+        "address2": "Hamburg",
+        "address3": "Nord District",
+        "cityName": "Raipur",
+        "stateName": "Chhattisgarh",
+        "countryName": "India",
+        "pincode": "370001",
+        "email": "kontakt@nordwelltech.de",
+        "website": "www.nordwelltech.de",
         "panNo": "",
         "cinNo": "",
         "gstinNo": "",
-        "printingName": "EuroTech Engineering GmbH",
-        "corporateOfficeAddress": "Munich, Germany",
+        "printingName": "Nordwell Technik GmbH",
+        "corporateOfficeAddress": "Hamburg, Germany",
         "corporateOfficeContactNo": null,
         "corporateOfficeContactNoCountryId": null,
-        "corporateOfficeEmail": "corp@eurotech.de",
-        "regdOfficeAddress": "Munich, Germany",
+        "corporateOfficeEmail": "corporate@nordwelltech.de",
+        "regdOfficeAddress": "Hamburg, Germany",
         "regdOfficeContactNo": null,
         "regdOfficeContactNoCountryId": null,
-        "regdOfficeEmail": "regd@eurotech.de",
+        "regdOfficeEmail": "registered@nordwelltech.de",
         "dbMasterId": null,
         "timeZonesId": 1,
-        "erpCompanyUniqueId": "ERP005",
-        "tallyCompanyName": "EuroTech Engineering GmbH",
-        "tallyGodownName": "EU Warehouse"
+        "erpCompanyUniqueId": "ERP104",
+        "tallyCompanyName": "Nordwell Technik GmbH",
+        "tallyGodownName": "Overseas Warehouse"
     }
-];
+]
 
 export const companyLocationData = [
     {
@@ -2068,8 +2068,8 @@ export const companyLocationData = [
         "stateName": "Chhattisgarh",
         "countryName": "India",
         "pincode": "492001",
-        "contactNo": "9876543211",
-        "contactNoCountryId": 91,
+        "contactNo": "+919876543211",
+        "contactNoCountryId": 1,
         "isDefault": true,
         "erpLocationUniqueId1": "SISLOC001",
         "erpLocationUniqueId2": "SISPLANT01"
@@ -2085,8 +2085,8 @@ export const companyLocationData = [
         "stateName": "Chhattisgarh",
         "countryName": "India",
         "pincode": "492099",
-        "contactNo": "9876543212",
-        "contactNoCountryId": 91,
+        "contactNo": "+919871543211",
+        "contactNoCountryId": 1,
         "isDefault": false,
         "erpLocationUniqueId1": "SISLOC002",
         "erpLocationUniqueId2": "SISWH01"
@@ -2102,8 +2102,8 @@ export const companyLocationData = [
         "stateName": "Maharashtra",
         "countryName": "India",
         "pincode": "400093",
-        "contactNo": "9988776656",
-        "contactNoCountryId": 91,
+        "contactNo": "+919876543211",
+        "contactNoCountryId": 1,
         "isDefault": true,
         "erpLocationUniqueId1": "MEWLOC001",
         "erpLocationUniqueId2": "MEWHO01"
@@ -2115,12 +2115,12 @@ export const companyLocationData = [
         "address1": "Plot 48",
         "address2": "Pimpri MIDC",
         "address3": "",
-        "cityName": "Pune",
+        "cityName": "Mumbai",
         "stateName": "Maharashtra",
         "countryName": "India",
         "pincode": "411018",
-        "contactNo": "9988776657",
-        "contactNoCountryId": 91,
+        "contactNo": "+919876443211",
+        "contactNoCountryId": 1,
         "isDefault": false,
         "erpLocationUniqueId1": "MEWLOC002",
         "erpLocationUniqueId2": "MEWPUNE01"
@@ -2132,12 +2132,12 @@ export const companyLocationData = [
         "address1": "GIDC Estate",
         "address2": "Phase I",
         "address3": "",
-        "cityName": "Pune",
+        "cityName": "Mumbai",
         "stateName": "Maharashtra",
         "countryName": "India",
         "pincode": "380001",
-        "contactNo": "9123456781",
-        "contactNoCountryId": 91,
+        "contactNo": "+919876523211",
+        "contactNoCountryId": 1,
         "isDefault": true,
         "erpLocationUniqueId1": "BPCLLOC001",
         "erpLocationUniqueId2": "BPCLAHD01"
@@ -2149,12 +2149,12 @@ export const companyLocationData = [
         "address1": "Chemical Storage Yard",
         "address2": "Hazira",
         "address3": "",
-        "cityName": "Pune",
+        "cityName": "Mumbai",
         "stateName": "Maharashtra",
         "countryName": "India",
         "pincode": "395003",
-        "contactNo": "9123456782",
-        "contactNoCountryId": 91,
+        "contactNo": "+919876547211",
+        "contactNoCountryId": 1,
         "isDefault": false,
         "erpLocationUniqueId1": "BPCLLOC002",
         "erpLocationUniqueId2": "BPCLSUR01"
@@ -2384,7 +2384,7 @@ export const docTypeData = [
     },
     {
         "docTypeName": "PR - Chemical - Division Four Company Three Only",
-        "docTypeAlias": "PRC",
+        "docTypeAlias": "PCD",
         "formName": "Purchase Request",
         "statusId": 1,
         "statusRemarks": "",
@@ -3012,8 +3012,11 @@ export const userData = [
         "userRoleDetail": [
             { "roleName": "Purchase Manager", "companyName": "Company One" }
         ],
-        "userDivisionDetail": [],
-        "userDepartmentDetail": [],
+        "userDivisionDetail": [
+
+        ],
+        "userDepartmentDetail": [
+        ],
         "password": "QWer12!@"
     },
     {
@@ -3035,7 +3038,8 @@ export const userData = [
             { "roleName": "Approving Authority", "companyName": "Company Two" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" }
+            { "divisionName": "Division One Company One Two Three" },
+            { "divisionName": "Division Two Company Two Three" }
         ],
         "userDepartmentDetail": [
             { "departmentName": "Department One Division One Two Three" },
@@ -3062,12 +3066,14 @@ export const userData = [
             { "roleName": "Compliance Auditor", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Division Two Company Two Three" }
+            { "divisionName": "Division One Company One Two Three" },
+            { "divisionName": "Division Two Company Two Three" },
+            { "divisionName": "Division Four Company Three Only" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Department Three Division Three" },
             { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
+            { "departmentName": "Department Two Division Two Three" },
+            { "departmentName": "Department Four Division Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3112,10 +3118,10 @@ export const userData = [
             { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Division Three Company One Only" }
+            { "divisionName": "Division Four Company Two Only" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Department Three Division Three" }
+            { "departmentName": "Department Five Division Two" }
         ],
         "password": "QWer12!@"
     },
@@ -3132,12 +3138,15 @@ export const userData = [
         "timeZonesId": 1,
         "email": "nabanita.chatterjee@shaktiindustrial.com",
         "erpUserId": "ERPUSR-3345",
-        "divisionTypeId": 1,
+        "divisionTypeId": 2,
         "departmentTypeId": 2,
         "userRoleDetail": [
             { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
         ],
-        "userDivisionDetail": [],
+        "userDivisionDetail": [
+            { "divisionName": "Division One Company One Two Three" },
+            { "divisionName": "Division Two Company Two Three" }
+        ],
         "userDepartmentDetail": [
             { "departmentName": "Department One Division One Two Three" },
             { "departmentName": "Department Two Division Two Three" }
@@ -3164,10 +3173,12 @@ export const userData = [
             { "roleName": "Compliance Auditor", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Division Two Company Two Three" }
+            { "divisionName": "Division Two Company Two Three" },
+            { "divisionName": "Division Four Company Three Only" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Department Three Division Three" }
+            { "departmentName": "Department Two Division Two Three" },
+            { "departmentName": "Department Four Division Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3190,12 +3201,12 @@ export const userData = [
             { "roleName": "Purchase Manager", "companyName": "Company Three" }
         ],
         "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" }
+            { "divisionName": "Division One Company One Two Three" },
+            { "divisionName": "Division Four Company Three Only" }
         ],
         "userDepartmentDetail": [
-            { "departmentName": "Department Three Division Three" },
             { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
+            { "departmentName": "Department Four Division Three" }
         ],
         "password": "QWer12!@"
     },
@@ -3212,13 +3223,17 @@ export const userData = [
         "timeZonesId": 1,
         "email": "sunita.pillai@bharatpetrochem.com",
         "erpUserId": null,
-        "divisionTypeId": 1,
-        "departmentTypeId": 1,
+        "divisionTypeId": 2,
+        "departmentTypeId": 2,
         "userRoleDetail": [
             { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
         ],
-        "userDivisionDetail": [],
-        "userDepartmentDetail": [],
+        "userDivisionDetail": [
+            { "divisionName": "Division Four Company Three Only" }
+        ],
+        "userDepartmentDetail": [
+            { "departmentName": "Department Four Division Three" }
+        ],
         "password": "QWer12!@"
     }
 ];

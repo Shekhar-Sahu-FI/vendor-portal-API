@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+// import { expect, test } from '@playwright/test';
+import { test, expect } from '../fixtures/apiFixtures';
 import { MasterApi } from '../services/MasterApi';
 import { expectSuccess, expectUpdated, expectDeleted } from './ValidationHelper';
 import { Logger } from './Logger';
@@ -170,5 +171,36 @@ export class ApiWorkflowHelper {
 
 
     return responses;
+  }
+
+  /**
+   * Seeds initial data by creating an individual test() for each object in payloadArray inside a describe block.
+   */
+  public static seedInitialDataIndividual(
+    testFn: any,
+    apiFixtureName: string,
+    payloadArray: any[],
+    description: string = 'Record',
+    transformPayload?: (payload: any, lookup: any, index?: number) => Promise<any>
+  ): void {
+    for (let i = 0; i < payloadArray.length; i++) {
+      const payload = payloadArray[i];
+      const identifier = payload.username ? `${payload.username} (${payload.displayName || ''})` : (payload.name || payload.code || `#${i + 1}`);
+      testFn(`should seed ${description} initial data for ${identifier}`, async (fixtures: any) => {
+        const api = fixtures[apiFixtureName];
+        const lookup = fixtures.lookup;
+        let finalPayload = payload;
+        if (transformPayload) {
+          finalPayload = await transformPayload(payload, lookup, i);
+        }
+
+        const saveResponse = await api.save(finalPayload);
+        await expectSuccess(saveResponse);
+        expect(saveResponse.body.success, "Expect response status to be true.").toBe(true);
+
+        const createdId = saveResponse.body.id || saveResponse.body.data?.id;
+        expect(createdId, "Expect created ID to be defined.").toBeDefined();
+      });
+    }
   }
 }

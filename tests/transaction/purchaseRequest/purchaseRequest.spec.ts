@@ -64,6 +64,7 @@ test.describe('Purchase Request API Tests', () => {
             costCenterName: "Cost Center One",
             priorityName: "Priority One",
             requiredQty: 5,
+            poQty : 15,
             rate: 150,
             remarks: "Urgent engineering requirement"
           }

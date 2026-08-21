@@ -266,16 +266,16 @@ export class LookupHelper {
     const normalizedRecord = recordName.toLowerCase().trim();
 
     // Check memory cache first
-    if (this.recordCache.has(normalizedGlobal)) {
-      const globalCache = this.recordCache.get(normalizedGlobal)!;
-      if (globalCache.has(normalizedRecord)) {
-        const item = globalCache.get(normalizedRecord)!;
-        Logger.info(`[CACHE HIT] Lookup for global '${globalName}' with name '${recordName}' resolved to record`);
-        return item;
-      }
-    }
+    // if (this.recordCache.has(normalizedGlobal)) {
+    //   const globalCache = this.recordCache.get(normalizedGlobal)!;
+    //   if (globalCache.has(normalizedRecord)) {
+    //     const item = globalCache.get(normalizedRecord)!;
+    //     Logger.info(`[CACHE HIT] Lookup for global '${globalName}' with name '${recordName}' resolved to record`);
+    //     return item;
+    //   }
+    // }
 
-    Logger.info(`[CACHE MISS] Lookup for global '${globalName}' with name '${recordName}'. Initiating API query...`);
+    // Logger.info(`[CACHE MISS] Lookup for global '${globalName}' with name '${recordName}'. Initiating API query...`);
 
     const config = API_REGISTRY.getConfig(globalName);
     if (!config) {
