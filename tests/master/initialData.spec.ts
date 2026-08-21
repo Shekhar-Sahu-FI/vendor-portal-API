@@ -32,7 +32,6 @@ test.describe('Initial Data Setup', () => {
         });
     });
 
-
     test('should seed Make Master initial data', async ({ makeApi, workflow }) => {
         await workflow.seedInitialData(makeApi, makeData, "Make Master");
     });
@@ -193,7 +192,7 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed DocType Master initial data', async ({ docTypeApi, workflow, lookup }) => {
         await workflow.seedInitialData(docTypeApi, docTypeData, "DocType Master", async (payload) => {
-            const form = await lookup.getGlobalRecord("form", payload.formName);
+            const form = await lookup.getGlobalRecord("forms", payload.formName);
             const companyDetails = [];
             for (const item of payload.companyDetails) {
                 const division = await lookup.searchDivision(item.companyName, item.divisionName);
@@ -237,7 +236,7 @@ test.describe('Initial Data Setup', () => {
             const formRights = [];
             if (payload.formRights) {
                 for (const formRight of payload.formRights) {
-                    const form = await lookup.getGlobalRecord("form", formRight.formName);
+                    const form = await lookup.getGlobalRecord("forms", formRight.formName);
                     if (form) {
                         const { formName, ...rest } = formRight;
                         formRights.push({ ...rest, formId: form.id });
@@ -330,7 +329,7 @@ test.describe('Initial Data Setup', () => {
     test('should seed Expense Head Master initial data', async ({ expenseHeadApi, workflow }) => {
         await workflow.seedInitialData(expenseHeadApi, expenseHeadData, "Expense Head Master");
     });
-    
+
     test('should seed VendorAttachment Master initial data', async ({ vendorAttachmentApi, workflow }) => {
         await workflow.seedInitialData(vendorAttachmentApi, vendorAttachmentData, "VendorAttachment Master");
     });
@@ -340,7 +339,7 @@ test.describe('Initial Data Setup', () => {
             const documentSeriesFormDetail = [];
             if (payload.documentSeriesFormDetail) {
                 for (const formDetail of payload.documentSeriesFormDetail) {
-                    const form = await lookup.getRecord("form", formDetail.formName);
+                    const form = await lookup.getGlobalRecord("forms", formDetail.formName);
                     const { formName, ...restForm } = formDetail;
                     documentSeriesFormDetail.push({
                         ...restForm,
@@ -404,7 +403,7 @@ test.describe('Initial Data Setup', () => {
                     const paymentType = await lookup.getGlobalRecord("paymentType", detail.paymentTypeName);
                     const baseDateType = await lookup.getGlobalRecord("baseDateType", detail.baseDateTypeName);
                     const payOn = await lookup.getGlobalRecord("payOn", detail.payOnName);
-                    
+
                     const { paymentTypeName, baseDateTypeName, payOnName, ...restDetail } = detail;
                     paymentTermDetails.push({
                         ...restDetail,

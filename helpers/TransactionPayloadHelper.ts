@@ -6,6 +6,7 @@ export interface PRItemParam {
   unitName?: string;
   makeName?: string;
   requiredQty?: number;
+  prQty?: number;
   rate?: number;
   remarks?: string;
   costCenterName?: string;
@@ -67,7 +68,7 @@ export class TransactionPayloadHelper {
 
     const department = await lookup.searchRecord("department", "departmentName.Contains", departmentName);
     const requestedByUser = await lookup.getRecord("user", params.requestedBy || 'admin@eprocurement.com') || null;
-    console.log("Requested bY user============>", requestedByUser)
+
 
     let contactNoAndCountryId;
     if (!requestedByUser?.contactNoE164 && !requestedByUser?.contactNoCountry?.id) {
@@ -99,6 +100,7 @@ export class TransactionPayloadHelper {
 
       const requiredQty = itemParam.requiredQty || 0;
       const rate = itemParam.rate || 0;
+      const prQty = itemParam.prQty || 0;
 
       purchaseRequestItemDetail.push({
         rowNo: i + 1,
@@ -107,9 +109,9 @@ export class TransactionPayloadHelper {
         techSpecification: "string",
         unitId: unitRecord?.id || 0,
         requiredQty: requiredQty,
-        prQty: requiredQty,
+        prQty: prQty,
         rate: rate,
-        amount: requiredQty * rate,
+        amount: prQty * rate,
         scheduleDate: todayStr,
         costCenterId: costCenterRecord?.id,
         priorityId: priorityRecord?.id,
