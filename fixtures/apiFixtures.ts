@@ -69,6 +69,8 @@ export interface ApiFixtures {
   verifyExpenseHead: (retrieved: any, original: any) => void;
   vendorAttachmentApi: MasterApi;
   paymentTermsGroupApi: MasterApi;
+  requestForQuotationApi: MasterApi;
+  quotationApi: MasterApi;
 
   supplierAuthManager: AuthManager;
   supplierRequestHelper: RequestHelper;
@@ -296,7 +298,7 @@ export const test = base.extend<ApiFixtures>({
     };
     await use(verifyFn);
   },
-  tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncHead')),
+  tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('termsAndConditionHead')),
   verifyTNCHead: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
       const data = retrieved.data || retrieved;
@@ -307,7 +309,7 @@ export const test = base.extend<ApiFixtures>({
     };
     await use(verifyFn);
   },
-  tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncGroup')),
+  tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('termsAndConditionGroup')),
   vendorCategoryApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorCategory')),
   verifyVendorCategory: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -376,6 +378,8 @@ export const test = base.extend<ApiFixtures>({
   },
   vendorAttachmentApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorAttachment')),
   paymentTermsGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('paymentTermsGroup')),
+  requestForQuotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('requestForQuotation')),
+  quotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('quotation')),
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
   warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),

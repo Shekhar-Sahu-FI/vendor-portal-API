@@ -1,3 +1,5 @@
+import { DocumentStatus, RefDocType } from '../../helpers/globalEnums';
+
 // export const unitData = [
 //     {
 //         "statusId": 1,
@@ -933,7 +935,7 @@ export const itemData = [
         "gstCategoryId": 3,
         "subgroupName": "Subgroup Two One",
         "hsnSacCode": "7210",
-        "makeMgmtTypeId": 3,
+        "makeMgmtTypeId": 1,
         "remarks": "",
         "unitConversionDetail": [],
         "itemSelectedMakeDetail": []
@@ -3291,8 +3293,8 @@ export const supplierAccountData = [
 
 export const vendorMasterData = [
     {
-        "vendorName": "Shakti Industrial Suppliers",
-        "legalName": "Shakti Industrial Suppliers Pvt Ltd",
+        "vendorName": "ABC Suppliers",
+        "legalName": "ABC Suppliers Pvt Ltd",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3301,13 +3303,13 @@ export const vendorMasterData = [
                 "addressLine1": "Plot 21, Industrial Area",
                 "addressLine2": "Urla",
                 "addressLine3": "",
-                "email": "info@shaktiispl.com",
+                "email": "info@abc.com",
                 "website": "https://www.shaktiispl.com",
                 "countryName": "India",
                 "stateName": "Chhattisgarh",
                 "cityName": "Raipur",
                 "pincode": "492001",
-                "vendorCategoryName": "Raw Material Supplier",
+                "vendorCategoryName": "Category One",
                 "panNo": "AABCS1234K",
                 "gstRegTypeId": 1,
                 "gstinNo": "22AABCS1234K1Z5",
@@ -3328,10 +3330,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Steel Materials"
+                        "itemGroupName": "Group One One"
                     },
                     {
-                        "itemGroupName": "Cables and Wires"
+                        "itemGroupName": "Group One Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3349,8 +3351,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Metro Engineering Traders",
-        "legalName": "Metro Engineering Traders Pvt Ltd",
+        "vendorName": "QWE Engineering Traders",
+        "legalName": "QWE Engineering Traders Pvt Ltd",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3365,7 +3367,7 @@ export const vendorMasterData = [
                 "stateName": "Maharashtra",
                 "cityName": "Mumbai",
                 "pincode": "400093",
-                "vendorCategoryName": "Equipment Supplier",
+                "vendorCategoryName": "Category Two",
                 "panNo": "AACCM5678P",
                 "gstRegTypeId": 1,
                 "gstinNo": "27AACCM5678P1Z3",
@@ -3386,10 +3388,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Cables and Wires"
+                        "itemGroupName": "Group Two One"
                     },
                     {
-                        "itemGroupName": "Bearings and Bushes"
+                        "itemGroupName": "Group Two Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3407,8 +3409,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Bharat Chemical Solutions",
-        "legalName": "Bharat Chemical Solutions Ltd",
+        "vendorName": "NMO CHemicals",
+        "legalName": "NMO Chemicals",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3417,13 +3419,13 @@ export const vendorMasterData = [
                 "addressLine1": "GIDC Estate",
                 "addressLine2": "Phase II",
                 "addressLine3": "",
-                "email": "info@bharatchem.com",
-                "website": "https://www.bharatchem.com",
+                "email": "info@nom.com",
+                "website": "https://www.nmo.com",
                 "countryName": "India",
                 "stateName": "Gujarat",
                 "cityName": "Ahmedabad",
                 "pincode": "380001",
-                "vendorCategoryName": "Service Provider",
+                "vendorCategoryName": "Category Three",
                 "panNo": "AADCB9876R",
                 "gstRegTypeId": 1,
                 "gstinNo": "24AADCB9876R1Z8",
@@ -3444,7 +3446,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Industrial Solvents"
+                        "itemGroupName": "Group Three One"
+                    },
+                    {
+                        "itemGroupName": "Group Three Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3462,8 +3467,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Global Manufacturing Inc",
-        "legalName": "Global Manufacturing Inc",
+        "vendorName": "XYZ Manufacturing Inc",
+        "legalName": "XYZ Manufacturing Inc",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3472,18 +3477,18 @@ export const vendorMasterData = [
                 "addressLine1": "1200 Industrial Drive",
                 "addressLine2": "",
                 "addressLine3": "",
-                "email": "sales@globalmfg.com",
-                "website": "https://www.globalmfg.com",
-                "countryName": "United States",
-                "stateName": "Texas",
-                "cityName": "Houston",
-                "pincode": "77001",
-                "vendorCategoryName": "Contractor",
-                "panNo": "",
-                "gstRegTypeId": 3,
-                "gstinNo": "",
+                "email": "sales@xyz.com",
+                "website": "https://www.xyz.com",
+                "countryName": "India",
+                "stateName": "Maharashtra",
+                "cityName": "Mumbai",
+                "pincode": "400001",
+                "vendorCategoryName": "Category Four",
+                "panNo": "AAACX9999K",
+                "gstRegTypeId": 1,
+                "gstinNo": "27AAACX9999K1Z2",
                 "regionId": 4,
-                "businessTypeId": 4,
+                "businessTypeId": 1,
                 "businessDescription": "International manufacturing and engineering services",
                 "msmeTypeId": 2,
                 "msmeNo": "",
@@ -3499,10 +3504,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Personal Protective Equipment"
+                        "itemGroupName": "Group Four One"
                     },
                     {
-                        "itemGroupName": "Corrugated Packaging"
+                        "itemGroupName": "Group Four Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3920,3 +3925,103 @@ export const paymentTermsGroupData = [
         ]
     }
 ];
+
+export const requestForQuotationData = [
+    {
+        "companyName": "Company One",
+        "divisionName": "Division One Company One Two Three",
+        "departmentName": "Department One Division One Two Three",
+        "docSeriesPattern": "RFQ/{{FY2}}/{{MMM}}/{{N}}",
+        "docNoYearly": "RFQ/27/Aug/_ _ _ _ _ ",
+        "docDate": "2026-08-23",
+        "docStatusId": DocumentStatus.Authorized,
+        "docTypeName": "RFQ - Standard - Division One Company One Two Three",
+        "refDocTypeId": RefDocType.DirectRFQ,
+        "dueDate": "2026-09-30T07:55:00.000Z",
+        "isPriceList": false,
+        "mailSubject": "Request for quotation of [02 CHANNEL AUDIO PA AMPLIFIER SYSTEM, 02 CHANNEL AUDIO PA AMPLIFIER SYSTEM]",
+        "contactName": "Shekhar Sahu",
+        "contactNo": "+919998884774",
+        "contactNoCountryName": "India",
+        "contactEmail": "tnoypy@mailto.plus",
+        "remarks": "This is remarks.",
+        "tncGroupName": "TNC Group One",
+        "approvalSetupId": null,
+        "attachment": [],
+        "lastModifiedDate": null,
+        "rfqItemDetail": [
+            {
+                "itemName": "Item Two Multi Unit Make One Two Three",
+                "makeName": "Make One",
+                "techSpecification": "asdfsf",
+                "unitName": "Unit Two",
+                "qty": "150",
+                "remarks": "dsfa",
+                "hsnCode": null,
+                "attachment": [],
+                "rfqPrItemDetail": []
+            },
+            {
+                "itemName": "Item Three No Multi Unit All Make",
+                "makeName": "Make Two",
+                "techSpecification": "sdfsdfs",
+                "unitName": "Unit Two",
+                "qty": "152.212",
+                "remarks": "sdfas",
+                "hsnCode": null,
+                "attachment": [],
+                "rfqPrItemDetail": []
+            }
+        ],
+        "rfqVendorDetail": [
+            {
+                "isGuestVendor": false,
+                "vendorName": "ABC Suppliers",
+                "vendorLocationName": "Plot 21, Industrial Area",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Rajesh Sharma",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            },
+            {
+                "isGuestVendor": false,
+                "vendorName": "QWE Engineering Traders",
+                "vendorLocationName": "MIDC Estate",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Amit Verma",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            },
+            {
+                "isGuestVendor": false,
+                "vendorName": "NMO CHemicals",
+                "vendorLocationName": "GIDC Estate",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Neha Patel",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            }
+        ],
+        "rfqTncDetail": []
+    }
+];
+
+

@@ -3,6 +3,7 @@ import { test, expect } from '../fixtures/apiFixtures';
 import { MasterApi } from '../services/MasterApi';
 import { expectSuccess, expectUpdated, expectDeleted } from './ValidationHelper';
 import { Logger } from './Logger';
+import { TransactionPayloadHelper } from './TransactionPayloadHelper';
 
 export class ApiWorkflowHelper {
   /**
@@ -202,5 +203,25 @@ export class ApiWorkflowHelper {
         expect(createdId, "Expect created ID to be defined.").toBeDefined();
       });
     }
+  }
+
+  /**
+   * Saves an RFQ record, retrieves the saved RFQ by ID (GET /api/purchase/request-for-quotations/{id}),
+   * builds the Quotation payload for a target vendor, and saves the Quotation.
+   */
+  public static async saveRfqAndQuotation(
+    rfqApi: MasterApi,
+    quotationApi: MasterApi,
+    rfqPayload: any,
+    vendorIndexOrName: number | string = 0,
+    quotationCustomParams: any = {}
+  ): Promise<{ rfqSaveResponse: any; rfqData: any; quotationSaveResponse: any; quotationPayload: any }> {
+    return TransactionPayloadHelper.saveRfqAndQuotation(
+      rfqApi,
+      quotationApi,
+      rfqPayload,
+      vendorIndexOrName,
+      quotationCustomParams
+    );
   }
 }
