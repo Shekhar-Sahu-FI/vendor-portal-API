@@ -669,21 +669,16 @@ export class TransactionPayloadHelper {
 
   /**
    * Generates a sample/dynamic payload for Purchase Order (PO).
+   * Pure function, no lookup initialization.
    */
-  public static async createPOPayload(lookup: LookupHelper, params: any = {}): Promise<any> {
+  public static createPurchaseOrderPayload(params: any = {}): any {
     const todayStr = this.formatDateStr(new Date());
 
-    const companyName = params.companyName || "Company One";
-    const docSeriesPtn = params.docSeriesPattern || 'PO/{{FY2}}/{{MMM}}/{{N}}';
-    
-    const company = await lookup.getRecord("company", companyName);
-    const docSeries = await lookup.getRecord("documentSeries", docSeriesPtn);
-
     return {
-      companyId: company?.id || null,
+      companyId: params.companyId || null,
       divisionId: params.divisionId || null,
       documentTypeId: params.documentTypeId || null,
-      docSeriesId: docSeries?.id || null,
+      docSeriesId: params.docSeriesId || null,
       docNoYearly: params.docNoYearly || null,
       docDate: params.docDate || todayStr,
       amendmentNo: params.amendmentNo || 0,
