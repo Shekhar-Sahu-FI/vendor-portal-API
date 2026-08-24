@@ -666,4 +666,68 @@ export class TransactionPayloadHelper {
       quotationParticipationDetail: params.quotationParticipationDetail || []
     };
   }
+
+  /**
+   * Generates a sample/dynamic payload for Purchase Order (PO).
+   */
+  public static async createPOPayload(lookup: LookupHelper, params: any = {}): Promise<any> {
+    const todayStr = this.formatDateStr(new Date());
+
+    const companyName = params.companyName || "Company One";
+    const docSeriesPtn = params.docSeriesPattern || 'PO/{{FY2}}/{{MMM}}/{{N}}';
+    
+    const company = await lookup.getRecord("company", companyName);
+    const docSeries = await lookup.getRecord("documentSeries", docSeriesPtn);
+
+    return {
+      companyId: company?.id || null,
+      divisionId: params.divisionId || null,
+      documentTypeId: params.documentTypeId || null,
+      docSeriesId: docSeries?.id || null,
+      docNoYearly: params.docNoYearly || null,
+      docDate: params.docDate || todayStr,
+      amendmentNo: params.amendmentNo || 0,
+      docStatusId: params.docStatusId ?? DocumentStatus.Draft,
+      isPoCapexIndentValidationApplicable: params.isPoCapexIndentValidationApplicable ?? false,
+      refDocTypeNo: params.refDocTypeNo ?? 1, // 1=Direct, 2=Purchase Request, 3=Quotation
+      refDocNo: params.refDocNo || null,
+      vendorId: params.vendorId || null,
+      vendorLocationId: params.vendorLocationId || null,
+      contactPersonName: params.contactPersonName || null,
+      validityDate: params.validityDate || todayStr,
+      departmentId: params.departmentId || null,
+      partyRefNo: params.partyRefNo || null,
+      partyRefDate: params.partyRefDate || null,
+      
+      poIndentDetail: params.poIndentDetail || [],
+      poItemDetail: params.poItemDetail || [],
+      
+      carrierTypeId: params.carrierTypeId || 1,
+      paymentModeId: params.paymentModeId || 1,
+      dueBasisId: params.dueBasisId || 1,
+      dueDays: params.dueDays || 30,
+      freightTypeId: params.freightTypeId || 1,
+      freightRateTypeId: params.freightRateTypeId || null,
+      freightAmount: params.freightAmount || 0,
+      noOfTrips: params.noOfTrips || null,
+      consigneeLocationId: params.consigneeLocationId || 1,
+      priorityId: params.priorityId || 1,
+      fromLocationId: params.fromLocationId || null,
+      toLocationId: params.toLocationId || null,
+      currencyId: params.currencyId || 1,
+      exchangeRate: params.exchangeRate || 1,
+      
+      basicAmount: params.basicAmount || 0,
+      netAmount: params.netAmount || 0,
+      taxAmount: params.taxAmount || 0,
+      
+      poTaxDetail: params.poTaxDetail || [],
+      poOtherChargeDetail: params.poOtherChargeDetail || [],
+      poTermsNConditionDetail: params.poTermsNConditionDetail || [],
+      poPaymentTerm: params.poPaymentTerm || [],
+      poAttachment: params.poAttachment || [],
+      poInformToDetail: params.poInformToDetail || [],
+      poTransportRouteDetail: params.poTransportRouteDetail || []
+    };
+  }
 }
