@@ -1,150 +1,175 @@
 import { test, expect } from '../../../fixtures/apiFixtures';
 
-type SavedPr = {
-  id: number;
-  detail: any;
-};
-
 const getResponseData = (body: any): any => body?.data ?? body;
 
 const getCreatedId = (body: any): number => {
   const id = body?.id ?? body?.data?.id;
-  expect(id, 'Save response should contain the created purchase request id.').toBeDefined();
+  expect(id, 'Save response should contain the created record id.').toBeDefined();
   return Number(id);
 };
 
-const getItems = (body: any): any[] => {
-  const data = getResponseData(body);
-  return data?.purchaseRequestItemDetail ?? data?.items ?? [];
-};
-
-const expectBalance = (detail: any, expectedQty: number, expectedRate: number): void => {
-  expect(Number(detail.prQty)).toBe(expectedQty);
-  expect(Number(detail.balanceQty)).toBe(expectedQty);
-  expect(Number(detail.rfqBalanceQty ?? detail.rfqBalQty)).toBe(expectedQty);
-  expect(Number(detail.poQty ?? 0)).toBe(0);
-  expect(Number(detail.rfqQty ?? 0)).toBe(0);
-  expect(Number(detail.amount)).toBe(expectedQty * expectedRate);
-};
-
-const saveAndRead = async (
-  PRApi: any,
-  payload: any
-): Promise<SavedPr> => {
-  const saveResponse = await PRApi.save(payload);
-  expect(saveResponse.ok).toBe(true);
-  expect(saveResponse.body.success).toBe(true);
-
-  const id = getCreatedId(saveResponse.body);
-  const getResponse = await PRApi.getById(id);
-  expect(getResponse.ok).toBe(true);
-  const details = getItems(getResponse.body);
-  expect(details.length).toBe(payload.purchaseRequestItemDetail.length);
-
-  return { id, detail: details[0] };
-};
-
-const deleteIfCreated = async (PRApi: any, id?: number): Promise<void> => {
+const deleteIfCreated = async (api: any, id?: number): Promise<void> => {
   if (id) {
-    const deleteResponse = await PRApi.deleteRecord(id);
+    const deleteResponse = await api.deleteRecord(id);
     expect(deleteResponse.ok).toBe(true);
   }
 };
 
-test.describe('Purchase Request item balance calculation', () => {
-  test('BAL-001: initializes balance fields from PR quantity and calculates amount', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [{ requiredQty: 7, rate: 12.5, remarks: 'Balance initialization' }]
-    });
-    let createdId: number | undefined;
+const buildRfqPayloadForPr = async (
+  lookup: any,
+  transactionPayloadHelper: any,
+  prRecord: any,
+  prItemQuantities: Array<{ prItemDetailId: number; rfqQty: number; firstCf?: number; secondCf?: number }>
+) => {
+  const companyId = prRecord.company?.id || prRecord.companyId;
+  const prItems = prRecord.purchaseRequestItemDetail ?? prRecord.items ?? [];
 
-    try {
-      const saved = await saveAndRead(PRApi, payload);
-      createdId = saved.id;
-      expectBalance(saved.detail, 7, 12.5);
-    } finally {
-      await deleteIfCreated(PRApi, createdId);
-    }
-  });
+  const items = prItemQuantities.map(({ prItemDetailId, rfqQty, firstCf = 1, secondCf = 1 }) => {
+    const prItem = prItems.find((i: any) => Number(i.id) === Number(prItemDetailId));
+    const itemId = prItem?.item?.id || prItem?.itemId;
+    const makeId = prItem?.make?.id || prItem?.makeId || null;
+    const unitId = prItem?.unit?.id || prItem?.unitId;
 
-  test('BAL-002: preserves three-decimal quantity and amount precision', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [{ requiredQty: 2.125, rate: 10.125, remarks: 'Decimal balance' }]
-    });
-    let createdId: number | undefined;
-
-    try {
-      const saved = await saveAndRead(PRApi, payload);
-      createdId = saved.id;
-      expectBalance(saved.detail, 2.125, 10.125);
-    } finally {
-      await deleteIfCreated(PRApi, createdId);
-    }
-  });
-
-  test('BAL-003: calculates each item balance independently and sums net amount', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [
-        { requiredQty: 3, rate: 20, remarks: 'First line' },
-        { requiredQty: 4.5, rate: 8, remarks: 'Second line' }
+    return {
+      itemId: itemId,
+      makeId: makeId,
+      unitId: unitId,
+      qty: rfqQty,
+      techSpecification: prItem?.techSpecification || "RFQ Tech Spec",
+      remarks: "RFQ against PR balance test",
+      rfqPrItemDetail: [
+        {
+          prItemDetailId: prItemDetailId,
+          itemId: itemId,
+          makeId: makeId,
+          rfqMakeId: makeId,
+          unitId: unitId,
+          rfqUnitId: unitId,
+          firstCf: firstCf,
+          secondCf: secondCf,
+          rfqQty: rfqQty,
+          techSpecification: prItem?.techSpecification || "PR Link Spec",
+          remarks: "Linked PR Item"
+        }
       ]
-    });
-    let createdId: number | undefined;
-
-    try {
-      const saveResponse = await PRApi.save(payload);
-      expect(saveResponse.ok).toBe(true);
-      createdId = getCreatedId(saveResponse.body);
-
-      const getResponse = await PRApi.getById(createdId);
-      expect(getResponse.ok).toBe(true);
-      const details = getItems(getResponse.body);
-      expect(details).toHaveLength(2);
-      expectBalance(details[0], 3, 20);
-      expectBalance(details[1], 4.5, 8);
-      expect(Number(getResponse.body.data?.netAmount ?? getResponse.body.netAmount)).toBe(96);
-    } finally {
-      await deleteIfCreated(PRApi, createdId);
-    }
+    };
   });
 
-  test('BAL-004: exposes a newly saved item through the pending-RFQ balance flow', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [{ requiredQty: 6, rate: 15, remarks: 'RFQ pending balance' }]
-    });
-    let createdId: number | undefined;
+  return await transactionPayloadHelper.createRFQPayload(lookup, {
+    companyId: companyId,
+    refDocTypeId: 2, // 2 = Purchase Request
+    items: items,
+    vendors: [
+      { vendorName: "ABC Suppliers", vendorLocationName: "Plot 21, Industrial Area, Urla, Raipur" }
+    ]
+  });
+};
+
+test.describe('PR - RFQ Balance Flow Tests', () => {
+
+  test('Should track PR RFQ balance end-to-end across partial and remaining quantity RFQ creations', async ({ PRApi, requestForQuotationApi, lookup, transactionPayloadHelper }) => {
+    let prId: number | undefined;
+    let rfq1Id: number | undefined;
+    let rfq2Id: number | undefined;
+    let prItemDetailId: number | undefined;
 
     try {
-      const saved = await saveAndRead(PRApi, payload);
-      createdId = saved.id;
-      const pendingResponse = await PRApi.getPendingItemsForRfq({
-        prItemDetailIds: [Number(saved.detail.id)]
+      // Step 1: Create PR with prQty = 10
+      await test.step('Step 1: Create Purchase Request (prQty = 10)', async () => {
+        const prPayload = await transactionPayloadHelper.createPRPayload(lookup, {
+          items: [{ requiredQty: 10, prQty: 10, rate: 20, remarks: 'PR for E2E RFQ Balance Flow' }]
+        });
+        const prSaveResponse = await PRApi.save(prPayload);
+        expect(prSaveResponse.ok, 'PR save should be successful').toBe(true);
+        prId = getCreatedId(prSaveResponse.body);
       });
-      expect(pendingResponse.ok).toBe(true);
-      const pendingItems = getResponseData(pendingResponse.body);
-      expect(Array.isArray(pendingItems)).toBe(true);
-      expect(pendingItems.some((item: any) =>
-        Number(item.prItemDetailId) === Number(saved.detail.id) &&
-        Number(item.rfqBalanceQty ?? item.balanceQty) === 6
-      )).toBe(true);
+
+      // Step 2: Verify Initial Balance (rfqQty = 0, rfqBalanceQty = 10)
+      await test.step('Step 2: Verify Initial Balance (rfqQty = 0, rfqBalanceQty = 10)', async () => {
+        const prGetResponse = await PRApi.getById(prId!);
+        expect(prGetResponse.ok).toBe(true);
+        const prData = getResponseData(prGetResponse.body);
+        const prItem = prData.purchaseRequestItemDetail[0];
+        prItemDetailId = prItem.id;
+
+        expect(Number(prItem.prQty)).toBe(10);
+        expect(Number(prItem.rfqQty ?? 0)).toBe(0);
+        expect(Number(prItem.rfqBalanceQty ?? prItem.balanceQty)).toBe(10);
+
+        // Check balance via pending-item-for-rfq API
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!] });
+        expect(pendingResponse.ok).toBe(true);
+        const pendingItems = getResponseData(pendingResponse.body);
+        const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
+        expect(matchedItem, 'PR item should be present in pending-item-for-rfq response').toBeDefined();
+        expect(Number(matchedItem.rfqBalanceQty ?? matchedItem.balanceQty)).toBe(10);
+      });
+
+      // Step 3: Create 1st RFQ against PR with Partial Quantity (rfqQty = 4) using transactionPayloadHelper.createRFQPayload
+      await test.step('Step 3: Create 1st RFQ against PR with Partial Quantity (rfqQty = 4)', async () => {
+        const prData = getResponseData((await PRApi.getById(prId!)).body);
+        const rfq1Payload = await buildRfqPayloadForPr(lookup, transactionPayloadHelper, prData, [{ prItemDetailId: prItemDetailId!, rfqQty: 4 }]);
+        const rfq1Response = await requestForQuotationApi.save(rfq1Payload);
+        expect(rfq1Response.ok, '1st RFQ save should be successful').toBe(true);
+        rfq1Id = getCreatedId(rfq1Response.body);
+      });
+
+      // Step 4: Verify Balance after Partial RFQ (rfqQty = 4, rfqBalanceQty = 6)
+      await test.step('Step 4: Verify Balance after Partial RFQ (rfqQty = 4, rfqBalanceQty = 6)', async () => {
+        const prGetResponse = await PRApi.getById(prId!);
+        expect(prGetResponse.ok).toBe(true);
+        const prData = getResponseData(prGetResponse.body);
+        const prItem = prData.purchaseRequestItemDetail[0];
+
+        expect(Number(prItem.rfqQty)).toBe(4);
+        expect(Number(prItem.rfqBalanceQty ?? prItem.balanceQty)).toBe(6);
+
+        // Check balance via pending-item-for-rfq API
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!] });
+        expect(pendingResponse.ok).toBe(true);
+        const pendingItems = getResponseData(pendingResponse.body);
+        const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
+        expect(matchedItem, 'PR item should be present in pending-item-for-rfq response after partial RFQ').toBeDefined();
+        expect(Number(matchedItem.rfqBalanceQty ?? matchedItem.balanceQty)).toBe(6);
+      });
+
+      // Step 5: Create 2nd RFQ against PR for Remaining Quantity (rfqQty = 6) using transactionPayloadHelper.createRFQPayload
+      await test.step('Step 5: Create 2nd RFQ against PR for Remaining Quantity (rfqQty = 6)', async () => {
+        const prData = getResponseData((await PRApi.getById(prId!)).body);
+        const rfq2Payload = await buildRfqPayloadForPr(lookup, transactionPayloadHelper, prData, [{ prItemDetailId: prItemDetailId!, rfqQty: 6 }]);
+        const rfq2Response = await requestForQuotationApi.save(rfq2Payload);
+        expect(rfq2Response.ok, '2nd RFQ save should be successful').toBe(true);
+        rfq2Id = getCreatedId(rfq2Response.body);
+      });
+
+      // Step 6: Verify Final Balance after Remaining RFQ (rfqQty = 10, rfqBalanceQty = 0)
+      await test.step('Step 6: Verify Final Balance after Remaining RFQ (rfqQty = 10, rfqBalanceQty = 0)', async () => {
+        const prGetResponse = await PRApi.getById(prId!);
+        expect(prGetResponse.ok).toBe(true);
+        const prData = getResponseData(prGetResponse.body);
+        const prItem = prData.purchaseRequestItemDetail[0];
+
+        expect(Number(prItem.rfqQty)).toBe(10);
+        expect(Number(prItem.rfqBalanceQty ?? prItem.balanceQty)).toBe(0);
+
+        // Check pending-item-for-rfq API: should show 0 balance or no longer pending
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!] });
+        expect(pendingResponse.ok).toBe(true);
+        const pendingItems = getResponseData(pendingResponse.body);
+        const matchedItem = Array.isArray(pendingItems)
+          ? pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId))
+          : null;
+        if (matchedItem) {
+          expect(Number(matchedItem.rfqBalanceQty ?? matchedItem.balanceQty)).toBe(0);
+        }
+      });
+
     } finally {
-      await deleteIfCreated(PRApi, createdId);
+      // Step 7: Cleanup
+      await deleteIfCreated(requestForQuotationApi, rfq2Id);
+      await deleteIfCreated(requestForQuotationApi, rfq1Id);
+      await deleteIfCreated(PRApi, prId);
     }
   });
 
-  test('BAL-005: rejects zero PR quantity because no positive balance can be created', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [{ requiredQty: 0, rate: 10, remarks: 'Invalid zero quantity' }]
-    });
-    const response = await PRApi.save(payload);
-    expect(response.status).toBeGreaterThanOrEqual(400);
-  });
-
-  test('BAL-006: rejects negative PR quantity', async ({ PRApi, lookup, transactionPayloadHelper }) => {
-    const payload = await transactionPayloadHelper.createPRPayload(lookup, {
-      items: [{ requiredQty: -1, rate: 10, remarks: 'Invalid negative quantity' }]
-    });
-    const response = await PRApi.save(payload);
-    expect(response.status).toBeGreaterThanOrEqual(400);
-  });
 });

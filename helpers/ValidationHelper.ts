@@ -91,3 +91,85 @@ export async function expectValidationMessage(response: ApiResponse, expectedMes
 export function containsValidation(response: ApiResponse, expectedMessage: string): boolean {
   return response.validationMessages.some(msg => msg.toLowerCase().includes(expectedMessage.toLowerCase()));
 }
+
+/**
+ * Asserts that a validation error detail exists in response for a specific field name.
+ *
+ * @param response The ApiResponse object returned from API call
+ * @param expectedField The field name expected in error details (e.g. "docStatusId")
+ * @param expectedMessage Optional expected error message or substring (e.g. "Invalid value.")
+ */
+export async function expectFieldError(
+  response: ApiResponse,
+  expectedField: string | string[],
+  expectedMessage?: string
+): Promise<void> {
+  expect([400, 422], `Expect response status to be 400 or 422 got ${response.status}`).toContain(response.status);
+
+  let details: Array<{ field?: string; message?: string; errorNo?: string }> = [];
+
+  if (response.body?.error?.details && Array.isArray(response.body.error.details)) {
+    details = response.body.error.details;
+  } else if (response.body?.details && Array.isArray(response.body.details)) {
+    details = response.body.details;
+  } else if (response.body?.errors) {
+    if (Array.isArray(response.body.errors)) {
+      details = response.body.errors;
+    } else if (typeof response.body.errors === 'object') {
+      details = Object.entries(response.body.errors).map(([field, msgs]) => ({
+        field,
+        message: Array.isArray(msgs) ? msgs.join(', ') : String(msgs)
+      }));
+    }
+  }
+
+  const expectedList = Array.isArray(expectedField) ? expectedField : [expectedField];
+  const matchingDetail = details.find(
+    d => d && d.field && expectedList.some(ef => ef.toLowerCase() === d.field!.toLowerCase())
+  );
+
+  const actualFields = details.map(d => d.field).filter(Boolean);
+
+  expect(
+    matchingDetail,
+    `Expect validation error detail for field "${expectedList.join(' or ')}" to be present, but found fields: [${actualFields.join(', ')}] in error details`
+  ).toBeDefined();
+
+  if (expectedMessage && matchingDetail) {
+    const actualMsg = matchingDetail.message || '';
+    expect(
+      actualMsg.toLowerCase().includes(expectedMessage.toLowerCase()),
+      `Expect field "${expectedList.join(' or ')}" error message to contain "${expectedMessage}", but got "${actualMsg}"`
+    ).toBe(true);
+  }
+}
+
+/**
+ * Asserts that validation error details exist for multiple specific field names.
+ */
+export async function expectFieldErrors(
+  response: ApiResponse,
+  expectedFields: string[]
+): Promise<void> {
+  for (const field of expectedFields) {
+    await expectFieldError(response, field);
+  }
+}
+
+/**
+ * Checks if response error details contain a specific field name (returns boolean).
+ */
+export function hasFieldError(response: ApiResponse, expectedField: string): boolean {
+  let details: Array<{ field?: string }> = [];
+
+  if (response.body?.error?.details && Array.isArray(response.body.error.details)) {
+    details = response.body.error.details;
+  } else if (response.body?.details && Array.isArray(response.body.details)) {
+    details = response.body.details;
+  } else if (response.body?.errors && typeof response.body.errors === 'object') {
+    details = Object.keys(response.body.errors).map(field => ({ field }));
+  }
+
+  return details.some(d => d && d.field && d.field.toLowerCase() === expectedField.toLowerCase());
+}
+

@@ -75,6 +75,13 @@ export class MasterApi extends BaseApi {
   }
 
   /**
+   * Retrieve purchase-request items that are available for PO processing.
+   */
+  public async getPendingItemsForPo<T = any>(payload: any): Promise<ApiResponse<T>> {
+    return this.post<T>('/pending-item-for-po', payload);
+  }
+
+  /**
    * Retrieve doctypes by form ID
    * GET /api/<masterName>/forms/<formId>
    */

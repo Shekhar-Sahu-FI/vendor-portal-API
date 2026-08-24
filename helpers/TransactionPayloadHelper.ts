@@ -37,14 +37,32 @@ export interface PRPayloadParams {
   approvalSetupId?: number;
 }
 
+export interface RFQPrItemDetailParam {
+  prItemDetailId: number;
+  itemId?: number;
+  makeId?: number;
+  rfqMakeId?: number;
+  unitId?: number;
+  rfqUnitId?: number;
+  firstCf?: number;
+  secondCf?: number;
+  rfqQty: number;
+  techSpecification?: string;
+  remarks?: string;
+}
+
 export interface RFQItemParam {
   itemName?: string;
+  itemId?: number;
   makeName?: string;
+  makeId?: number;
   unitName?: string;
+  unitId?: number;
   techSpecification?: string;
   qty?: number | string;
   remarks?: string;
   hsnCode?: string | null;
+  rfqPrItemDetail?: RFQPrItemDetailParam[];
 }
 
 export interface RFQVendorParam {
@@ -58,10 +76,13 @@ export interface RFQVendorParam {
 
 export interface RFQPayloadParams {
   companyName?: string;
+  companyId?: number;
   divisionName?: string;
   departmentName?: string;
   docSeriesPattern?: string;
+  docSeriesId?: number;
   docTypeName?: string;
+  docTypeId?: number;
   docNoYearly?: string;
   docDate?: string;
   docStatusId?: number;
@@ -112,7 +133,7 @@ export class TransactionPayloadHelper {
     const docType = await lookup.searchRecord("docType", "DocTypeName.Contains", docTypeName);
 
     const department = await lookup.searchRecord("department", "departmentName.Contains", departmentName);
-    const requestedByUser = await lookup.getRecord("user", params.requestedBy || 'admin@eprocurement.com') || null;
+    const requestedByUser = await lookup.getRecord("user", params.requestedBy || 'admin') || null;
 
 
     let contactNoAndCountryId;
@@ -143,9 +164,9 @@ export class TransactionPayloadHelper {
       const costCenterRecord = await lookup.searchRecord("costCenter", "CostCenterName.Contains", costCenterName);
       const priorityRecord = await lookup.searchRecord("priority", "PriorityName.Contains", priorityName);
 
-      const requiredQty = itemParam.requiredQty || 0;
-      const rate = itemParam.rate || 0;
-      const prQty = itemParam.prQty || 0;
+      const requiredQty = itemParam.requiredQty || 1;
+      const rate = itemParam.rate || 1;
+      const prQty = itemParam.prQty || 1;
 
       purchaseRequestItemDetail.push({
         rowNo: i + 1,
@@ -397,9 +418,9 @@ export class TransactionPayloadHelper {
     const countryName = params.contactNoCountryName || "India";
     const tncGroupName = params.tncGroupName || "TNC Group One";
 
-    const company = await lookup.getRecord("company", companyName);
-    const docSeries = await lookup.searchRecord("docSeries", "Pattern.Contains", docSeriesPtn);
-    const docType = await lookup.searchRecord("docType", "DocTypeName.Contains", docTypeName);
+    const company = params.companyId ? { id: params.companyId } : await lookup.getRecord("company", companyName);
+    const docSeries = params.docSeriesId ? { id: params.docSeriesId } : await lookup.searchRecord("docSeries", "Pattern.Contains", docSeriesPtn);
+    const docType = params.docTypeId ? { id: params.docTypeId } : await lookup.searchRecord("docType", "DocTypeName.Contains", docTypeName);
     const country = await lookup.getRecord("country", countryName);
     const tncGroup = await lookup.getRecord("termsAndConditionGroup", tncGroupName);
 
@@ -425,20 +446,43 @@ export class TransactionPayloadHelper {
 
     const rfqItemDetail: any[] = [];
     for (const itemParam of itemParams) {
-      const itemRecord = itemParam.itemName ? await lookup.getRecord("item", itemParam.itemName) : null;
-      const makeRecord = itemParam.makeName ? await lookup.getRecord("make", itemParam.makeName) : null;
-      const unitRecord = itemParam.unitName ? await lookup.getRecord("unit", itemParam.unitName) : null;
+      const itemRecord = itemParam.itemId ? { id: itemParam.itemId } : (itemParam.itemName ? await lookup.getRecord("item", itemParam.itemName) : null);
+      const makeRecord = itemParam.makeId !== undefined ? (itemParam.makeId ? { id: itemParam.makeId } : null) : (itemParam.makeName ? await lookup.getRecord("make", itemParam.makeName) : null);
+      const unitRecord = itemParam.unitId ? { id: itemParam.unitId } : (itemParam.unitName ? await lookup.getRecord("unit", itemParam.unitName) : null);
+
+      const itemId = itemRecord?.id || null;
+      const makeId = makeRecord?.id || null;
+      const unitId = unitRecord?.id || null;
+
+      const rfqPrItemDetail: any[] = [];
+      if (itemParam.rfqPrItemDetail && itemParam.rfqPrItemDetail.length > 0) {
+        for (const prDetail of itemParam.rfqPrItemDetail) {
+          rfqPrItemDetail.push({
+            prItemDetailId: prDetail.prItemDetailId,
+            itemId: prDetail.itemId || itemId,
+            makeId: prDetail.makeId ?? makeId,
+            rfqMakeId: prDetail.rfqMakeId ?? prDetail.makeId ?? makeId,
+            unitId: prDetail.unitId || unitId,
+            rfqUnitId: prDetail.rfqUnitId || prDetail.unitId || unitId,
+            firstCf: prDetail.firstCf ?? 1,
+            secondCf: prDetail.secondCf ?? 1,
+            rfqQty: prDetail.rfqQty ?? (typeof itemParam.qty === 'number' ? itemParam.qty : parseFloat(String(itemParam.qty || '0'))),
+            techSpecification: prDetail.techSpecification || itemParam.techSpecification || "string",
+            remarks: prDetail.remarks || itemParam.remarks || "string"
+          });
+        }
+      }
 
       rfqItemDetail.push({
-        itemId: itemRecord?.id || null,
-        makeId: makeRecord?.id || null,
-        unitId: unitRecord?.id || null,
+        itemId: itemId,
+        makeId: makeId,
+        unitId: unitId,
         techSpecification: itemParam.techSpecification || "string",
         qty: String(itemParam.qty || "100"),
         remarks: itemParam.remarks || "string",
         hsnCode: itemParam.hsnCode || null,
         attachment: [],
-        rfqPrItemDetail: []
+        rfqPrItemDetail: rfqPrItemDetail
       });
     }
 
@@ -638,7 +682,7 @@ export class TransactionPayloadHelper {
 
     const companyName = params.companyName || "Company One";
     const docSeriesPtn = params.docSeriesPattern || 'CS/{{FY2}}/{{MMM}}/{{N}}';
-    
+
     const company = await lookup.getRecord("company", companyName);
     const docSeries = await lookup.searchRecord("docSeries", "Pattern.Contains", docSeriesPtn);
 
@@ -693,10 +737,10 @@ export class TransactionPayloadHelper {
       departmentId: params.departmentId || null,
       partyRefNo: params.partyRefNo || null,
       partyRefDate: params.partyRefDate || null,
-      
+
       poIndentDetail: params.poIndentDetail || [],
       poItemDetail: params.poItemDetail || [],
-      
+
       carrierTypeId: params.carrierTypeId || 1,
       paymentModeId: params.paymentModeId || 1,
       dueBasisId: params.dueBasisId || 1,
@@ -711,11 +755,11 @@ export class TransactionPayloadHelper {
       toLocationId: params.toLocationId || null,
       currencyId: params.currencyId || 1,
       exchangeRate: params.exchangeRate || 1,
-      
+
       basicAmount: params.basicAmount || 0,
       netAmount: params.netAmount || 0,
       taxAmount: params.taxAmount || 0,
-      
+
       poTaxDetail: params.poTaxDetail || [],
       poOtherChargeDetail: params.poOtherChargeDetail || [],
       poTermsNConditionDetail: params.poTermsNConditionDetail || [],

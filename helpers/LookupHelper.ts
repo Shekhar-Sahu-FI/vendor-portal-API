@@ -545,8 +545,7 @@ export class LookupHelper {
 
     const normalizedLocName = vendorLocationName.toLowerCase().trim();
     let matchedLocation = locations.find((l: any) =>
-      (l.addressLine1 && String(l.addressLine1).toLowerCase().trim().includes(normalizedLocName)) ||
-      (l.vendorLocationName && String(l.vendorLocationName).toLowerCase().trim().includes(normalizedLocName))
+      (l.addressLine1 && String(l.addressLine1).toLowerCase().trim().includes(normalizedLocName)) 
     );
 
     if (!matchedLocation && locations.length > 0) {
