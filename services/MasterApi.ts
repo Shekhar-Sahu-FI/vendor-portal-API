@@ -64,6 +64,17 @@ export class MasterApi extends BaseApi {
   }
 
   /**
+   * Retrieve purchase-request items that are available for RFQ processing.
+   */
+  public async getPendingItemsForRfq<T = any>(payload: {
+    prItemDetailIds?: number[];
+    prIds?: number[];
+    expenditureTypeId?: number;
+  }): Promise<ApiResponse<T>> {
+    return this.post<T>('/pending-item-for-rfq', payload);
+  }
+
+  /**
    * Retrieve doctypes by form ID
    * GET /api/<masterName>/forms/<formId>
    */
