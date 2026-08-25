@@ -1,11 +1,19 @@
 import { test, expect } from '../../fixtures/apiFixtures';
-import { unitData, groupData, subgroupData, makeData, businessTypeData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData, paymentTermsGroupData, requestForQuotationData } from './masterData';
+import { unitData, groupData, subgroupData, makeData, businessTypeData, finYearData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData, paymentTermsGroupData, requestForQuotationData } from './masterData';
 
 
 test.describe('Initial Data Setup', () => {
 
     test('should seed Unit Master initial data', async ({ unitApi, workflow }) => {
         await workflow.seedInitialData(unitApi, unitData, "");
+    });
+
+    test('should seed Make Master initial data', async ({ makeApi, workflow }) => {
+        await workflow.seedInitialData(makeApi, makeData, "Make Master");
+    });
+
+    test('should seed Category Master initial data', async ({ categoryApi, workflow }) => {
+        await workflow.seedInitialData(categoryApi, categoryData, "Category Master");
     });
 
     test('should seed Group Master initial data', async ({ groupApi, workflow, lookup }) => {
@@ -32,8 +40,44 @@ test.describe('Initial Data Setup', () => {
         });
     });
 
-    test('should seed Make Master initial data', async ({ makeApi, workflow }) => {
-        await workflow.seedInitialData(makeApi, makeData, "Make Master");
+    test('should seed Item Master initial data', async ({ itemApi, workflow, lookup }) => {
+        await workflow.seedInitialData(itemApi, itemData, "Item Master", async (payload) => {
+            const unit = await lookup.getRecord("unit", payload.unitName);
+            const subgroup = await lookup.getRecord("subgroup", payload.subgroupName);
+
+            const unitConversionDetail = [];
+            if (payload.unitConversionDetail) {
+                for (const ucd of payload.unitConversionDetail) {
+                    const toUnit = await lookup.getRecord("unit", ucd.tounitName);
+                    const { tounitName, ...restUcd } = ucd;
+                    unitConversionDetail.push({
+                        ...restUcd,
+                        toUnitId: toUnit?.id
+                    });
+                }
+            }
+
+            const itemSelectedMakeDetail = [];
+            if (payload.itemSelectedMakeDetail) {
+                for (const make of payload.itemSelectedMakeDetail) {
+                    const makeRecord = await lookup.getRecord("make", make.makeName);
+                    const { makeName, ...restMake } = make;
+                    itemSelectedMakeDetail.push({
+                        ...restMake,
+                        makeId: makeRecord?.id
+                    });
+                }
+            }
+
+            return {
+                ...payload,
+                unitId: unit?.id,
+                subgroupId: subgroup?.id,
+                itemCode: subgroup?.subgroupCode + payload.code,
+                unitConversionDetail,
+                itemSelectedMakeDetail
+            };
+        });
     });
 
     test('should seed BusinessType Master initial data', async ({ businessTypeApi, workflow }) => {
@@ -84,50 +128,6 @@ test.describe('Initial Data Setup', () => {
         await workflow.seedInitialData(priorityApi, priorityData, "Priority Master");
     });
 
-    test('should seed Category Master initial data', async ({ categoryApi, workflow }) => {
-        await workflow.seedInitialData(categoryApi, categoryData, "Category Master");
-    });
-
-    test('should seed Item Master initial data', async ({ itemApi, workflow, lookup }) => {
-        await workflow.seedInitialData(itemApi, itemData, "Item Master", async (payload) => {
-            const unit = await lookup.getRecord("unit", payload.unitName);
-            const subgroup = await lookup.getRecord("subgroup", payload.subgroupName);
-
-            const unitConversionDetail = [];
-            if (payload.unitConversionDetail) {
-                for (const ucd of payload.unitConversionDetail) {
-                    const toUnit = await lookup.getRecord("unit", ucd.tounitName);
-                    const { tounitName, ...restUcd } = ucd;
-                    unitConversionDetail.push({
-                        ...restUcd,
-                        toUnitId: toUnit?.id
-                    });
-                }
-            }
-
-            const itemSelectedMakeDetail = [];
-            if (payload.itemSelectedMakeDetail) {
-                for (const make of payload.itemSelectedMakeDetail) {
-                    const makeRecord = await lookup.getRecord("make", make.makeName);
-                    const { makeName, ...restMake } = make;
-                    itemSelectedMakeDetail.push({
-                        ...restMake,
-                        makeId: makeRecord?.id
-                    });
-                }
-            }
-
-            return {
-                ...payload,
-                unitId: unit?.id,
-                subgroupId: subgroup?.id,
-                itemCode: subgroup?.subgroupCode + payload.code,
-                unitConversionDetail,
-                itemSelectedMakeDetail
-            };
-        });
-    });
-
     test('should seed Country Master initial data', async ({ countryApi, workflow }) => {
         await workflow.seedInitialData(countryApi, countryData, "Country Master");
     });
@@ -168,6 +168,10 @@ test.describe('Initial Data Setup', () => {
             const city = await lookup.getRecord("city", payload.cityName);
             return { ...payload, companyId: company?.id, countryId: state?.countryId, stateId: state?.id, cityId: city?.id };
         });
+    });
+
+    test('should seed Financial Year Master initial data', async ({ finYearApi, workflow }) => {
+        await workflow.seedInitialData(finYearApi, finYearData, "Financial Year Master");
     });
 
     test('should seed Division Master initial data', async ({ divisionApi, workflow, lookup }) => {
@@ -243,6 +247,73 @@ test.describe('Initial Data Setup', () => {
             return {
                 ...payload,
                 costCenterCompanyDivisionDetail: companyDetail
+            };
+        });
+    });
+
+    test('should seed Vendor Master initial data', async ({ vendorMasterApi, workflow, lookup }) => {
+
+        await workflow.seedInitialData(vendorMasterApi, vendorMasterData, "Vendor Master Master", async (payload) => {
+            const vendorLocationDetail = [];
+            if (payload.vendorLocationDetail && payload.vendorLocationDetail.length > 0) {
+                let locIdx = 1;
+                for (const loc of payload.vendorLocationDetail) {
+                    const state = loc.stateName ? await lookup.getState(loc.stateName, loc.countryName) : null;
+                    const city = loc.cityName ? await lookup.getRecord("city", loc.cityName) : null;
+
+                    let vendorCategoryId = loc.vendorCategoryId;
+                    if (!vendorCategoryId && loc.vendorCategoryName) {
+                        const vendorCategory = await lookup.getRecord("vendorCategory", loc.vendorCategoryName);
+                        vendorCategoryId = vendorCategory?.id;
+                    }
+
+                    const contactInfo = await lookup.getContactNoAndCountryId(loc.countryName || "India", locIdx++);
+                    const contactNo = loc.contactNo || contactInfo.contactNo;
+                    const contactNoCountryId = loc.contactNoCountryId || contactInfo.contactNoCountryId;
+
+                    const vendorLocationContactPersonDetail = [];
+                    if (loc.vendorLocationContactPersonDetail && loc.vendorLocationContactPersonDetail.length > 0) {
+                        for (const cp of loc.vendorLocationContactPersonDetail) {
+                            vendorLocationContactPersonDetail.push({
+                                ...cp,
+                                contactNo: cp.contactNo || contactNo,
+                                contactNoCountryId: cp.contactNoCountryId || contactNoCountryId
+                            });
+                        }
+                    }
+
+                    const vendorLocationItemGroupDetail = [];
+                    if (loc.vendorLocationItemGroupDetail && loc.vendorLocationItemGroupDetail.length > 0) {
+                        for (const itemGroup of loc.vendorLocationItemGroupDetail) {
+                            if (itemGroup.itemGroupName) {
+                                const group = await lookup.getRecord("group", itemGroup.itemGroupName);
+                                vendorLocationItemGroupDetail.push({
+                                    ...itemGroup,
+                                    itemGroupId: group?.id || itemGroup.itemGroupId
+                                });
+                            } else {
+                                vendorLocationItemGroupDetail.push(itemGroup);
+                            }
+                        }
+                    }
+
+                    vendorLocationDetail.push({
+                        ...loc,
+                        countryId: state?.countryId || loc.countryId,
+                        stateId: state?.id || loc.stateId,
+                        cityId: city?.id || loc.cityId,
+                        vendorCategoryId: vendorCategoryId || loc.vendorCategoryId,
+                        contactNo,
+                        contactNoCountryId,
+                        vendorLocationContactPersonDetail,
+                        vendorLocationItemGroupDetail
+                    });
+                }
+            }
+
+            return {
+                ...payload,
+                vendorLocationDetail
             };
         });
     });
@@ -334,70 +405,23 @@ test.describe('Initial Data Setup', () => {
         });
     });
 
-    test('should seed Supplier Account Master initial data', async ({ supplierAccountApi, workflow }) => {
-        await workflow.seedInitialData(supplierAccountApi, supplierAccountData, "Supplier Account Master");
-    });
-
-    test('should seed Vendor Master Master initial data', async ({ vendorMasterApi, workflow, lookup }) => {
-        test.setTimeout(90000);
-        await workflow.seedInitialData(vendorMasterApi, vendorMasterData, "Vendor Master Master", async (payload) => {
+    test('should seed Supplier Account Master initial data', async ({ supplierAccountApi, workflow, lookup }) => {
+        await workflow.seedInitialData(supplierAccountApi, supplierAccountData, "Supplier Account Master", async (payload) => {
             const vendorLocationDetail = [];
             if (payload.vendorLocationDetail && payload.vendorLocationDetail.length > 0) {
-                let locIdx = 1;
                 for (const loc of payload.vendorLocationDetail) {
-                    const state = loc.stateName ? await lookup.getState(loc.stateName, loc.countryName) : null;
-                    const city = loc.cityName ? await lookup.getRecord("city", loc.cityName) : null;
-
-                    let vendorCategoryId = loc.vendorCategoryId;
-                    if (!vendorCategoryId && loc.vendorCategoryName) {
-                        const vendorCategory = await lookup.getRecord("vendorCategory", loc.vendorCategoryName);
-                        vendorCategoryId = vendorCategory?.id;
-                    }
-
-                    const contactInfo = await lookup.getContactNoAndCountryId(loc.countryName || "India", locIdx++);
-                    const contactNo = loc.contactNo || contactInfo.contactNo;
-                    const contactNoCountryId = loc.contactNoCountryId || contactInfo.contactNoCountryId;
-
-                    const vendorLocationContactPersonDetail = [];
-                    if (loc.vendorLocationContactPersonDetail && loc.vendorLocationContactPersonDetail.length > 0) {
-                        for (const cp of loc.vendorLocationContactPersonDetail) {
-                            vendorLocationContactPersonDetail.push({
-                                ...cp,
-                                contactNo: cp.contactNo || contactNo,
-                                contactNoCountryId: cp.contactNoCountryId || contactNoCountryId
-                            });
-                        }
-                    }
-
-                    const vendorLocationItemGroupDetail = [];
-                    if (loc.vendorLocationItemGroupDetail && loc.vendorLocationItemGroupDetail.length > 0) {
-                        for (const itemGroup of loc.vendorLocationItemGroupDetail) {
-                            if (itemGroup.itemGroupName) {
-                                const group = await lookup.getRecord("group", itemGroup.itemGroupName);
-                                vendorLocationItemGroupDetail.push({
-                                    ...itemGroup,
-                                    itemGroupId: group?.id || itemGroup.itemGroupId
-                                });
-                            } else {
-                                vendorLocationItemGroupDetail.push(itemGroup);
-                            }
-                        }
-                    }
-
+                    const vendorInfo = await lookup.getVendorLocationAndContactPerson(
+                        loc.vendorName,
+                        loc.vendorLocationName
+                    );
+                    const { vendorName, vendorLocationName, ...restLoc } = loc;
                     vendorLocationDetail.push({
-                        ...loc,
-                        countryId: state?.countryId || loc.countryId,
-                        stateId: state?.id || loc.stateId,
-                        cityId: city?.id || loc.cityId,
-                        vendorCategoryId: vendorCategoryId || loc.vendorCategoryId,
-                        contactNo,
-                        contactNoCountryId,
-                        vendorLocationContactPersonDetail,
-                        vendorLocationItemGroupDetail
+                        ...restLoc,
+                        vendorId: vendorInfo.vendorId,
+                        vendorLocationId: vendorInfo.vendorLocationId
                     });
                 }
             }
-
             return {
                 ...payload,
                 vendorLocationDetail
@@ -499,99 +523,99 @@ test.describe('Initial Data Setup', () => {
         });
     });
 
-    test('should seed Request for Quotation initial data', async ({ requestForQuotationApi, workflow, lookup }) => {
-        test.setTimeout(90000);
-        await workflow.seedInitialData(requestForQuotationApi, requestForQuotationData, "Request for Quotation", async (payload) => {
-            const company = await lookup.getRecord("company", payload.companyName);
-            const docSeries = await lookup.searchRecord("docSeries", "Pattern.Contains", payload.docSeriesPattern);
-            const docType = await lookup.searchRecord("docType", "DocTypeName.Contains", payload.docTypeName);
-            const country = await lookup.getRecord("country", payload.contactNoCountryName || "India");
-            const tncGroup = await lookup.getRecord("termsAndConditionGroup", payload.tncGroupName);
+    // test('should seed Request for Quotation initial data', async ({ requestForQuotationApi, workflow, lookup }) => {
+    //     test.setTimeout(90000);
+    //     await workflow.seedInitialData(requestForQuotationApi, requestForQuotationData, "Request for Quotation", async (payload) => {
+    //         const company = await lookup.getRecord("company", payload.companyName);
+    //         const docSeries = await lookup.searchRecord("docSeries", "Pattern.Contains", payload.docSeriesPattern);
+    //         const docType = await lookup.searchRecord("docType", "DocTypeName.Contains", payload.docTypeName);
+    //         const country = await lookup.getRecord("country", payload.contactNoCountryName || "India");
+    //         const tncGroup = await lookup.getRecord("termsAndConditionGroup", payload.tncGroupName);
 
-            const rfqItemDetail = [];
-            if (payload.rfqItemDetail && payload.rfqItemDetail.length > 0) {
-                for (const itemDetail of payload.rfqItemDetail) {
-                    const item = await lookup.getRecord("item", itemDetail.itemName);
-                    const make = itemDetail.makeName ? await lookup.getRecord("make", itemDetail.makeName) : null;
-                    const unit = itemDetail.unitName ? await lookup.getRecord("unit", itemDetail.unitName) : null;
+    //         const rfqItemDetail = [];
+    //         if (payload.rfqItemDetail && payload.rfqItemDetail.length > 0) {
+    //             for (const itemDetail of payload.rfqItemDetail) {
+    //                 const item = await lookup.getRecord("item", itemDetail.itemName);
+    //                 const make = itemDetail.makeName ? await lookup.getRecord("make", itemDetail.makeName) : null;
+    //                 const unit = itemDetail.unitName ? await lookup.getRecord("unit", itemDetail.unitName) : null;
 
-                    const { itemName, makeName, unitName, ...restItem } = itemDetail;
-                    rfqItemDetail.push({
-                        ...restItem,
-                        itemId: item?.id,
-                        makeId: make?.id,
-                        unitId: unit?.id
-                    });
-                }
-            }
+    //                 const { itemName, makeName, unitName, ...restItem } = itemDetail;
+    //                 rfqItemDetail.push({
+    //                     ...restItem,
+    //                     itemId: item?.id,
+    //                     makeId: make?.id,
+    //                     unitId: unit?.id
+    //                 });
+    //             }
+    //         }
 
-            const rfqVendorDetail = [];
-            if (payload.rfqVendorDetail && payload.rfqVendorDetail.length > 0) {
-                for (const vendorDetail of payload.rfqVendorDetail) {
-                    const vendorInfo = await lookup.getVendorLocationAndContactPerson(
-                        vendorDetail.vendorName,
-                        vendorDetail.vendorLocationName
-                    );
+    //         const rfqVendorDetail = [];
+    //         if (payload.rfqVendorDetail && payload.rfqVendorDetail.length > 0) {
+    //             for (const vendorDetail of payload.rfqVendorDetail) {
+    //                 const vendorInfo = await lookup.getVendorLocationAndContactPerson(
+    //                     vendorDetail.vendorName,
+    //                     vendorDetail.vendorLocationName
+    //                 );
 
-                    const contactPersonDetail = [];
-                    if (vendorDetail.contactPersonDetail && vendorDetail.contactPersonDetail.length > 0) {
-                        for (const cpDetail of vendorDetail.contactPersonDetail) {
-                            let cpId = null;
-                            if (cpDetail.contactPersonName && vendorInfo.vendorLocation?.vendorLocationContactPersonDetail) {
-                                const matchedCp = vendorInfo.vendorLocation.vendorLocationContactPersonDetail.find(
-                                    (c: any) => c.contactPersonName?.toLowerCase().trim() === cpDetail.contactPersonName.toLowerCase().trim()
-                                );
-                                cpId = matchedCp?.id || vendorInfo.vendorLocationContactPersonId;
-                            } else {
-                                cpId = vendorInfo.vendorLocationContactPersonId;
-                            }
+    //                 const contactPersonDetail = [];
+    //                 if (vendorDetail.contactPersonDetail && vendorDetail.contactPersonDetail.length > 0) {
+    //                     for (const cpDetail of vendorDetail.contactPersonDetail) {
+    //                         let cpId = null;
+    //                         if (cpDetail.contactPersonName && vendorInfo.vendorLocation?.vendorLocationContactPersonDetail) {
+    //                             const matchedCp = vendorInfo.vendorLocation.vendorLocationContactPersonDetail.find(
+    //                                 (c: any) => c.contactPersonName?.toLowerCase().trim() === cpDetail.contactPersonName.toLowerCase().trim()
+    //                             );
+    //                             cpId = matchedCp?.id || vendorInfo.vendorLocationContactPersonId;
+    //                         } else {
+    //                             cpId = vendorInfo.vendorLocationContactPersonId;
+    //                         }
 
-                            const { contactPersonName, ...restCp } = cpDetail;
-                            contactPersonDetail.push({
-                                ...restCp,
-                                vendorLocationContactPersonId: cpId
-                            });
-                        }
-                    }
+    //                         const { contactPersonName, ...restCp } = cpDetail;
+    //                         contactPersonDetail.push({
+    //                             ...restCp,
+    //                             vendorLocationContactPersonId: cpId
+    //                         });
+    //                     }
+    //                 }
 
-                    const { vendorName, vendorLocationName, ...restVendor } = vendorDetail;
-                    rfqVendorDetail.push({
-                        ...restVendor,
-                        vendorLocationId: vendorInfo.vendorLocationId,
-                        contactPersonDetail
-                    });
-                }
-            }
+    //                 const { vendorName, vendorLocationName, ...restVendor } = vendorDetail;
+    //                 rfqVendorDetail.push({
+    //                     ...restVendor,
+    //                     vendorLocationId: vendorInfo.vendorLocationId,
+    //                     contactPersonDetail
+    //                 });
+    //             }
+    //         }
 
-            const rfqTncDetail = [];
-            if (tncGroup?.id) {
+    //         const rfqTncDetail = [];
+    //         if (tncGroup?.id) {
 
-                const tncHeads = await lookup.getTncGroupDetails(tncGroup.id);
-                console.log("tncHead", tncHeads)
-                for (const item of tncHeads) {
-                    console.log("items", item)
-                    rfqTncDetail.push({
-                        tncHeadId: item.tncHead?.id || item.tncHeadId,
-                        tncValue: item.tncValue || ""
-                    });
-                }
-            }
+    //             const tncHeads = await lookup.getTncGroupDetails(tncGroup.id);
+    //             console.log("tncHead", tncHeads)
+    //             for (const item of tncHeads) {
+    //                 console.log("items", item)
+    //                 rfqTncDetail.push({
+    //                     tncHeadId: item.tncHead?.id || item.tncHeadId,
+    //                     tncValue: item.tncValue || ""
+    //                 });
+    //             }
+    //         }
 
-            console.log('rfqTncDetail', rfqTncDetail);
+    //         console.log('rfqTncDetail', rfqTncDetail);
 
-            const { companyName, divisionName, departmentName, docSeriesPattern, docTypeName, contactNoCountryName, tncGroupName, ...restPayload } = payload;
+    //         const { companyName, divisionName, departmentName, docSeriesPattern, docTypeName, contactNoCountryName, tncGroupName, ...restPayload } = payload;
 
-            return {
-                ...restPayload,
-                companyId: company?.id,
-                docSeriesId: docSeries?.id,
-                docTypeId: docType?.id,
-                contactNoCountryId: country?.id,
-                tncGroupId: tncGroup?.id,
-                rfqItemDetail,
-                rfqVendorDetail,
-                rfqTncDetail
-            };
-        });
-    });
+    //         return {
+    //             ...restPayload,
+    //             companyId: company?.id,
+    //             docSeriesId: docSeries?.id,
+    //             docTypeId: docType?.id,
+    //             contactNoCountryId: country?.id,
+    //             tncGroupId: tncGroup?.id,
+    //             rfqItemDetail,
+    //             rfqVendorDetail,
+    //             rfqTncDetail
+    //         };
+    //     });
+    // });
 });

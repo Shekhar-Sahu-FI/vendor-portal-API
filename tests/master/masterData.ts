@@ -2846,10 +2846,10 @@ export const roleData = [
             { "formName": "Comparative Statement", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Purchase Order", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Role Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "User Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Role", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "User", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Approval Setup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "IP Whitelist", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true }
         ],
         "reportRights": [
@@ -2867,10 +2867,10 @@ export const roleData = [
             { "formName": "Comparative Statement", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
             { "formName": "Purchase Order", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "PO Cancellation", "canSave": true, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
-            { "formName": "PO CS Exemption", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
+            { "formName": "Cancel Purchase Order", "canSave": true, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
+            { "formName": "PO-CS Exemption", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
             { "formName": "Item Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true }
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true }
         ],
         "reportRights": [
             { "reportId": 1 }, { "reportId": 2 }, { "reportId": 5 }, { "reportId": 6 }
@@ -2913,7 +2913,7 @@ export const roleData = [
             { "formName": "Request For Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Purchase Order", "canSave": false, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Add Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": false, "canViewReport": false }
+            { "formName": "Vendor Registration Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": false, "canViewReport": false }
         ],
         "reportRights": []
     },
@@ -2922,9 +2922,9 @@ export const roleData = [
         "statusRemarks": "",
         "roleName": "Master Data Entry Clerk",
         "formRights": [
-            { "formName": "Category Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Group Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Subgroup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Category Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Group Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Subgroup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Item Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Unit Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Make Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
@@ -2941,11 +2941,11 @@ export const roleData = [
         "statusRemarks": "",
         "roleName": "Supplier Account Administrator",
         "formRights": [
-            { "formName": "Supplier Account Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Supplier Account", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Vendor Location Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
             { "formName": "Vendor Attachment Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Add Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": true, "canViewReport": false }
+            { "formName": "Vendor Registration Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": true, "canViewReport": false }
         ],
         "reportRights": [
             { "reportId": 7 }
@@ -3244,48 +3244,48 @@ export const supplierAccountData = [
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Shakti Industrial Suppliers",
+        "supplierAccountName": "ABC Suppliers",
         "description": "Raw material and industrial equipment supplier based in Raipur, Chhattisgarh",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Raipur - Urla Industrial Area",
-                "vendorName": "Shakti Industrial Suppliers"
+                "vendorLocationName": "Plot 21, Industrial Area",
+                "vendorName": "ABC Suppliers"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Metro Engineering Traders",
+        "supplierAccountName": "QWE Engineering Traders",
         "description": "Industrial tools and spare parts supplier based in Mumbai, Maharashtra",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Mumbai - Andheri East (MIDC Estate)",
-                "vendorName": "Metro Engineering Traders"
+                "vendorLocationName": "MIDC Estate",
+                "vendorName": "QWE Engineering Traders"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Bharat Chemical Solutions",
+        "supplierAccountName": "NMO CHemicals",
         "description": "Industrial chemicals manufacturer and service provider based in Ahmedabad, Gujarat",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Ahmedabad - GIDC Estate Phase II",
-                "vendorName": "Bharat Chemical Solutions"
+                "vendorLocationName": "GIDC Estate",
+                "vendorName": "NMO CHemicals"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Global Manufacturing Inc",
-        "description": "International manufacturing, engineering services and contracting based in Houston, Texas, USA",
+        "supplierAccountName": "XYZ Manufacturing Inc",
+        "description": "International manufacturing, engineering services and contracting based in Mumbai, Maharashtra, India",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Houston - Industrial Drive (USA)",
-                "vendorName": "Global Manufacturing Inc"
+                "vendorLocationName": "1200 Industrial Drive",
+                "vendorName": "XYZ Manufacturing Inc"
             }
         ]
     }
@@ -4023,5 +4023,63 @@ export const requestForQuotationData = [
         "rfqTncDetail": []
     }
 ];
+
+export const finYearData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2022-23",
+        "alias": "FY22-23",
+        "shortAlias": "22-23",
+        "startDate": "2022-04-01",
+        "endDate": "2023-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2023-24",
+        "alias": "FY23-24",
+        "shortAlias": "23-24",
+        "startDate": "2023-04-01",
+        "endDate": "2024-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2024-25",
+        "alias": "FY24-25",
+        "shortAlias": "24-25",
+        "startDate": "2024-04-01",
+        "endDate": "2025-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2025-26",
+        "alias": "FY25-26",
+        "shortAlias": "25-26",
+        "startDate": "2025-04-01",
+        "endDate": "2026-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2026-27",
+        "alias": "FY26-27",
+        "shortAlias": "26-27",
+        "startDate": "2026-04-01",
+        "endDate": "2027-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    }
+]
 
 

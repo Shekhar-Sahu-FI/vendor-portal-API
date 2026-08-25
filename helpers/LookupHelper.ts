@@ -530,7 +530,7 @@ export class LookupHelper {
     vendorLocationContactPersonId: number | string | null;
   }> {
     // Step 1: Get Vendor record to obtain vendorId
-    const vendor = await this.getRecord("vendor", vendorName);
+    const vendor = await this.getRecord("vendorMaster", vendorName);
     const vendorId = vendor.id || vendor.Id;
 
     // Step 2: Get Vendor Locations via GET /api/master/vendor-master/locations/Get?VendorId={vendorId}
