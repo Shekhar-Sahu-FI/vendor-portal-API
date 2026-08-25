@@ -383,6 +383,8 @@ export const test = base.extend<ApiFixtures>({
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
   warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),
+  PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
+  POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),

@@ -116,7 +116,7 @@ export class TransactionPayloadHelper {
    * Generates a sample payload for Purchase Request based on the standardized schema.
    */
   public static async createPRPayload(lookup: LookupHelper, params: PRPayloadParams = {}): Promise<any> {
-    const todayStr = this.formatDateStr(new Date());
+    const todayStr = new Date().toISOString().split('T')[0];
 
     const companyName = params.companyName || "Company One";
     const divisionName = params.divisionName || "Division One Company One Two Three";
