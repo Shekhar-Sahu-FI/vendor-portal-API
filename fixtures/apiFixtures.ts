@@ -36,7 +36,8 @@ export interface ApiFixtures {
   verifyBusinessType: (retrieved: any, original: any) => void;
   prReasonApi: MasterApi;
   verifyPrReason: (retrieved: any, original: any) => void;
-
+  finYearApi: MasterApi;
+  verifyFinYear: (retrieved: any, original: any) => void;
   currencyApi: MasterApi;
   verifyCurrency: (retrieved: any, original: any) => void;
   cSReasonApi: MasterApi;
@@ -366,7 +367,7 @@ export const test = base.extend<ApiFixtures>({
   roleApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('role')),
   userApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('user')),
   supplierAccountApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('supplierAccount')),
-  vendorMasterApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorMaster')),
+  vendorMasterApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendor')),
   expenseHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('expense')),
   verifyExpenseHead: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -383,8 +384,12 @@ export const test = base.extend<ApiFixtures>({
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
   warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),
+<<<<<<< HEAD
   PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
   POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
+=======
+  finYearApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('financialYear')),
+>>>>>>> a36c0bbe1a29600164ef2ad61dcd366b568ba20c
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),

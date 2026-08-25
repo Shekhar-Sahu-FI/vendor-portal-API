@@ -47,7 +47,7 @@ export const API_REGISTRY = {
     tncGroup: { url: '/api/master/terms-and-condition-groups', matchField: 'tncGroupName' },
     tncHead: { url: '/api/master/terms-and-condition-heads', matchField: 'tncHeadName' },
     unit: { url: '/api/units', matchField: 'unitName' },
-    vendor: { url: '/api/master/vendor-master', matchField: 'vendorName' },
+    vendor: { url: '/api/master/vendors', matchField: 'vendorName' },
     vendorMaster: { url: '/api/master/vendor-master', matchField: 'vendorName' },
     vendorAttachment: { url: '/api/master/vendor-attachments', matchField: 'fileName' },
     vendorCategory: { url: '/api/master/vendor-categories', matchField: 'vendorCategoryName' },
