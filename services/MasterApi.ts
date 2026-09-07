@@ -23,11 +23,22 @@ export class MasterApi extends BaseApi {
   }
 
   /**
-   * Update an existing master record
-   * PUT /api/<masterName>/<id>
+   * Update an existing record.
+   * If both id and payload are provided: PUT /api/<masterName>/<id>
+   * If only payload is provided: PUT /api/<masterName> (used for transactions where PUT route is at controller root)
    */
-  public async update<T = any>(id: string | number, payload: any): Promise<ApiResponse<T>> {
-    return this.put<T>(`/${id}`, payload);
+  public async update<T = any>(idOrPayload: string | number | any, payload?: any): Promise<ApiResponse<T>> {
+    if (payload !== undefined) {
+      return this.put<T>(`/${idOrPayload}`, payload);
+    }
+    return this.put<T>('', idOrPayload);
+  }
+
+  /**
+   * Update a record where PUT route is at the root endpoint (e.g. PUT /api/purchase-requests)
+   */
+  public async updateRoot<T = any>(payload: any): Promise<ApiResponse<T>> {
+    return this.put<T>('', payload);
   }
 
   /**

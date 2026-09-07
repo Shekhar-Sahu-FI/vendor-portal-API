@@ -19,9 +19,13 @@ export class AuthManager {
   private isLoggingIn: boolean = false;
   private loginPromise: Promise<string> | null = null;
   private role: string;
+  private customUsername?: string;
+  private customPassword?: string;
 
-  private constructor(role: string = 'admin') {
+  private constructor(role: string = 'admin', customUsername?: string, customPassword?: string) {
     this.role = role;
+    this.customUsername = customUsername;
+    this.customPassword = customPassword;
   }
 
   private getTokenFilePath(): string {
@@ -29,11 +33,14 @@ export class AuthManager {
   }
 
   /**
-   * Get Singleton Instance of AuthManager per role
+   * Get Singleton Instance of AuthManager per role, with optional custom credentials
    */
-  public static getInstance(role: string = 'admin'): AuthManager {
+  public static getInstance(role: string = 'admin', credentials?: { username: string; password: string }): AuthManager {
     if (!AuthManager.instances[role]) {
-      AuthManager.instances[role] = new AuthManager(role);
+      AuthManager.instances[role] = new AuthManager(role, credentials?.username, credentials?.password);
+    } else if (credentials) {
+      AuthManager.instances[role].customUsername = credentials.username;
+      AuthManager.instances[role].customPassword = credentials.password;
     }
     return AuthManager.instances[role];
   }
@@ -133,10 +140,9 @@ export class AuthManager {
    */
   private async login(requestContext: APIRequestContext): Promise<string> {
     const url = `${ENV_CONFIG.BASE_URL}/api/auth/login`;
-    const payload = {
-      username: this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_USERNAME : ENV_CONFIG.AUTH_USERNAME,
-      password: this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_PASSWORD : ENV_CONFIG.AUTH_PASSWORD,
-    };
+    const username = this.customUsername || (this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_USERNAME : ENV_CONFIG.AUTH_USERNAME);
+    const password = this.customPassword || (this.role === 'supplier' ? ENV_CONFIG.SUPPLIER_PASSWORD : ENV_CONFIG.AUTH_PASSWORD);
+    const payload = { username, password };
     console.log("login info:", payload)
 
     Logger.info(`Logging in to: ${url} as role: ${this.role}`);

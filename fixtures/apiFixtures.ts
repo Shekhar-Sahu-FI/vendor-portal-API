@@ -86,6 +86,12 @@ export interface ApiFixtures {
   warehouseTypeApi: MasterApi;
   ownershipApi: MasterApi;
   warehouseApi: MasterApi;
+  approvalSetupApi: MasterApi;
+  approvalProcessApi: MasterApi;
+
+  companyUserAuthManager: AuthManager;
+  companyUserRequestHelper: RequestHelper;
+  companyUserMasterApiFactory: (masterName: string) => MasterApi;
 
   workflow: typeof ApiWorkflowHelper;
 }
@@ -114,6 +120,20 @@ export const test = base.extend<ApiFixtures>({
 
   supplierMasterApiFactory: async ({ supplierRequestHelper }, use) => {
     const factory = (masterName: string) => new MasterApi(supplierRequestHelper, masterName);
+    await use(factory);
+  },
+
+  companyUserAuthManager: async ({ }, use) => {
+    await use(AuthManager.getInstance('companyUser', { username: 'single_form_user', password: 'QWer12!@' }));
+  },
+
+  companyUserRequestHelper: async ({ request, companyUserAuthManager }, use) => {
+    const helper = new RequestHelper(request, companyUserAuthManager, { 'CompanyId': '1' });
+    await use(helper);
+  },
+
+  companyUserMasterApiFactory: async ({ companyUserRequestHelper }, use) => {
+    const factory = (masterName: string) => new MasterApi(companyUserRequestHelper, masterName);
     await use(factory);
   },
 
@@ -384,12 +404,11 @@ export const test = base.extend<ApiFixtures>({
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
   warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),
-<<<<<<< HEAD
-  PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
-  POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
-=======
+  // PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
+  // POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
   finYearApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('financialYear')),
->>>>>>> a36c0bbe1a29600164ef2ad61dcd366b568ba20c
+  approvalSetupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('approvalSetup')),
+  approvalProcessApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('approvalProcess')),
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),
