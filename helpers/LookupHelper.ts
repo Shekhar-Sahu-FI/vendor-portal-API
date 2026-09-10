@@ -7,7 +7,7 @@ export class LookupHelper {
   // Cache format: Map<masterName, Map<recordName, any>>
   private recordCache: Map<string, Map<string, any>> = new Map();
 
-  constructor(private readonly requestHelper: RequestHelper) { }
+  constructor(public readonly requestHelper: RequestHelper) { }
 
   /**
    * Resolves a human-readable name to its corresponding full record data for any Master API.
@@ -56,7 +56,7 @@ export class LookupHelper {
     let matchedItem: any = null;
     const matchField = masterApi.matchField;
     for (const item of items) {
-      const nameVal = item[matchField] || item.name || item.Name;
+      const nameVal = item[matchField] || item.name || item.Name || item.pattern || item.Pattern || item.code || item.Code || item.seriesName;
       if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
         matchedItem = item;
         break;
@@ -484,7 +484,7 @@ export class LookupHelper {
     let matchedItem: any = null;
     const matchField = masterApi.matchField;
     for (const item of items) {
-      const nameVal = item[matchField] || item.name || item.Name;
+      const nameVal = item[matchField] || item.name || item.Name || item.pattern || item.Pattern || item.code || item.Code || item.seriesName;
       if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
         matchedItem = item;
         break;

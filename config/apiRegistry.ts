@@ -179,7 +179,8 @@ export const API_REGISTRY = {
   // =========================================================
   other: {
     documentAttachment: { url: '/api/document-attachments', matchField: 'fileName' },
-    documentSeries: { url: '/api/docSeries', matchField: 'seriesName' },
+    docSeries: { url: '/api/docSeries', matchField: 'pattern' },
+    documentSeries: { url: '/api/docSeries', matchField: 'pattern' },
     costCenter: { url: '/api/cost-centers', matchField: 'costCenterName' },
     hsn: { url: '/api/masterdata/get-hsn-wise-tax', matchField: 'hsnCode' },
     print: { url: '/api/reports/prints', matchField: 'id' },
