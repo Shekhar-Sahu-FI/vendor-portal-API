@@ -81,6 +81,8 @@ export class MasterApi extends BaseApi {
     prItemDetailIds?: number[];
     prIds?: number[];
     expenditureTypeId?: number;
+    tillDate?: string;
+    [key: string]: any;
   }): Promise<ApiResponse<T>> {
     return this.post<T>('/pending-item-for-rfq', payload);
   }
@@ -88,7 +90,14 @@ export class MasterApi extends BaseApi {
   /**
    * Retrieve purchase-request items that are available for PO processing.
    */
-  public async getPendingItemsForPo<T = any>(payload: any): Promise<ApiResponse<T>> {
+  public async getPendingItemsForPo<T = any>(payload: {
+    prItemDetailIds?: number[];
+    prIds?: number[];
+    companyId?: number;
+    divisionId?: number;
+    tillDate?: string;
+    [key: string]: any;
+  }): Promise<ApiResponse<T>> {
     return this.post<T>('/pending-item-for-po', payload);
   }
 

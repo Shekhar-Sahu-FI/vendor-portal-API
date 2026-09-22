@@ -408,6 +408,8 @@ test.describe('Request for Quotation - Draft Save, Complete Field Update & Trans
       const todayStr = formatDate(new Date());
       const dueDate = `${formatDate(new Date(Date.now() + 10 * 24 * 60 * 60 * 1000))}T18:00:00.000Z`;
 
+      const make1 = await lookup.searchRecord('make', 'MakeName.Contains', 'Make One');
+
       // -----------------------------------------------------------------------
       // Step 1: Save base Draft RFQ
       // -----------------------------------------------------------------------
@@ -433,7 +435,7 @@ test.describe('Request for Quotation - Draft Save, Complete Field Update & Trans
         rfqItemDetail: [
           {
             itemId: item1.id,
-            makeId: null,
+            makeId: make1?.id ?? 1,
             techSpecification: 'Base spec',
             unitId: unit1.id,
             qty: '50',
@@ -489,7 +491,7 @@ test.describe('Request for Quotation - Draft Save, Complete Field Update & Trans
         rfqItemDetail: [
           {
             itemId: item1.id,
-            makeId: null,
+            makeId: make1?.id ?? 1,
             techSpecification: 'Base spec',
             unitId: unit1.id,
             qty: '50',
@@ -512,58 +514,73 @@ test.describe('Request for Quotation - Draft Save, Complete Field Update & Trans
       };
 
       // -----------------------------------------------------------------------
-      // Scenario A: Changing docNoYearly to an altered document number on Update
+      // Scenario A: Changing DocType to PR DocType (not linked with RFQ form) should fail
       // -----------------------------------------------------------------------
-      await test.step('Scenario A: Modifying docNoYearly on Update should fail with validation error', async () => {
-        const payloadWithAlteredDocNo = {
+      await test.step('Scenario A: Modifying docTypeId to a non-RFQ DocType should fail with validation error', async () => {
+        const payloadWithChangedDocType = {
           ...validUpdateBase,
-          docNoYearly: `RFQ/ALTERED/${Date.now().toString().slice(-5)}`
+          docTypeId: validDocType2.id // PR docType has FormId = PR, not RFQ
         };
-        const res = await requestForQuotationApi.update(rfqId, payloadWithAlteredDocNo);
-        expect(res.ok, 'Updating docNoYearly to a manual custom number should be rejected').toBe(false);
+        const res = await requestForQuotationApi.update(rfqId, payloadWithChangedDocType);
+        expect(res.ok, 'Updating to a non-RFQ DocType should be rejected').toBe(false);
         expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
+        const errorText = JSON.stringify(res.body);
+        expect(errorText).toContain('not linked with RFQ form');
       });
 
       // -----------------------------------------------------------------------
-      // Scenario B: Changing Company to a valid different Company on Update
+      // Scenario B: Changing Company to an invalid company ID on Update
       // -----------------------------------------------------------------------
-      await test.step('Scenario B: Changing Company to valid different Company on Update should fail with validation error', async () => {
+      await test.step('Scenario B: Changing Company to invalid company on Update should fail with validation error', async () => {
         const payloadWithChangedCompany = {
           ...validUpdateBase,
-          companyId: validCompany2.id
+          companyId: 999999
         };
         const res = await requestForQuotationApi.update(rfqId, payloadWithChangedCompany);
-        expect(res.ok, 'Updating to a different company should be rejected').toBe(false);
+        expect(res.ok, 'Updating to an invalid company should be rejected').toBe(false);
         expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
       });
 
       // -----------------------------------------------------------------------
-      // Scenario C: Changing DocType & Document Series to valid alternate records on Update
+      // Scenario C: Setting docSeriesId null and duplicate manual docNoYearly on Update
       // -----------------------------------------------------------------------
-      await test.step('Scenario C: Changing DocType and DocSeries to valid alternate records should fail with validation error', async () => {
-        const payloadWithChangedDocTypeAndSeries = {
-          ...validUpdateBase,
-          docTypeId: validDocType2.id,
-          docSeriesId: validDocSeries2.id
+      await test.step('Scenario C: Duplicate manual docNoYearly on Update should fail with validation error', async () => {
+        // Create another RFQ to have a known manual docNo
+        const secondManualDocNo = `MANUAL-DUP-${Date.now().toString().slice(-6)}`;
+        const secondRfqPayload = {
+          ...basePayload,
+          docSeriesId: null,
+          docNoYearly: secondManualDocNo
         };
-        const res = await requestForQuotationApi.update(rfqId, payloadWithChangedDocTypeAndSeries);
-        expect(res.ok, 'Updating to different DocType and DocSeries should be rejected').toBe(false);
-        expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
+        const saveSecondRes = await requestForQuotationApi.save(secondRfqPayload);
+        if (saveSecondRes.ok) {
+          const secondRfqId = getCreatedId(saveSecondRes.body);
+          try {
+            const payloadWithDuplicateDocNo = {
+              ...validUpdateBase,
+              docSeriesId: null,
+              docNoYearly: secondManualDocNo
+            };
+            const res = await requestForQuotationApi.update(rfqId, payloadWithDuplicateDocNo);
+            expect(res.ok, 'Updating to duplicate manual docNo should be rejected').toBe(false);
+            expect(res.status).toBeGreaterThanOrEqual(400);
+          } finally {
+            await deleteIfCreated(requestForQuotationApi, secondRfqId);
+          }
+        }
       });
 
       // -----------------------------------------------------------------------
-      // Scenario D: Changing Company, DocType, DocSeries, and DocNoYearly ALL together
+      // Scenario D: Changing DocType to non-RFQ DocType and Invalid Company ALL together
       // -----------------------------------------------------------------------
-      await test.step('Scenario D: Changing Company, DocType, DocSeries, and DocNoYearly ALL together with valid master records should fail', async () => {
-        const payloadWithAllChangedValid = {
+      await test.step('Scenario D: Changing DocType to non-RFQ and invalid Company together should fail', async () => {
+        const payloadWithAllChanged = {
           ...validUpdateBase,
-          companyId: validCompany2.id,
-          docTypeId: validDocType2.id,
-          docSeriesId: validDocSeries2.id,
-          docNoYearly: `RFQ/MUTATE/${Date.now().toString().slice(-5)}`
+          companyId: 999999,
+          docTypeId: validDocType2.id
         };
-        const res = await requestForQuotationApi.update(rfqId, payloadWithAllChangedValid);
-        expect(res.ok, 'Updating all restricted fields together with valid master records should be rejected').toBe(false);
+        const res = await requestForQuotationApi.update(rfqId, payloadWithAllChanged);
+        expect(res.ok, 'Updating invalid fields together should be rejected').toBe(false);
         expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
       });
 

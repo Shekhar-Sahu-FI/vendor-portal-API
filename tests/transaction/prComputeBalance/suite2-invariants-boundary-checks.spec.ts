@@ -225,9 +225,11 @@ test.describe('Suite 2: Invariants, Boundary Checks & Exception Handling (TC13 -
 
     // 1. Query pending PO items with non-existent ID
     const pendingPoRes = await PRApi.getPendingItemsForPo({
+      prIds: [nonExistentId],
       prItemDetailIds: [nonExistentId],
       companyId: context.company.id,
-      divisionId: context.division.id
+      divisionId: context.division.id,
+      tillDate: '2026-09-16'
     });
     expect(pendingPoRes.ok).toBe(true);
     const poItems = getResponseData(pendingPoRes.body);
@@ -237,7 +239,11 @@ test.describe('Suite 2: Invariants, Boundary Checks & Exception Handling (TC13 -
     expect(matchedPo, 'Non-existent PR Item ID should yield no pending PO record').toBeFalsy();
 
     // 2. Query pending RFQ items with non-existent ID
-    const pendingRfqRes = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [nonExistentId] });
+    const pendingRfqRes = await PRApi.getPendingItemsForRfq({
+      prIds: [nonExistentId],
+      prItemDetailIds: [nonExistentId],
+      tillDate: '2026-09-16'
+    });
     expect(pendingRfqRes.ok).toBe(true);
     const rfqItems = getResponseData(pendingRfqRes.body);
     const matchedRfq = Array.isArray(rfqItems)

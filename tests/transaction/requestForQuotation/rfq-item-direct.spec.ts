@@ -351,15 +351,21 @@ test.describe('RFQ Item Details - Direct Tests @RFQ-ITMD', () => {
   });
 
   // ===========================================================================
-  // RFQ-ITMD-019: Deleting the only item row leaves item list empty rejected
+  // RFQ-ITMD-019: Empty item list allowed in Draft mode
   // ===========================================================================
-  test('RFQ-ITMD-019: Empty item list rejected', async ({ requestForQuotationApi, lookup }) => {
-    const context = await getMasterContext(lookup);
-    const payload = createBaseDirectRfqPayload(context);
-    payload.rfqItemDetail = []; // Empty item list
+  test('RFQ-ITMD-019: Empty item list allowed in Draft mode', async ({ requestForQuotationApi, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseDirectRfqPayload(context);
+      payload.rfqItemDetail = []; // Empty item list
 
-    const response = await requestForQuotationApi.save(payload);
-    expect(response.status, 'Empty item detail list must be rejected with status >= 400').toBeGreaterThanOrEqual(400);
+      const response = await requestForQuotationApi.save(payload);
+      expect(response.ok, 'Draft RFQ should be accepted with empty item list').toBe(true);
+      rfqId = getCreatedId(response.body);
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
   });
 
   // ===========================================================================

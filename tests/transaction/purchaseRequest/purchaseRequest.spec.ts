@@ -1036,7 +1036,7 @@ test.describe('Purchase Request API Tests', () => {
 
   // });
 
-  test.describe.only('H. Request-Level / HTTP-Level Negative Tests (REQ)', () => {
+  test.describe('H. Request-Level / HTTP-Level Negative Tests (REQ)', () => {
 
     test('REQ-001: Should fail on malformed JSON body', async ({ request, authManager }) => {
       const token = await authManager.getToken(request);

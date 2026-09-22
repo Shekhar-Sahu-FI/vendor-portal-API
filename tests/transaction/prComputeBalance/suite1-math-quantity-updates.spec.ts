@@ -40,14 +40,18 @@ test.describe('Suite 1: Mathematical Calculation & Quantity Updates (TC01 - TC12
         balanceQty: 100,
         rfqBalanceQty: 100,
         statusId: Status.Authorize, // 9
-        headerStatusId: Status.Authorize // 9
-      });
+        headerStatusId: DocumentStatus.Authorized // 30
+      }, context);
+
+      const todayStr = seed.prData.docDate || new Date().toISOString().split('T')[0];
 
       // Verify pending items for PO query returns the untouched PR item
       const pendingPoRes = await PRApi.getPendingItemsForPo({
+        prIds: [prId],
         prItemDetailIds: [item.id],
         companyId: context.company.id,
-        divisionId: context.division.id
+        divisionId: context.division.id,
+        tillDate: todayStr
       });
       expect(pendingPoRes.ok).toBe(true);
       const pendingPoItems = getResponseData(pendingPoRes.body);
@@ -58,7 +62,11 @@ test.describe('Suite 1: Mathematical Calculation & Quantity Updates (TC01 - TC12
       expect(Number(matchedPoItem.balanceQty)).toBe(100);
 
       // Verify pending items for RFQ query returns the untouched PR item
-      const pendingRfqRes = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [item.id] });
+      const pendingRfqRes = await PRApi.getPendingItemsForRfq({
+        prIds: [prId],
+        prItemDetailIds: [item.id],
+        tillDate: todayStr
+      });
       expect(pendingRfqRes.ok).toBe(true);
       const pendingRfqItems = getResponseData(pendingRfqRes.body);
       const matchedRfqItem = Array.isArray(pendingRfqItems)

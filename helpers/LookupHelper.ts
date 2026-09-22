@@ -2,6 +2,7 @@ import { RequestHelper } from './RequestHelper';
 import { MasterApi } from '../services/MasterApi';
 import { Logger } from './Logger';
 import { API_REGISTRY } from '../config/apiRegistry';
+import { CollectionVariableHelper } from './CollectionVariableHelper';
 
 export class LookupHelper {
   // Cache format: Map<masterName, Map<recordName, any>>
@@ -96,6 +97,21 @@ export class LookupHelper {
     }
 
     return id;
+  }
+
+  /**
+   * Resolves a master record directly from collection variables file without making network/API calls.
+   * Supported masters: unit, make, category, group, subgroup.
+   */
+  public getFromCollection(masterName: any, recordName: string): any {
+    return CollectionVariableHelper.fetchRecord(masterName, recordName);
+  }
+
+  /**
+   * Resolves a master ID directly from collection variables file without making network/API calls.
+   */
+  public getIdFromCollection(masterName: any, recordName: string): number | string {
+    return CollectionVariableHelper.fetchId(masterName, recordName);
   }
 
   /**

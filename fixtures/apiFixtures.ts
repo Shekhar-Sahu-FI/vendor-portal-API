@@ -6,6 +6,7 @@ import { PayloadHelper } from '../helpers/PayloadHelper';
 import { TransactionPayloadHelper } from '../helpers/TransactionPayloadHelper';
 import { MasterApi } from '../services/MasterApi';
 import { ApiWorkflowHelper } from '../helpers/ApiWorkflowHelper';
+import { CollectionVariableHelper } from '../helpers/CollectionVariableHelper';
 
 // Extend base Playwright test type to declare fixtures
 export interface ApiFixtures {
@@ -95,6 +96,7 @@ export interface ApiFixtures {
   companyUserMasterApiFactory: (masterName: string) => MasterApi;
 
   workflow: typeof ApiWorkflowHelper;
+  collectionVariables: typeof CollectionVariableHelper;
 }
 
 // Custom test fixture builder
@@ -152,6 +154,11 @@ export const test = base.extend<ApiFixtures>({
   transactionPayloadHelper: async ({ }, use) => {
     // Provide TransactionPayloadHelper class reference
     await use(TransactionPayloadHelper);
+  },
+
+  collectionVariables: async ({ }, use) => {
+    // Provide CollectionVariableHelper class reference
+    await use(CollectionVariableHelper);
   },
 
   masterApiFactory: async ({ requestHelper }, use) => {
@@ -426,3 +433,4 @@ export const test = base.extend<ApiFixtures>({
 
 // Re-export standard expect matching Playwright's ecosystem
 export { expect } from '@playwright/test';
+export { CollectionVariableHelper } from '../helpers/CollectionVariableHelper';
