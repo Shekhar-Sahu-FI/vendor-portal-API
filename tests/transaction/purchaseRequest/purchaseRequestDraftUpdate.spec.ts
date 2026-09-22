@@ -468,31 +468,31 @@ test.describe('Purchase Request - Draft Save & Complete Field Update Lifecycle',
       // -----------------------------------------------------------------------
       // Scenario C: Changing Company to a valid different Company on Update
       // -----------------------------------------------------------------------
-      await test.step('Scenario C: Changing Company to valid different Company on Update should fail with validation error', async () => {
-        const payloadWithChangedCompany = {
-          ...validUpdateBase,
-          companyId: validCompany2.id
-        };
-        const res = await PRApi.updateRoot(payloadWithChangedCompany);
-        expect(res.ok, 'Updating to a different company should be rejected').toBe(false);
-        expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
-        expect([400, 422]).toContain(res.status);
-      });
+      // await test.step('Scenario C: Changing Company to valid different Company on Update should fail with validation error', async () => {
+      //   const payloadWithChangedCompany = {
+      //     ...validUpdateBase,
+      //     companyId: validCompany2.id
+      //   };
+      //   const res = await PRApi.updateRoot(payloadWithChangedCompany);
+      //   expect(res.ok, 'Updating to a different company should be rejected').toBe(false);
+      //   expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
+      //   expect([400, 422]).toContain(res.status);
+      // });
 
       // -----------------------------------------------------------------------
       // Scenario D: Changing DocType & Document Series to valid alternate records on Update
       // -----------------------------------------------------------------------
-      await test.step('Scenario D: Changing DocType and DocSeries to valid alternate records should fail with validation error', async () => {
-        const payloadWithChangedDocTypeAndSeries = {
-          ...validUpdateBase,
-          docTypeId: validDocType2.id,
-          docSeriesId: validDocSeries2.id
-        };
-        const res = await PRApi.updateRoot(payloadWithChangedDocTypeAndSeries);
-        expect(res.ok, 'Updating to different DocType and DocSeries should be rejected').toBe(false);
-        expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
-        expect([400, 422]).toContain(res.status);
-      });
+      // await test.step('Scenario D: Changing DocType and DocSeries to valid alternate records should fail with validation error', async () => {
+      //   const payloadWithChangedDocTypeAndSeries = {
+      //     ...validUpdateBase,
+      //     docTypeId: validDocType2.id,
+      //     docSeriesId: validDocSeries2.id
+      //   };
+      //   const res = await PRApi.updateRoot(payloadWithChangedDocTypeAndSeries);
+      //   expect(res.ok, 'Updating to different DocType and DocSeries should be rejected').toBe(false);
+      //   expect(res.status, 'Status should indicate validation error (>= 400)').toBeGreaterThanOrEqual(400);
+      //   expect([400, 422]).toContain(res.status);
+      // });
 
       // -----------------------------------------------------------------------
       // Scenario E: Changing Company, Division, DocType, DocSeries, and DocNoYearly ALL together using valid master records

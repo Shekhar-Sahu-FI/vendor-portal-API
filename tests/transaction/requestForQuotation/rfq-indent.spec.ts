@@ -82,7 +82,7 @@ test.describe('RFQ Indent Details Tests @RFQ-IND', () => {
     PRApi: any,
     context: any,
     items: Array<{ qty: number; rate?: number }>,
-    docStatusId: number = DocumentStatus.Draft
+    docStatusId: number = DocumentStatus.Authorized
   ) => {
     const now = new Date();
     const todayStr = formatDate(now);
@@ -273,7 +273,7 @@ test.describe('RFQ Indent Details Tests @RFQ-IND', () => {
       const { prId: createdPrId, prData } = await createPrWithItems(PRApi, context, [
         { qty: 10, rate: 100 },
         { qty: 15, rate: 100 }
-      ]);
+      ], 30);
       prId = createdPrId;
 
       const prLine1Id = Number(prData.purchaseRequestItemDetail[0].id);

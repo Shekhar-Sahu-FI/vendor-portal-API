@@ -73,6 +73,8 @@ export interface ApiFixtures {
   paymentTermsGroupApi: MasterApi;
   requestForQuotationApi: MasterApi;
   quotationApi: MasterApi;
+  comparativeStatementApi: MasterApi;
+  csNegotiationApi: MasterApi;
   purchaseOrderCancellationApi: MasterApi;
 
   supplierAuthManager: AuthManager;
@@ -409,6 +411,8 @@ export const test = base.extend<ApiFixtures>({
   paymentTermsGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('paymentTermsGroup')),
   requestForQuotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('requestForQuotation')),
   quotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('quotation')),
+  comparativeStatementApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('comparativeStatement')),
+  csNegotiationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('csNegotiation')),
   purchaseOrderCancellationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrderCancellation')),
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),

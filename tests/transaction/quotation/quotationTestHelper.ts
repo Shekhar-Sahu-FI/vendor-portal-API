@@ -235,7 +235,12 @@ export const buildValidQuotationPayload = (
     quotationItemDetail: items,
     quotationTaxDetail: overrides.quotationTaxDetail || [],
     quotationOtherChargeDetail: overrides.quotationOtherChargeDetail || [],
-    quotationTermsNConditionDetail: overrides.quotationTermsNConditionDetail || [],
+    quotationTermsNConditionDetail: overrides.quotationTermsNConditionDetail || (
+      (rfqInfo.rfqData?.rfqTNCDetail || rfqInfo.rfqData?.rfqTncDetail || []).map((t: any, idx: number) => ({
+        tncHeadId: t.tncHead?.id || t.tncHeadId,
+        tncValue: t.tncValue ? `Accepted: ${t.tncValue}` : `Agreed Term ${idx + 1}`
+      }))
+    ),
     quotationInformToDetail: overrides.quotationInformToDetail || [],
     attachment: overrides.attachment || [],
     lastModifiedDate: overrides.lastModifiedDate

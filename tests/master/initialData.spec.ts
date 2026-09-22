@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures/apiFixtures';
-import { unitData, groupData, subgroupData, makeData, businessTypeData, finYearData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData, paymentTermsGroupData, requestForQuotationData } from './masterData';
+import { unitData, groupData, subgroupData, makeData, businessTypeData, finYearData, currencyData, cSReasonData, regionData, tNCHeadData, tNCGroupData, vendorCategoryData, priorityData, categoryData, itemData, countryData, stateData, cityData, locationData, companyData, companyLocationData, divisionData, departmentData, docTypeData, costCenterData, roleData, userData, supplierAccountData, vendorMasterData, expenseHeadData, vendorAttachmentData, documentSeriesData, paymentTermsGroupData, requestForQuotationData, approvalSetupData } from './masterData';
 
 
 test.describe('Initial Data Setup', () => {
@@ -519,6 +519,138 @@ test.describe('Initial Data Setup', () => {
             return {
                 ...payload,
                 paymentTermDetails
+            };
+        });
+    });
+
+    test('should seed Approval Setup Master initial data', async ({ approvalSetupApi, workflow, lookup }) => {
+        await workflow.seedInitialData(approvalSetupApi, approvalSetupData, "Approval Setup Master", async (payload) => {
+            const form = await lookup.getGlobalRecord("forms", payload.formName);
+            const formId = form?.id;
+
+            let approvalScopeId = 2;
+            if (payload.approvalScopeName) {
+                try {
+                    const scope = await lookup.getGlobalRecord("approvalScope", payload.approvalScopeName);
+                    if (scope?.id) approvalScopeId = scope.id;
+                } catch {
+                    approvalScopeId = 2;
+                }
+            }
+
+            const levelDetail = [];
+            if (payload.levelDetail) {
+                for (const level of payload.levelDetail) {
+                    const userDetail = [];
+                    if (level.userDetail) {
+                        for (const user of level.userDetail) {
+                            let userId = null;
+                            if (user.userName) {
+                                try {
+                                    const userRecord = await lookup.getRecord("user", user.userName);
+                                    userId = userRecord?.id;
+                                } catch {
+                                    try {
+                                        const adminRecord = await lookup.getRecord("user", "admin");
+                                        userId = adminRecord?.id || 1;
+                                    } catch {
+                                        userId = 1;
+                                    }
+                                }
+                            }
+                            let roleId = null;
+                            if (user.roleName) {
+                                try {
+                                    const roleRecord = await lookup.getRecord("role", user.roleName);
+                                    roleId = roleRecord?.id || null;
+                                } catch {
+                                    roleId = null;
+                                }
+                            }
+                            userDetail.push({
+                                userId: userId || 1,
+                                roleId: roleId,
+                                isDefault: user.isDefault ?? false
+                            });
+                        }
+                    }
+
+                    let approvalRuleId = level.approvalRuleId || 2;
+                    if (level.approvalRuleName) {
+                        try {
+                            const rule = await lookup.getGlobalRecord("approvalRule", level.approvalRuleName);
+                            if (rule?.id) approvalRuleId = rule.id;
+                        } catch {
+                            approvalRuleId = 2;
+                        }
+                    }
+
+                    const { userDetail: _, ...restLevel } = level;
+                    levelDetail.push({
+                        ...restLevel,
+                        approvalRuleId,
+                        userDetail
+                    });
+                }
+            }
+
+            const orgUnitDetail = [];
+            if (payload.orgUnitDetail) {
+                for (const org of payload.orgUnitDetail) {
+                    const division = await lookup.searchDivision(org.companyName, org.divisionName);
+                    let departmentId = null;
+                    if (org.departmentName) {
+                        try {
+                            const dept = await lookup.getRecord("department", org.departmentName);
+                            departmentId = dept?.id || null;
+                        } catch {
+                            departmentId = null;
+                        }
+                    }
+                    if (division) {
+                        orgUnitDetail.push({
+                            companyId: division.companyId,
+                            divisionId: division.id,
+                            departmentId: departmentId
+                        });
+                    }
+                }
+            }
+
+            const docTypeDetail = [];
+            if (payload.docTypeDetail) {
+                for (const doc of payload.docTypeDetail) {
+                    let docType = null;
+                    if (formId) {
+                        try {
+                            docType = await lookup.getDocTypeByFormId(doc.docTypeName, formId);
+                        } catch {
+                            // fallback
+                        }
+                    }
+                    if (!docType) {
+                        try {
+                            docType = await lookup.getRecord("docType", doc.docTypeName);
+                        } catch {
+                            // ignore
+                        }
+                    }
+                    if (docType?.id) {
+                        docTypeDetail.push({
+                            docTypeId: docType.id
+                        });
+                    }
+                }
+            }
+
+            const { formName, approvalScopeName, ...restPayload } = payload;
+            return {
+                ...restPayload,
+                formId,
+                approvalScopeId,
+                levelDetail,
+                orgUnitDetail,
+                docTypeDetail
             };
         });
     });

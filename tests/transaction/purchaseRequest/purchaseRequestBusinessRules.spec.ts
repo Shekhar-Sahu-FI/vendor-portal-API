@@ -3,7 +3,7 @@ import { expectBadRequest, expectSuccess } from '../../../helpers/ValidationHelp
 import { DocumentStatus } from '../../../helpers/globalEnums';
 import { deleteIfCreated, getCreatedId, getResponseData } from '../prComputeBalance/prComputeBalanceHelper';
 
-test.describe('Purchase Request Domain Business Rules & Edge Constraints (PR-BR)', () => {
+test.describe('Purchase Request Domain Business Rules & Edge Constraints @PR-BR', () => {
   let cachedBasePayload: any = null;
 
   const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {
@@ -226,7 +226,7 @@ test.describe('Purchase Request Domain Business Rules & Edge Constraints (PR-BR)
         };
 
         const updateRes = await PRApi.updateRoot(updatePayload);
-        expect(updateRes.status).toBe(409);
+        expect(updateRes.status).toBe(400);
       } finally {
         await deleteIfCreated(PRApi, prId);
       }

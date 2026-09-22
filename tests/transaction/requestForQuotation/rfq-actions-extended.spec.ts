@@ -373,4 +373,226 @@ test.describe('RFQ Extended Actions Tests (RFQ-ACT-EXT)', () => {
       expect(response.body.success).toBe(false);
     }
   });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-011: Resend Mail succeeds for active authorized RFQ vendor
+  // ===========================================================================
+  test('RFQ-ACT-EXT-011: Resend Mail on active authorized RFQ vendor returns valid response', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const getRes = await requestForQuotationApi.getById(rfqId);
+      const data = getResponseData(getRes.body);
+      const vendorDetailId = data.rfqVendorDetail?.[0]?.id;
+      expect(vendorDetailId, 'Vendor detail ID must exist').toBeDefined();
+
+      const resendRes = await requestHelper.put(
+        `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/vendor/${vendorDetailId}/resend-mail`,
+        {}
+      );
+      expect([200, 204]).toContain(resendRes.status);
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-012: Add Vendor to Authorized RFQ handles execution or portal policy
+  // ===========================================================================
+  test('RFQ-ACT-EXT-012: Add Vendor to Authorized RFQ handles execution or portal policy', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const addVendorPayload = {
+        vendors: [
+          {
+            isGuestVendor: false,
+            vendorLocationId: context.vendor2Info.vendorLocationId,
+            contactPersonDetail: []
+          }
+        ]
+      };
+
+      const addRes = await requestHelper.post(
+        `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/${rfqId}/vendors`,
+        addVendorPayload
+      );
+
+      if (addRes.ok) {
+        expect(addRes.status).toBe(200);
+        const getRes = await requestForQuotationApi.getById(rfqId);
+        const data = getResponseData(getRes.body);
+        expect(data.rfqVendorDetail.length).toBeGreaterThanOrEqual(2);
+      } else {
+        const errorText = JSON.stringify(addRes.body);
+        const isHandledError =
+          errorText.includes('Adding vendors to RFQ is not allowed based on portal configuration.') ||
+          errorText.includes('Vendor already exists') ||
+          errorText.includes('VALIDATION_ERROR');
+        expect(isHandledError).toBe(true);
+      }
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-013: Add duplicate vendor to Authorized RFQ is rejected
+  // ===========================================================================
+  test('RFQ-ACT-EXT-013: Add duplicate vendor to Authorized RFQ is rejected', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      // Attempt adding the already-present vendor1
+      const duplicateVendorPayload = {
+        vendors: [
+          {
+            isGuestVendor: false,
+            vendorLocationId: context.vendor1Info.vendorLocationId,
+            contactPersonDetail: []
+          }
+        ]
+      };
+
+      const addRes = await requestHelper.post(
+        `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/${rfqId}/vendors`,
+        duplicateVendorPayload
+      );
+      expect(addRes.status).toBeGreaterThanOrEqual(400);
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-014: Vendor Timeline returns valid timeline for authorized RFQ vendor
+  // ===========================================================================
+  test('RFQ-ACT-EXT-014: Vendor Timeline returns valid timeline for authorized RFQ vendor', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const getRes = await requestForQuotationApi.getById(rfqId);
+      const data = getResponseData(getRes.body);
+      const vendorDetailId = data.rfqVendorDetail?.[0]?.id;
+      expect(vendorDetailId).toBeDefined();
+
+      const timelineRes = await requestHelper.get(
+        `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/vendor/${vendorDetailId}/vendorTimeline`
+      );
+      expect(timelineRes.status).toBe(200);
+      expect(timelineRes.body.success).toBe(true);
+      expect(timelineRes.body.data).toBeDefined();
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-015: Quotation Detail for Authorized RFQ returns vendor list and quote summary
+  // ===========================================================================
+  test('RFQ-ACT-EXT-015: Quotation Detail for Authorized RFQ returns vendor list and quote summary', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const quotationDetailRes = await requestHelper.get(
+        `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/${rfqId}/quotation-detail`
+      );
+      expect(quotationDetailRes.status).toBe(200);
+      expect(quotationDetailRes.body.success).toBe(true);
+      const qData = getResponseData(quotationDetailRes.body);
+      expect(qData).toBeDefined();
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-016: Vendor Participation Action Viewed (23) with valid public ID
+  // ===========================================================================
+  test('RFQ-ACT-EXT-016: Vendor Participation Action Viewed (23) with valid public ID', async ({ requestForQuotationApi, requestHelper, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, { docStatusId: DocumentStatus.Authorized });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const getRes = await requestForQuotationApi.getById(rfqId);
+      const data = getResponseData(getRes.body);
+      const publicId = data.rfqVendorDetail?.[0]?.publicId;
+
+      if (publicId) {
+        const participationPayload = {
+          rfqVendorDetailPublicId: publicId,
+          action: 23 // Viewed
+        };
+
+        const partRes = await requestHelper.post(
+          `${ENV_CONFIG.BASE_URL}/api/purchase/request-for-quotations/vendor-participation`,
+          participationPayload
+        );
+        expect(partRes.status).toBe(200);
+        expect(partRes.body.success).toBe(true);
+      }
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
+
+  // ===========================================================================
+  // RFQ-ACT-EXT-017: Price List RFQ creation (isPriceList: true) and verification
+  // ===========================================================================
+  test('RFQ-ACT-EXT-017: Price List RFQ creation (isPriceList: true) and verification', async ({ requestForQuotationApi, lookup }) => {
+    let rfqId: number | undefined;
+    try {
+      const context = await getMasterContext(lookup);
+      const payload = createBaseRfqPayload(context, {
+        isPriceList: true,
+        mailSubject: 'Price List RFQ Verification Subject'
+      });
+
+      const saveRes = await requestForQuotationApi.save(payload);
+      expect(saveRes.ok, `Expected Price List RFQ save to succeed: ${JSON.stringify(saveRes.body)}`).toBe(true);
+      rfqId = getCreatedId(saveRes.body);
+
+      const getRes = await requestForQuotationApi.getById(rfqId);
+      expect(getRes.ok).toBe(true);
+      const data = getResponseData(getRes.body);
+      expect(data.isPriceList).toBe(true);
+    } finally {
+      await deleteIfCreated(requestForQuotationApi, rfqId);
+    }
+  });
 });

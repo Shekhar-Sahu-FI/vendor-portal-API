@@ -151,17 +151,47 @@ export enum DocSeriesFrequency {
 }
 
 export enum RefDocType {
+    // 1 Direct | Form 6 | For Purchase Request | isAudit: false
     DirectPR = 1,
+    // 2 Direct | Form 10 | For Purchase Order | isAudit: false
     DirectPO = 2,
+    // 3 Purchase Request | Form 10 | For Purchase Order | isAudit: false
     PurchaseRequestPO = 3,
+    // 4 Quotation | Form 10 | For Purchase Order | isAudit: false
     QuotationPO = 4,
+    // 5 Direct | Form 7 | For RFQ | isAudit: false
     DirectRFQ = 5,
+    // 6 Purchase Request | Form 7 | For RFQ | isAudit: false
     PurchaseRequestRFQ = 6,
+    // 7 RFQ | Form 6 | For CS | isAudit: false
     RfqCS = 7,
+    // 8 CS | Form 8 | For CS | isAudit: false
     CsCS = 8,
+    // 9 Auction | Form 7 | For RFQ | isAudit: true
     AuctionRFQ = 9,
+    // 10 Direct | Form 106 | For Auction | isAudit: false
     DirectAuction = 10,
-    RfqAuction = 11
+    // 11 RFQ | Form 106 | For Auction | isAudit: false
+    RfqAuction = 11,
+    // 12 Auction | Form 8 | For Auction | isAudit: false
+    AuctionAuction = 12,
+
+    // Aliases for Purchase Order (Form 10)
+    PurchaseRequest = 3,
+    Quotation = 4,
+    Direct = 2,
+
+    // Aliases for RFQ (Form 7)
+    RFQ_Direct = 5,
+    RFQ_PurchaseRequest = 6,
+    RFQ_Auction = 9,
+
+    // Aliases for CS (Form 8)
+    RFQ = 7,
+    CS = 8,
+
+    // Aliases for Auction (Form 106)
+    Auction = 9
 }
 
 export enum NotificationChannel {

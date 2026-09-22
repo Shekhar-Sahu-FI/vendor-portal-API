@@ -24,7 +24,7 @@ const deleteIfCreated = async (api: any, id?: number): Promise<void> => {
 
 const formatDate = (d: Date): string => d.toISOString().split('T')[0];
 
-test.describe('RFQ Terms & Conditions Tests (RFQ-TNC)', () => {
+test.describe('RFQ Terms & Conditions Tests @RFQ-TNC', () => {
   test.setTimeout(90000);
 
   let cachedContext: any = null;
@@ -48,17 +48,20 @@ test.describe('RFQ Terms & Conditions Tests (RFQ-TNC)', () => {
     );
     const contact = await lookup.getContactNoAndCountryId('India', 7);
 
-    // Look up T&C Heads and T&C Group
-    const tncHead1 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Payment Terms')
-      || await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Payment')
-      || { id: 1, tncHeadName: 'Payment Terms' };
+    // Look up T&C Heads and T&C Group from initial master data
+    const tncHead1 = await lookup.getRecord('termsAndConditionHead', 'Head One is Compulsory Not Default')
+      || await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Head One')
+      || await lookup.getRecord('termsAndConditionHead', 'Head One')
+      || { id: 1, tncHeadName: 'Head One is Compulsory Not Default' };
 
-    const tncHead2 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Delivery')
-      || await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Warranty')
-      || { id: 2, tncHeadName: 'Delivery Terms' };
+    const tncHead2 = await lookup.getRecord('termsAndConditionHead', 'Head Two is Default Not Compulsory')
+      || await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Head Two')
+      || await lookup.getRecord('termsAndConditionHead', 'Head Two')
+      || { id: 2, tncHeadName: 'Head Two is Default Not Compulsory' };
 
-    const tncGroup = await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'TNC Group One')
-      || await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'Group')
+    const tncGroup = await lookup.getRecord('termsAndConditionGroup', 'TNC Group One')
+      || await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'TNC Group One')
+      || await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'TNC Group')
       || null;
 
     cachedContext = { company, docSeries, docType, item, unit, make, vendor1Info, contact, tncHead1, tncHead2, tncGroup };

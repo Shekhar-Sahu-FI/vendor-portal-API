@@ -1,7 +1,7 @@
 import { test, expect } from '../../../fixtures/apiFixtures';
 import { DocumentStatus, RefDocType } from '../../../helpers/globalEnums';
 
-test.describe('RFQ General Info Tests RFQ-GEN', () => {
+test.describe('RFQ General Info Tests @RFQ-GEN', () => {
   let cachedBasePayload: any = null;
 
   const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {

@@ -4080,6 +4080,132 @@ export const finYearData = [
         "previousFinYearId": null,
         "nextFinYearId": null
     }
-]
+];
+
+export const approvalSetupData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "formName": "Purchase Request",
+        "approvalScopeName": "CompanyDivisionDepartmentWise",
+        "approvalSetupName": "PR Approval Setup - All Companies & Divisions",
+        "minNetAmount": null,
+        "maxNetAmount": null,
+        "description": "Approval setup for Purchase Request across all companies, divisions, and PR document types",
+        "isAudit": false,
+        "fromDate": null,
+        "toDate": null,
+        "isAuditApplyToExistingDocuments": false,
+        "levelDetail": [
+            {
+                "levelNo": 1,
+                "printingCaption": "First Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "admin",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            },
+            {
+                "levelNo": 2,
+                "printingCaption": "Second Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "UN1",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            }
+        ],
+        "orgUnitDetail": [
+            { "companyName": "Company One", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company One", "divisionName": "Division Three Company One Only", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Five Company Two Only", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Four Company Three Only", "departmentName": null }
+        ],
+        "docTypeDetail": [
+            { "docTypeName": "PR - Standard - Division One Company One Two Three" },
+            { "docTypeName": "PR - Engineering - Division One Company One Two Three" },
+            { "docTypeName": "PR - Chemical - Division Four Company Three Only" },
+            { "docTypeName": "PR - Supply Chain - Division One Company One Two Three" },
+            { "docTypeName": "PR - Export - Division Four Company Three Only" }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "formName": "Purchase Order",
+        "approvalScopeName": "CompanyDivisionDepartmentWise",
+        "approvalSetupName": "PO Approval Setup - All Companies & Divisions",
+        "minNetAmount": null,
+        "maxNetAmount": null,
+        "description": "Approval setup for Purchase Order across all companies, divisions, and PO document types",
+        "isAudit": false,
+        "fromDate": null,
+        "toDate": null,
+        "isAuditApplyToExistingDocuments": false,
+        "levelDetail": [
+            {
+                "levelNo": 1,
+                "printingCaption": "First Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "admin",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            },
+            {
+                "levelNo": 2,
+                "printingCaption": "Second Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "UN1",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            }
+        ],
+        "orgUnitDetail": [
+            { "companyName": "Company One", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company One", "divisionName": "Division Three Company One Only", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Five Company Two Only", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Four Company Three Only", "departmentName": null }
+        ],
+        "docTypeDetail": [
+            { "docTypeName": "PO - Standard - Division One Company One Two Three" },
+            { "docTypeName": "PO - Engineering - Division One Company One Two Three" },
+            { "docTypeName": "PO - Chemical - Division Four Company Three Only" },
+            { "docTypeName": "PO - Supply Chain - Division One Company One Two Three" },
+            { "docTypeName": "PO - Export - Division Four Company Three Only" }
+        ]
+    }
+];
+
 
 

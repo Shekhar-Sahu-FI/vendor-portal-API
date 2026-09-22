@@ -3,7 +3,7 @@ import { expectBadRequest, expectForbidden, expectNotFound, expectSuccess, expec
 import { DocumentStatus } from '../../../helpers/globalEnums';
 import { deleteIfCreated, getCreatedId, getResponseData } from '../prComputeBalance/prComputeBalanceHelper';
 
-test.describe('Purchase Request Deletion & Audit Lifecycle (PR-DEL)', () => {
+test.describe('Purchase Request Deletion & Audit Lifecycle @PR-DEL', () => {
   let cachedBasePayload: any = null;
 
   const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {
@@ -89,6 +89,7 @@ test.describe('Purchase Request Deletion & Audit Lifecycle (PR-DEL)', () => {
           deleteReason: "Cancelled due to requisition budget adjustment"
         }
       });
+      console.log("@#@", response)
       expect([200, 204]).toContain(response.status());
 
       const getRes = await PRApi.getById(prId);

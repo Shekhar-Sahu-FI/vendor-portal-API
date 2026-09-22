@@ -717,56 +717,145 @@ export class TransactionPayloadHelper {
    */
   public static createPurchaseOrderPayload(params: any = {}): any {
     const todayStr = this.formatDateStr(new Date());
+    const validityDateStr = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     return {
-      companyId: params.companyId || null,
-      divisionId: params.divisionId || null,
-      documentTypeId: params.documentTypeId || null,
-      docSeriesId: params.docSeriesId || null,
       docNoYearly: params.docNoYearly || null,
+      docSeriesId: params.docSeriesId || null,
+      erpSerialNoId: params.erpSerialNoId || null,
       docDate: params.docDate || todayStr,
-      amendmentNo: params.amendmentNo || 0,
       docStatusId: params.docStatusId ?? DocumentStatus.Draft,
-      isPoCapexIndentValidationApplicable: params.isPoCapexIndentValidationApplicable ?? false,
-      refDocTypeNo: params.refDocTypeNo ?? 1, // 1=Direct, 2=Purchase Request, 3=Quotation
-      refDocNo: params.refDocNo || null,
-      vendorId: params.vendorId || null,
-      vendorLocationId: params.vendorLocationId || null,
-      contactPersonName: params.contactPersonName || null,
-      validityDate: params.validityDate || todayStr,
+      amendmentNo: params.amendmentNo || 0,
+      amendmentDate: params.amendmentDate || todayStr,
+      mainPoId: params.mainPoId || null,
+      amendmentReason: params.amendmentReason || null,
+      companyId: params.companyId || 1,
+      divisionId: params.divisionId || 1,
+      docTypeId: params.docTypeId || params.documentTypeId || 1,
+      expenditureTypeId: params.expenditureTypeId ?? ExpenditureType.Capex, // 1
+      refDocTypeId: params.refDocTypeId ?? params.refDocTypeNo ?? RefDocType.DirectPO, // 2
+      quotationId: params.quotationId ?? params.refDocNo ?? null,
+      vendorLocationId: params.vendorLocationId || 1,
+      contactPersonId: params.contactPersonId || null,
+      validityDate: params.validityDate || validityDateStr,
       departmentId: params.departmentId || null,
       partyRefNo: params.partyRefNo || null,
       partyRefDate: params.partyRefDate || null,
-
-      poIndentDetail: params.poIndentDetail || [],
-      poItemDetail: params.poItemDetail || [],
-
-      carrierTypeId: params.carrierTypeId || 1,
+      vehicleType: params.vehicleType || params.vehicleTypeId || 1,
       paymentModeId: params.paymentModeId || 1,
       dueBasisId: params.dueBasisId || 1,
       dueDays: params.dueDays || 30,
-      freightTypeId: params.freightTypeId || 1,
+      freightTypeId: params.freightTypeId !== undefined ? params.freightTypeId : (params.isRouteApplicable || params.isTransportationRouteApplicable ? null : 1),
       freightRateTypeId: params.freightRateTypeId || null,
-      freightAmount: params.freightAmount || 0,
-      noOfTrips: params.noOfTrips || null,
-      consigneeLocationId: params.consigneeLocationId || 1,
+      freightAmount: params.freightAmount !== undefined ? params.freightAmount : null,
       priorityId: params.priorityId || 1,
-      fromLocationId: params.fromLocationId || null,
-      toLocationId: params.toLocationId || null,
+      fromLocationId: params.fromLocationId !== undefined ? params.fromLocationId : (params.isRouteApplicable || params.isTransportationRouteApplicable ? null : 1),
+      toLocationId: params.toLocationId !== undefined ? params.toLocationId : (params.isRouteApplicable || params.isTransportationRouteApplicable ? null : 1),
+      consigneeLocationId: params.consigneeLocationId || 1,
+      isRouteApplicable: params.isRouteApplicable ?? params.isTransportationRouteApplicable ?? false,
+      transportationRouteLevelId: params.transportationRouteLevelId || null,
+      isManuallyClosing: params.isManuallyClosing ?? false,
       currencyId: params.currencyId || 1,
       exchangeRate: params.exchangeRate || 1,
-
       basicAmount: params.basicAmount || 0,
       netAmount: params.netAmount || 0,
       taxAmount: params.taxAmount || 0,
+      tncGroupId: params.tncGroupId || null,
+      paymentTermsGroupId: params.paymentTermsGroupId || null,
+      expenseGroupId: params.expenseGroupId || null,
+      approvalSetupId: params.approvalSetupId || null,
+      remarks: params.remarks || 'Test PO',
+      noOfTrips: params.noOfTrips || null,
+      attachment: params.attachment || params.poAttachment || [],
+      taxDetails: params.taxDetails || params.poTaxDetail || [],
+      itemDetail: params.itemDetail || params.poItemDetail || [],
+      termsNConditionDetails: params.termsNConditionDetails || params.poTermsNConditionDetail || [],
+      transportationRoute: params.transportationRoute || params.poTransportRouteDetail || [],
+      paymentTerms: params.paymentTerms || params.poPaymentTerm || [],
+      expenseDetail: params.expenseDetail || params.poOtherChargeDetail || []
+    };
+  }
 
-      poTaxDetail: params.poTaxDetail || [],
-      poOtherChargeDetail: params.poOtherChargeDetail || [],
-      poTermsNConditionDetail: params.poTermsNConditionDetail || [],
-      poPaymentTerm: params.poPaymentTerm || [],
-      poAttachment: params.poAttachment || [],
-      poInformToDetail: params.poInformToDetail || [],
-      poTransportRouteDetail: params.poTransportRouteDetail || []
+  public static async createPOPayload(lookup: LookupHelper, params: any = {}): Promise<any> {
+    const company = params.companyId ? null : (await lookup.searchRecord('company', 'CompanyName.Contains', params.companyName || 'Company One')
+      || await lookup.getRecord('company', params.companyName || 'Company One'));
+    const companyId = params.companyId || company?.id || 1;
+
+    const division = params.divisionId ? null : (await lookup.searchRecord('division', 'divisionName.Contains', params.divisionName || 'Division One')
+      || await lookup.getRecord('division', params.divisionName || 'Division One'));
+    const divisionId = params.divisionId || division?.id || 1;
+
+    const docSeries = params.docSeriesId ? null : (await lookup.searchRecord('docSeries', 'Pattern.Contains', params.docSeriesPattern || 'PO')
+      || await lookup.searchRecord('docSeries', 'Pattern.Contains', 'PO-{{YYYY}}-{{MM}}-{{N}}'));
+    const docSeriesId = params.docSeriesId ?? (docSeries?.id || null);
+
+    const docType = params.docTypeId ? null : (await lookup.searchRecord('docType', 'DocTypeName.Contains', params.docTypeName || 'PO')
+      || await lookup.searchRecord('docType', 'DocTypeName.Contains', 'PO'));
+    const docTypeId = params.docTypeId || docType?.id || 1;
+
+    return this.createPurchaseOrderPayload({
+      ...params,
+      companyId,
+      divisionId,
+      docSeriesId,
+      docTypeId
+    });
+  }
+
+  /**
+   * Helper to construct Comparative Statement (CS) payload
+   */
+  static async createCSPayload(lookup: LookupHelper, params: any = {}) {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    const validityDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const company = params.companyId ? null : (await lookup.searchRecord('company', 'CompanyName.Contains', params.companyName || 'Company One')
+      || await lookup.getRecord('company', params.companyName || 'Company One'));
+    const companyId = params.companyId || company?.id || 1;
+
+    const docSeries = params.docSeriesId ? null : (await lookup.searchRecord('docSeries', 'Pattern.Contains', params.docSeriesPattern || 'CS')
+      || await lookup.searchRecord('docSeries', 'Pattern.Contains', 'CS/{{FY2}}/{{MMM}}/{{N}}'));
+    const docSeriesId = params.docSeriesId ?? (docSeries?.id || null);
+
+    const docType = params.docTypeId ? null : (await lookup.searchRecord('docType', 'DocTypeName.Contains', params.docTypeName || 'Comparative Statement')
+      || await lookup.searchRecord('docType', 'DocTypeName.Contains', 'CS'));
+    const docTypeId = params.docTypeId || docType?.id || 1;
+
+    return {
+      companyId: companyId,
+      docTypeId: docTypeId,
+      docNoYearly: params.docNoYearly || '',
+      docDate: params.docDate || todayStr,
+      docSeriesId: docSeriesId,
+      docStatusId: params.docStatusId ?? DocumentStatus.Draft,
+      refDocTypeId: params.refDocTypeId ?? RefDocType.RFQ, // 7 = RFQ, 8 = CS
+      rfqId: params.rfqId ?? 0,
+      refCsId: params.refCsId ?? null,
+      vendorSelectionBasisId: params.vendorSelectionBasisId ?? 1, // 1 = Item Wise, 2 = Quotation Wise
+      selectionCriteriaId: params.selectionCriteriaId ?? 1, // 1 = Lowest
+      validityDate: params.validityDate || validityDate,
+      remarks: params.remarks ?? 'Test Comparative Statement',
+      approvalSetupId: params.approvalSetupId ?? null,
+      quotationParticipationDetail: params.quotationParticipationDetail || [],
+      additionalDetail: params.additionalDetail || [],
+      quotationDetail: params.quotationDetail || []
+    };
+  }
+
+  /**
+   * Helper to construct CS Negotiation payload
+   */
+  static async createCSNegotiationPayload(params: any = {}) {
+    return {
+      csId: params.csId ?? 0,
+      vendorLocationId: params.vendorLocationId ?? 0,
+      quotationId: params.quotationId ?? 0,
+      isSend: params.isSend ?? false,
+      itemDetail: params.itemDetail || [],
+      tncDetail: params.tncDetail || [],
+      taxDetail: params.taxDetail || []
     };
   }
 }
+

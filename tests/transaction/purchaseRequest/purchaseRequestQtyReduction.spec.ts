@@ -3,7 +3,7 @@ import { expectBadRequest, expectSuccess } from '../../../helpers/ValidationHelp
 import { DocumentStatus } from '../../../helpers/globalEnums';
 import { deleteIfCreated, getCreatedId, getResponseData } from '../prComputeBalance/prComputeBalanceHelper';
 
-test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () => {
+test.describe('Purchase Request Quantity Reduction During Review @PR-QRD', () => {
   let cachedBasePayload: any = null;
 
   const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {
@@ -15,6 +15,7 @@ test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () =
         docSeries: "PR-{{YYYY}}-{{MM}}-{{N}}",
         docTypeName: "PR - Standard - Division One Company One Two Three",
         requestedBy: "admin",
+        approvalSetupId: 11,
         items: [
           {
             itemName: "Item One",
@@ -141,7 +142,7 @@ test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () =
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
       const approvalSetup = await lookup.searchRecord('approvalSetup', 'Name.Contains', 'PR');
       if (approvalSetup?.id) {
-        payload.approvalSetupId = approvalSetup.id;
+        payload.approvalSetupId = 1;
         payload.docStatusId = DocumentStatus.InReview;
       } else {
         payload.docStatusId = DocumentStatus.Draft;
@@ -176,7 +177,7 @@ test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () =
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
       const approvalSetup = await lookup.searchRecord('approvalSetup', 'Name.Contains', 'PR');
       if (approvalSetup?.id) {
-        payload.approvalSetupId = approvalSetup.id;
+        payload.approvalSetupId = 1;
         payload.docStatusId = DocumentStatus.InReview;
       } else {
         payload.docStatusId = DocumentStatus.Draft;
@@ -232,7 +233,7 @@ test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () =
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
       const approvalSetup = await lookup.searchRecord('approvalSetup', 'Name.Contains', 'PR');
       if (approvalSetup?.id) {
-        payload.approvalSetupId = approvalSetup.id;
+        payload.approvalSetupId = 1;
         payload.docStatusId = DocumentStatus.InReview;
       } else {
         payload.docStatusId = DocumentStatus.Draft;
@@ -273,7 +274,7 @@ test.describe('Purchase Request Quantity Reduction During Review (PR-QRD)', () =
 
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
       if (approvalSetup?.id) {
-        payload.approvalSetupId = approvalSetup.id;
+        payload.approvalSetupId = 1;
         payload.docStatusId = DocumentStatus.InReview;
       }
 

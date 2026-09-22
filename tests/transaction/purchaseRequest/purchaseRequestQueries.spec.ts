@@ -2,7 +2,7 @@ import { test, expect } from '../../../fixtures/apiFixtures';
 import { expectBadRequest, expectForbidden, expectNotFound, expectSuccess } from '../../../helpers/ValidationHelper';
 import { deleteIfCreated, getCreatedId, getResponseData } from '../prComputeBalance/prComputeBalanceHelper';
 
-test.describe('Purchase Request Queries, Snapshots & Auxiliary Endpoints (PR-QRY)', () => {
+test.describe('Purchase Request Queries, Snapshots & Auxiliary Endpoints @PR-QRY', () => {
   let cachedBasePayload: any = null;
 
   const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {

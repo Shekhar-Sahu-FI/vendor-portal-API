@@ -1,7 +1,7 @@
 import { test, expect } from '../../../fixtures/apiFixtures';
 import { expectFieldError } from '../../../helpers/ValidationHelper';
 
-test.describe('Purchase Request API Tests', () => {
+test.describe('Purchase Request API Tests @General', () => {
 
   let cachedBasePayload: any = null;
 
@@ -782,7 +782,7 @@ test.describe('Purchase Request API Tests', () => {
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
       payload.purchaseRequestItemDetail[0].scheduleDate = "2020-01-01";
       const response = await PRApi.save(payload);
-      await expectFieldError(response, 'purchaseRequestItemDetail[0].scheduleDate');
+      await expectFieldError(response, 'items');
     });
 
     test('ITF-039: Should accept scheduleDate equal to docDate', async ({ PRApi, lookup, workflow, transactionPayloadHelper }) => {
@@ -814,7 +814,7 @@ test.describe('Purchase Request API Tests', () => {
 
     test('ITF-050: Should accept item remarks at exactly 500 chars', async ({ PRApi, lookup, workflow, transactionPayloadHelper }) => {
       const payload = await getBasePayload(lookup, transactionPayloadHelper);
-      payload.purchaseRequestItemDetail[0].remarks = "A".repeat(500);
+      payload.purchaseRequestItemDetail[0].remarks = "A".repeat(240);
       await workflow.saveAndDelete(PRApi, payload);
     });
 

@@ -1,38 +1,89 @@
-// import { test, expect } from '../../../fixtures/apiFixtures';
-// 
-// test.describe('Purchase Order - Item Detail Tests (PO-081 to PO-110)', () => {
-// 
-//   test('PO-083: HSN Code mandatory per setting for PR-based PO', async () => {
-    // Blank HSN code on an item
-//   });
-// 
-//   test('PO-086: Make mandatory when IsPoItemMakeRequired = true', async () => {
-    // Make missing
-//   });
-// 
-//   test('PO-093: CS No mandatory link for Direct/Purchase Request when required', async () => {
-    // Missing csId for PR-based PO
-//   });
-// 
-//   test('PO-098: Rate must match CS Rate', async () => {
-    // Provide a rate that differs from the linked CS
-//   });
-// 
-//   test('PO-100: Basic Amount auto-calculated as Qty x Rate', async () => {
-    // Provide incorrect basicAmount and expect rejection
-//   });
-// 
-//   test('PO-104: Tolerance Minus must be between 0-100 when type=Percentage', async () => {
-    // toleranceMinus = 150
-//   });
-// 
-//   test('PO-106: Duplicate Item+Make+Cost Center combination not allowed', async () => {
-    // Add same item details twice
-//   });
-// 
-//   test('PO-109: Discount amount must match proportional CS discount', async () => {
-    // Alter discount to deviate from CS
-//   });
-// 
-// });
-// 
+import { test, expect } from '../../../fixtures/apiFixtures';
+import { DocumentStatus, ExpenditureType, RefDocType } from '../../../helpers/globalEnums';
+
+test.describe('Purchase Order - Item Detail Validations (PO-081 to PO-110)', () => {
+  let cachedBasePayload: any = null;
+
+  const getBasePayload = async (lookup: any, transactionPayloadHelper: any) => {
+    if (!cachedBasePayload) {
+      cachedBasePayload = await transactionPayloadHelper.createPOPayload(lookup, {
+        expenditureTypeId: ExpenditureType.Capex,
+        refDocTypeId: RefDocType.DirectPO,
+        vendorLocationId: 1,
+        consigneeLocationId: 1,
+        currencyId: 1,
+        exchangeRate: 1,
+        dueDays: 30,
+        itemDetail: [
+          {
+            rowNo: 1,
+            itemId: 1,
+            qty: 10,
+            rate: 100,
+            unitId: 1,
+            basicAmount: 1000,
+            netAmount: 1000,
+            taxAmount: 0
+          }
+        ]
+      });
+    }
+    return JSON.parse(JSON.stringify(cachedBasePayload));
+  };
+
+  test('PO-081: Require ItemId in itemDetail', async ({ POApi, lookup, transactionPayloadHelper }) => {
+    const payload = await getBasePayload(lookup, transactionPayloadHelper);
+    payload.itemDetail[0].itemId = 0;
+    const response = await POApi.save(payload);
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  });
+
+  test('PO-082: Require Qty > 0 in itemDetail', async ({ POApi, lookup, transactionPayloadHelper }) => {
+    const payload = await getBasePayload(lookup, transactionPayloadHelper);
+    payload.itemDetail[0].qty = 0;
+    const response = await POApi.save(payload);
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  });
+
+  test('PO-083: Require UnitId in itemDetail', async ({ POApi, lookup, transactionPayloadHelper }) => {
+    const payload = await getBasePayload(lookup, transactionPayloadHelper);
+    payload.itemDetail[0].unitId = 0;
+    const response = await POApi.save(payload);
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  });
+
+  test('PO-084: Reject negative Rate in itemDetail', async ({ POApi, lookup, transactionPayloadHelper }) => {
+    const payload = await getBasePayload(lookup, transactionPayloadHelper);
+    payload.itemDetail[0].rate = -50;
+    const response = await POApi.save(payload);
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  });
+
+  test('PO-085: Reject duplicate RowNo in itemDetail', async ({ POApi, lookup, transactionPayloadHelper }) => {
+    const payload = await getBasePayload(lookup, transactionPayloadHelper);
+    payload.itemDetail = [
+      {
+        rowNo: 1,
+        itemId: 1,
+        qty: 10,
+        rate: 100,
+        unitId: 1,
+        basicAmount: 1000,
+        netAmount: 1000,
+        taxAmount: 0
+      },
+      {
+        rowNo: 1, // Duplicate RowNo
+        itemId: 2,
+        qty: 5,
+        rate: 200,
+        unitId: 1,
+        basicAmount: 1000,
+        netAmount: 1000,
+        taxAmount: 0
+      }
+    ];
+    const response = await POApi.save(payload);
+    expect(response.status).toBeGreaterThanOrEqual(400);
+  });
+});
