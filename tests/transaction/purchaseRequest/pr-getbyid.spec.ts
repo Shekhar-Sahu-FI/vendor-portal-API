@@ -277,7 +277,7 @@ test.describe('Purchase Request - GetById Complete Field & Condition Verificatio
   // ===========================================================================
   // TEST CASE 2: Minimal / Mandatory-Only PR (Omission of All Optional Fields)
   // ===========================================================================
-  test('PR-GBI-002: Minimal PR - Save with mandatory-only fields (all optional omitted), verify getById handles nulls/defaults gracefully', async ({
+  test('PR-GBI-002: Minimal PR - Save with mandatory-only fields all optional omitted, verify getById handles nulls defaults gracefully', async ({
     PRApi,
     lookup
   }) => {
@@ -374,7 +374,7 @@ test.describe('Purchase Request - GetById Complete Field & Condition Verificatio
   // ===========================================================================
   // TEST CASE 3: Expenditure Types (Opex vs Capex) Verification
   // ===========================================================================
-  test('PR-GBI-003: Expenditure Type - Verify expenditureType object correctly returned for Opex (Revenue) in getById', async ({
+  test('PR-GBI-003: Expenditure Type - Verify expenditureType object correctly returned for Opex Revenue in getById', async ({
     PRApi,
     lookup
   }) => {
@@ -449,7 +449,7 @@ test.describe('Purchase Request - GetById Complete Field & Condition Verificatio
   // ===========================================================================
   // TEST CASE 4: Authorized State PR Verification
   // ===========================================================================
-  test('PR-GBI-004: Authorized PR - Save PR in Authorized state (docStatusId: 30) and verify status in getById', async ({
+  test('PR-GBI-004: Authorized PR - Save PR in Authorized state docStatusId: 30 and verify status in getById', async ({
     PRApi,
     lookup
   }) => {

@@ -335,18 +335,27 @@ test.describe('Suite 1: Mathematical Calculation & Quantity Updates (TC01 - TC12
 
     try {
       const context = await getMasterContext(lookup);
-      const seed = await createPrWithItems(PRApi, context, [{ qty: 100, rate: 100 }]);
+      // Multi-unit item from initial master data: Item Two Multi Unit Make One Two Three (context.item1)
+      // PR created in base unit: Unit One (context.unit1)
+      const seed = await createPrWithItems(PRApi, context, [{
+        itemId: context.item1.id,
+        unitId: context.unit1.id,
+        qty: 100,
+        rate: 100
+      }]);
       prId = seed.prId;
       const item = seed.savedPrItems[0];
 
-      // PR UOM is Unit1 (e.g. NOS). PO UOM is Unit2 (e.g. BOX), where 1 BOX = 10 NOS (firstCf = 10, secondCf = 1).
-      // PO ordered qty = 4 BOX => Effective PR Qty = 4 * 10 / 1 = 40 NOS.
+      // PO uses different unit (Unit Two) than used in PR (Unit One)
+      // Master data defines Fixed conversion 1:1 between Unit One and Unit Two (FromUnitValue=1, ToUnitValue=1)
+      // PO ordered qty = 40 in Unit Two => Effective PR Qty = 40 * 1 / 1 = 40 in Unit One
       const poSeed = await createPoForPr(POApi, context, seed.prData, [{
         prItemDetailId: item.id,
-        poQty: 4,
-        unitId: context.unit2?.id || context.unit1.id,
-        firstCf: 10,
-        secondCf: 1
+        unitId: context.unit2?.id || 101,
+        poQty: 40,
+        firstCf: 1,
+        secondCf: 1,
+        rate: 100
       }], { refDocTypeId: RefDocType.PurchaseRequestPO });
       poId = poSeed.poId;
 
