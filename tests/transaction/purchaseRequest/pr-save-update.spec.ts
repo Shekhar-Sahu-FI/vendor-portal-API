@@ -217,7 +217,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
                 refDate: refDate,
                 requestedBy: 'Alexander Hamilton',
                 requestedByContactNoCountryId: ctx.countryId,
-                requestedByContactNo: ctx.contactNo,
+                requestedByContactNo: '+919876543210',
                 requestedByEmailId: 'alexander.h@procure.com',
                 remarks: 'Expedited procurement requested for Q4 project milestones.',
                 netAmount: 2500.00,
