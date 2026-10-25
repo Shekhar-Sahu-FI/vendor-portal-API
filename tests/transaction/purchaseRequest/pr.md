@@ -71,6 +71,7 @@
 | `PR-UPD-POS-02` | PUT | `/api/purchase-requests` | Happy Path | 200 OK | Modify line items & recomputed NetAmount |
 | `PR-UPD-POS-03` | PUT | `/api/purchase-requests` | Happy Path | 200 OK | Update InformTo list & Item Attachments |
 | `PR-UPD-POS-04` | PUT | `/api/purchase-requests` | Happy Path | 200 OK | InReview Qty reduction within balance |
+| `PR-UPD-POS-05` | PUT | `/api/purchase-requests` | Happy Path | 200 OK | Exhaustive Field Update Lifecycle in Draft Mode |
 | `PR-SAVE-VAL-HDR-01` | POST | `/api/purchase-requests` | Header Validation | 400 Bad Request | DocSeriesId and DocNoYearly both missing |
 | `PR-SAVE-VAL-HDR-02` | POST | `/api/purchase-requests` | Header Validation | 400 Bad Request | DocNoYearly empty string with null series |
 | `PR-SAVE-VAL-HDR-03` | POST | `/api/purchase-requests` | Header Validation | 400 Bad Request | DocNoYearly length > 30 chars (31 chars) |
@@ -113,6 +114,7 @@
 | `PR-UPD-VAL-04` | PUT | `/api/purchase-requests` | Update Concurrency | 409 Conflict | Stale LastModifiedDate |
 | `PR-UPD-VAL-05` | PUT | `/api/purchase-requests` | Immutability | 400 Bad Request | Modifying DocNoYearly on Update |
 | `PR-UPD-VAL-06` | PUT | `/api/purchase-requests` | State Guard | 400 Bad Request | Updating Authorized PR |
+| `PR-UPD-VAL-07` | PUT | `/api/purchase-requests` | Restricted Fields | 400 Bad Request | Modifying Company/Division/DocType on Update |
 | `PR-CALC-VAL-01` | POST | `/api/purchase-requests` | Calculations | 400 Bad Request | Item Amount != Rate * PrQty |
 | `PR-CALC-VAL-02` | POST | `/api/purchase-requests` | Calculations | 400 Bad Request | NetAmount != Sum of Item Amounts |
 | `PR-CALC-VAL-03` | POST | `/api/purchase-requests` | Date Logic | 400 Bad Request | ScheduleDate < DocDate |

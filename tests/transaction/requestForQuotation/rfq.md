@@ -99,6 +99,8 @@
 | `RFQ-UPD-POS-02` | PUT | `/api/purchase/request-for-quotations/{id}` | Happy Path | 200 OK | Update RFQ line quantities and replace vendor details |
 | `RFQ-UPD-POS-03` | PUT | `/api/purchase/request-for-quotations/{id}` | Happy Path | 200 OK | Transition Draft (10) to InReview (20) with ApprovalSetupId |
 | `RFQ-UPD-POS-04` | PUT | `/api/purchase/request-for-quotations/{id}` | Happy Path | 200 OK | Transition Draft (10) to Authorized (30) |
+| `RFQ-UPD-POS-05` | PUT | `/api/purchase/request-for-quotations/{id}` | Happy Path | 200 OK | Complete Draft update lifecycle mutating all header, line, vendor and T&C fields |
+| `RFQ-UPD-POS-06` | PUT | `/api/purchase/request-for-quotations/{id}` | Sourcing Transition | 200 OK | Sourcing transition: Direct RFQ -> Against PR -> Revert to Direct RFQ |
 | `RFQ-VAL-HDR-01` | POST | `/api/purchase/request-for-quotations` | Header Validation | 400 Bad Request | Both `DocSeriesId` and `DocNoYearly` missing |
 | `RFQ-VAL-HDR-02` | POST | `/api/purchase/request-for-quotations` | Header Validation | 400 Bad Request | `DocNoYearly` length > 30 characters |
 | `RFQ-VAL-HDR-03` | POST | `/api/purchase/request-for-quotations` | Header Validation | 400 Bad Request | `CompanyId = 0` |
@@ -173,6 +175,7 @@
 | `RFQ-UPD-VAL-04` | PUT | `/api/purchase/request-for-quotations/{id}` | State Guard | 400 Bad Request | Update RFQ currently In Review (`docStatusNo = 20`) |
 | `RFQ-UPD-VAL-05` | PUT | `/api/purchase/request-for-quotations/{id}` | State Guard | 400 Bad Request | Update RFQ currently Authorized (`docStatusNo = 30`) |
 | `RFQ-UPD-VAL-06` | PUT | `/api/purchase/request-for-quotations/{id}` | Update Validation | 400 Bad Request | `RefDocTypeId = 3` (Auction) on Update |
+| `RFQ-UPD-VAL-07` | PUT | `/api/purchase/request-for-quotations/{id}` | Immutability Guard | 400 Bad Request | Restricted header fields immutability on Update (Company, DocType, DocNoYearly) |
 | `RFQ-APPR-VAL-01` | POST | `/api/purchase/request-for-quotations` | Workflow | 400 Bad Request | `DocStatusId: 20` (InReview) without `ApprovalSetupId` |
 | `RFQ-APPR-VAL-02` | POST | `/api/purchase/request-for-quotations` | Workflow | 400 Bad Request | `DocStatusId: 30` (Authorized) with `ApprovalSetupId` |
 | `RFQ-SEC-401-01` | POST | `/api/purchase/request-for-quotations` | Security | 401 Unauthorized | Missing Authorization header on Save |
@@ -742,6 +745,23 @@ expect(body.message).toBe('Document Updated Successfully');
   ]
 }
 ```
+- **Expected Status:** `200 OK`
+
+---
+
+#### `RFQ-UPD-POS-05`: Complete Draft Update Lifecycle - Mutate All Header, Item, Vendor and T&C Fields
+- **Method & Route:** `PUT /api/purchase/request-for-quotations/{id}`
+- **Description:** Save a complete RFQ in Draft mode, assert initial saved values, update all header fields, line items, vendor selections, and T&C head values in a single PUT, and assert full state update via GET.
+- **Expected Status:** `200 OK`
+
+---
+
+#### `RFQ-UPD-POS-06`: Sourcing Transition Lifecycle - Direct RFQ to Against PR and Revert Back to Direct RFQ
+- **Method & Route:** `PUT /api/purchase/request-for-quotations/{id}`
+- **Description:** Verify dynamic sourcing transitions for an active Draft RFQ:
+  1. Save initial Direct RFQ (`RefDocTypeId: 5`, `rfqPRItemDetail: []`).
+  2. Update to Against Purchase Request (`RefDocTypeId: 6`, link valid PR item detail row).
+  3. Revert back to Direct RFQ (`RefDocTypeId: 5`, clear PR line details).
 - **Expected Status:** `200 OK`
 
 ---
@@ -1485,6 +1505,13 @@ expect(body.message).toBe('Document Updated Successfully');
 - **Expected Error:**
   - `error.details[0].message`: `"RFQ having RefDocType Auction cannot be updated."`
   - Error code: `PMRFQ-BR-6027`
+
+---
+
+#### `RFQ-UPD-VAL-07`: Restricted Header Fields Immutability on Update (Company, DocType, DocNoYearly)
+- **Method & Route:** `PUT /api/purchase/request-for-quotations/{id}`
+- **Description:** Verify rejection when attempting to mutate restricted header master fields (`CompanyId`, `DocTypeId`, duplicate manual `DocNoYearly`) on an existing RFQ.
+- **Expected Status:** `400 Bad Request`
 
 ---
 

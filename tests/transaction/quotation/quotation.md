@@ -214,6 +214,15 @@
 
 ## 2. Test Execution Matrix Summary
 
+### 2.1 Test Suite Architecture & File Layout
+The Quotation test suite is organized into 4 modular Playwright specification files + 1 unified data helper:
+1. **`quotation-save-update.spec.ts` (112 Tests):** Save & Update Positive flows, Header/Item/Tax/T&C/InformTo/Attachment/RFQ/Guest/Policy Validations, Concurrency, Security, and Boundary testing.
+2. **`quotation-getbyid.spec.ts` (10 Tests):** Complete field and condition verification, minimal/guest vendor mapping, schema invariants, complex multi-tax split, and error handling.
+3. **`quotation-actions.spec.ts` (21 Tests):** Withdrawal & Rejoin lifecycle (`QUOT-WTH-*`), Deletion lifecycle (`QUOT-DEL-*`), and Live Auction bidding rules (`QUOT-AUC-*`).
+4. **`quotation-queries.spec.ts` (14 Tests):** Pagination, filtering, sorting, print preview (`GetForPrint`), shell/latest quotation by RFQ public ID (`GetByRfqPublicId`), Pending CS list, and PO detail queries.
+5. **`quotationTestData.ts`:** Unified master lookups, fixtures (`createAuthorizedRfqFixture`), quotation builders (`buildValidQuotationPayload`), and test lifecycle utilities (`createValidQuotation`).
+
+### 2.2 Execution Matrix Catalog
 | Test ID | Method | Endpoint | Scenario Category | HTTP Status | Target Field / Assertion |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `QUOT-SAVE-POS-01` | POST | `/api/purchase/quotations` | Happy Path | 200 OK | Minimal valid Draft quotation (`docStatusId: 10`) |
@@ -226,6 +235,7 @@
 | `QUOT-SAVE-POS-08` | POST | `/api/purchase/quotations` | Happy Path | 200 OK | Valid Header and Item document attachments |
 | `QUOT-SAVE-POS-09` | POST | `/api/purchase/quotations` | Happy Path | 200 OK | Valid Guest Vendor quotation with verified Country & State |
 | `QUOT-SAVE-POS-10` | POST | `/api/purchase/quotations` | Happy Path | 200 OK | Auction quotation submission (`isAuction: true`) auto-authorized |
+| `QUOT-SAVE-POS-11` | POST | `/api/purchase/quotations` | Happy Path | 200 OK | Full End-to-End Direct RFQ to Quotation Flow with exact item taxes and total recomputations |
 | `QUOT-UPD-POS-01` | PUT | `/api/purchase/quotations/{id}` | Happy Path | 200 OK | In-place update of Draft quotation (`docStatusId: 10`) preserving Revision 0 |
 | `QUOT-UPD-POS-02` | PUT | `/api/purchase/quotations/{id}` | Happy Path | 200 OK | Transition Draft (10) to Authorized (30) in place |
 | `QUOT-UPD-POS-03` | PUT | `/api/purchase/quotations/{id}` | Happy Path | 200 OK | Update Authorized quotation creates Revision 1 (`revisionNo: 1`) with new ID |
@@ -531,6 +541,17 @@ expect(body.data.revisionNo).toBe(0);
 - **Expected Response Assertions:**
   - `data.id > 0`
   - Recomputed `RateAfterDiscount` matches `Rate - DiscountPerQty`.
+
+---
+
+#### `QUOT-SAVE-POS-11`: Full End-to-End Direct RFQ to Quotation Flow with Exact Taxes
+- **Method & Route:** `POST /api/purchase/quotations`
+- **Description:** Constructs and authorizes a fresh Direct RFQ with 1 item line and registered vendor, then submits a quotation matching exact multi-tier tax computations (freight, CGST 9%, SGST 9%) and verifies database persistence via `GET /api/purchase/quotations/{id}`.
+- **Expected Status:** `200 OK`
+- **Expected Response Assertions:**
+  - `data.id > 0`
+  - `savedData.docNoYearly` matches generated code
+  - `savedData.rfqId` links to authorized prerequisite RFQ
 
 ---
 

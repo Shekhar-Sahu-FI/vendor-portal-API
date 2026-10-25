@@ -2,16 +2,12 @@ import { test, expect } from '../../../fixtures/apiFixtures';
 import { DocumentStatus, RefDocType } from '../../../helpers/globalEnums';
 import {
     expectSuccess,
-    expectBadRequest,
-    expectUnauthorized,
-    expectNotFound
+    expectBadRequest
 } from '../../../helpers/ValidationHelper';
 import {
     getCsMasterContext,
     createPrerequisiteRfqAndQuotations,
     buildValidCsPayload,
-    buildValidCsNegotiationPayload,
-    deleteCsHierarchy,
     deleteIfCreated,
     getCreatedId,
     getResponseData,
@@ -21,7 +17,7 @@ import {
     CsMasterContext
 } from './csTestData';
 
-test.describe('Comparative Statement (CS) Save & Update API Test Specification', () => {
+test.describe('Comparative Statement (CS) - Save, Update & Validations Suite', () => {
     test.setTimeout(180000);
 
     let context: CsMasterContext;
@@ -41,9 +37,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 1: Positive / Happy Path Scenarios
+    // Category 1: Positive / Happy Path Save Scenarios
     // ===========================================================================
-    test.describe('Category 1: Positive / Happy Path Scenarios', () => {
+    test.describe('Category 1: Positive Save Scenarios', () => {
 
         test('CS-SAVE-POS-01: Save Minimal Valid Draft CS (Item-Wise Allocation)', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
@@ -86,7 +82,7 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
             await deleteIfCreated(comparativeStatementApi, id);
         });
 
-        test('CS-SAVE-POS-04: Save CS with Additional Particulars', async ({ comparativeStatementApi }) => {
+        test('CS-SAVE-POS-04: Save CS with Additional Particulars (Freight, Lead Time)', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
                 docStatusId: DocumentStatus.Draft,
                 additionalDetail: [
@@ -147,6 +143,12 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
             const id = getCreatedId(res);
             await deleteIfCreated(comparativeStatementApi, id);
         });
+    });
+
+    // ===========================================================================
+    // Category 2: Positive In-Place Update & Status Transitions
+    // ===========================================================================
+    test.describe('Category 2: Positive In-Place Update & Status Transitions', () => {
 
         test('CS-UPD-POS-01: In-Place Update of Draft CS', async ({ comparativeStatementApi }) => {
             const savePayload = buildValidCsPayload(setup, context, {
@@ -199,12 +201,46 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
                 await deleteIfCreated(comparativeStatementApi, csId);
             }
         });
+
+        test('CS-UPD-POS-03: Update Draft CS with additional particulars and modified remarks', async ({ comparativeStatementApi }) => {
+            const savePayload = buildValidCsPayload(setup, context, {
+                docStatusId: DocumentStatus.Draft
+            });
+            const saveRes = await comparativeStatementApi.save(savePayload);
+            await expectSuccess(saveRes);
+            const csId = getCreatedId(saveRes);
+
+            try {
+                const updatePayload = {
+                    ...savePayload,
+                    id: csId,
+                    remarks: 'Updated Remarks with Freight',
+                    additionalDetail: [
+                        {
+                            particularName: 'Loading & Unloading',
+                            quotationDetail: [
+                                { quotationId: setup.q1Id, particularValue: 500 }
+                            ]
+                        }
+                    ]
+                };
+                const updateRes = await comparativeStatementApi.update(csId, updatePayload);
+                await expectSuccess(updateRes);
+
+                const getRes = await comparativeStatementApi.getById(csId);
+                expect(getRes.ok).toBe(true);
+                const fetched = getResponseData(getRes.body);
+                expect(fetched.remarks).toBe('Updated Remarks with Freight');
+            } finally {
+                await deleteIfCreated(comparativeStatementApi, csId);
+            }
+        });
     });
 
     // ===========================================================================
-    // Category 2: Header Field Validations
+    // Category 3: Header Field Validations
     // ===========================================================================
-    test.describe('Category 2: Header Field Validations', () => {
+    test.describe('Category 3: Header Field Validations', () => {
 
         test('CS-VAL-HDR-01: Save rejects companyId = 0', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, { companyId: 0 });
@@ -268,9 +304,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 3: Reference Document & RFQ Association
+    // Category 4: Reference Document & RFQ Association Validations
     // ===========================================================================
-    test.describe('Category 3: Reference Document & RFQ Association', () => {
+    test.describe('Category 4: Reference Document & RFQ Association', () => {
 
         test('CS-VAL-REF-01: Save rejects refDocTypeId = 0', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, { refDocTypeId: 0 });
@@ -324,9 +360,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 4: Vendor Selection Basis & Criteria
+    // Category 5: Vendor Selection Basis & Criteria Validations
     // ===========================================================================
-    test.describe('Category 4: Vendor Selection Basis & Criteria', () => {
+    test.describe('Category 5: Vendor Selection Basis & Criteria', () => {
 
         test('CS-VAL-SEL-01: Save rejects vendorSelectionBasisId = 0', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, { vendorSelectionBasisId: 0 });
@@ -342,9 +378,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 5: Quotation Participation Validations
+    // Category 6: Quotation Participation Validations
     // ===========================================================================
-    test.describe('Category 5: Quotation Participation Validations', () => {
+    test.describe('Category 6: Quotation Participation Validations', () => {
 
         test('CS-VAL-PRT-01: Save rejects empty quotationParticipationDetail: []', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
@@ -377,9 +413,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 6: Item-Wise Allocation Validations
+    // Category 7: Item-Wise Allocation Validations
     // ===========================================================================
-    test.describe('Category 6: Item-Wise Allocation Validations', () => {
+    test.describe('Category 7: Item-Wise Allocation Validations', () => {
 
         test('CS-VAL-IW-01: Save rejects missing quotationItemDetailId when vendorSelectionBasisId = 1', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
@@ -427,7 +463,7 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
             await expectBadRequest(res);
         });
 
-        test('CS-VAL-IW-05: Save rejects empty quotationDetail: []', async ({ comparativeStatementApi }) => {
+        test('CS-VAL-IW-05: Save rejects empty csQuotationDetail: []', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
                 csQuotationDetail: []
             });
@@ -437,9 +473,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 7: Overall Vendor Selection Validations
+    // Category 8: Overall Vendor Selection Validations
     // ===========================================================================
-    test.describe('Category 7: Overall Vendor Selection Validations', () => {
+    test.describe('Category 8: Overall Vendor Selection Validations', () => {
 
         test('CS-VAL-OA-01: Save rejects populated quotationItemDetailId or qty when vendorSelectionBasisId = 2', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
@@ -478,9 +514,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 8: Additional Particulars Validations
+    // Category 9: Additional Particulars Validations
     // ===========================================================================
-    test.describe('Category 8: Additional Particulars Validations', () => {
+    test.describe('Category 9: Additional Particulars Validations', () => {
 
         test('CS-VAL-ADD-01: Save rejects empty particularName in additionalDetail', async ({ comparativeStatementApi }) => {
             const payload = buildValidCsPayload(setup, context, {
@@ -524,137 +560,9 @@ test.describe('Comparative Statement (CS) Save & Update API Test Specification',
     });
 
     // ===========================================================================
-    // Category 9: Actions & Lifecycle Validations
+    // Category 10: Boundary & Security Validations
     // ===========================================================================
-    test.describe('Category 9: Actions & Lifecycle Validations', () => {
-
-        test('CS-ACT-001: Search CS endpoint returns 200 with pagination', async ({ requestHelper }) => {
-            const res = await requestHelper.get('/api/purchase/comparative-statements', {
-                searchParams: { pageNo: 1, pageSize: 10, sorting: 'docDate desc' }
-            });
-            expect([200, 204]).toContain(res.status);
-        });
-
-        test('CS-ACT-002: Get Summary Grid returns 200', async ({ requestHelper }) => {
-            const res = await requestHelper.get('/api/purchase/comparative-statements/get', {
-                searchParams: { pageNo: 1, pageSize: 10 }
-            });
-            expect([200, 204]).toContain(res.status);
-        });
-
-        test('CS-ACT-003: Check newer drafts for CS returns valid status', async ({ requestHelper }) => {
-            const res = await requestHelper.get('/api/purchase/comparative-statements/1/newer-drafts');
-            expect([200, 404]).toContain(res.status);
-        });
-
-        test('CS-ACT-004: Items for PO rejects empty PO items (400)', async ({ requestHelper }) => {
-            const res = await requestHelper.post('/api/purchase/comparative-statements/get-cs-item-for-po', {
-                data: { poItems: [], isMakeSpecificItemsOnly: false, isPriceList: false }
-            });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-ACT-005: Get CS by non-existent ID returns 404', async ({ comparativeStatementApi }) => {
-            const res = await comparativeStatementApi.getById(999999);
-            expect([400, 404]).toContain(res.status);
-        });
-
-        test('CS-ACT-006: Delete non-existent CS returns 404', async ({ comparativeStatementApi }) => {
-            const res = await comparativeStatementApi.deleteRecord(999999);
-            expect([400, 404]).toContain(res.status);
-        });
-
-        test('CS-ACT-007: Amend validity date rejects earlier date', async ({ requestHelper }) => {
-            const todayStr = formatDate(new Date());
-            const res = await requestHelper.patch('/api/purchase/comparative-statements/999999/validity-date', {
-                data: { newValidityDate: todayStr, reason: 'Extension' }
-            });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-ACT-008: Un-authorize rejects non-existent CS', async ({ requestHelper }) => {
-            const res = await requestHelper.put('/api/purchase/comparative-statements/999999/un-authorize', {
-                data: {}
-            });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-DEL-POS-01: Successfully delete Draft CS', async ({ comparativeStatementApi }) => {
-            const payload = buildValidCsPayload(setup, context, {
-                docStatusId: DocumentStatus.Draft
-            });
-            const saveRes = await comparativeStatementApi.save(payload);
-            await expectSuccess(saveRes);
-            const csId = getCreatedId(saveRes);
-
-            const delRes = await comparativeStatementApi.deleteRecord(csId);
-            expect([200, 204]).toContain(delRes.status);
-
-            const getRes = await comparativeStatementApi.getById(csId);
-            expect([400, 404]).toContain(getRes.status);
-        });
-    });
-
-    // ===========================================================================
-    // Category 10: Negotiation Validations
-    // ===========================================================================
-    test.describe('Category 10: Negotiation Validations', () => {
-
-        test('CS-NEG-001: Negotiation save rejects csId = 0', async ({ requestHelper }) => {
-            const payload = buildValidCsNegotiationPayload(0, setup.q1Id, context.vendor1Info.vendorLocationId, setup.q1Item1Id);
-            const res = await requestHelper.post('/api/negotiation/save', { data: payload });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-NEG-002: Negotiation save rejects quotationId = 0', async ({ requestHelper }) => {
-            const payload = buildValidCsNegotiationPayload(1, 0, context.vendor1Info.vendorLocationId, setup.q1Item1Id);
-            const res = await requestHelper.post('/api/negotiation/save', { data: payload });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-NEG-003: Negotiation save rejects negative rate in itemDetail', async ({ requestHelper }) => {
-            const payload = buildValidCsNegotiationPayload(1, setup.q1Id, context.vendor1Info.vendorLocationId, setup.q1Item1Id, {
-                rate: -10
-            });
-            const res = await requestHelper.post('/api/negotiation/save', { data: payload });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-NEG-004: Negotiation save rejects discount percentage > 100', async ({ requestHelper }) => {
-            const payload = buildValidCsNegotiationPayload(1, setup.q1Id, context.vendor1Info.vendorLocationId, setup.q1Item1Id, {
-                discountPerc: 105
-            });
-            const res = await requestHelper.post('/api/negotiation/save', { data: payload });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-NEG-005: Negotiation save rejects duplicate quotationItemDetailId', async ({ requestHelper }) => {
-            const payload = buildValidCsNegotiationPayload(1, setup.q1Id, context.vendor1Info.vendorLocationId, setup.q1Item1Id);
-            payload.itemDetail.push({
-                quotationItemDetailId: setup.q1Item1Id,
-                negotiationOnId: 1,
-                rate: 90,
-                discountPerc: 0,
-                discountAmount: 0,
-                basicAmount: 90,
-                savingAmount: 10
-            });
-            const res = await requestHelper.post('/api/negotiation/save', { data: payload });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-
-        test('CS-NEG-006: Negotiation send rejects invalid negotiationId', async ({ requestHelper }) => {
-            const res = await requestHelper.patch('/api/negotiation/send', {
-                data: { negotiationId: 0 }
-            });
-            expect(res.status).toBeGreaterThanOrEqual(400);
-        });
-    });
-
-    // ===========================================================================
-    // Category 11: Security & Boundary Validations
-    // ===========================================================================
-    test.describe('Category 11: Security & Boundary Validations', () => {
+    test.describe('Category 10: Boundary & Security Validations', () => {
 
         test('CS-SEC-001: Save without Authorization header returns 401 Unauthorized', async ({ request }) => {
             const res = await request.post('/api/purchase/comparative-statements', { data: {} });

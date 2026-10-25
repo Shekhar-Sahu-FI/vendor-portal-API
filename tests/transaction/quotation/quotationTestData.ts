@@ -376,3 +376,41 @@ export const buildValidQuotationPayload = (
         lastModifiedDate: overrides.lastModifiedDate
     };
 };
+
+export interface CreatedQuotationResult extends AuthorizedRfqFixture {
+    quotationId: number;
+    quotationData: any;
+    lastModifiedDate: string;
+    quotationPayload: any;
+}
+
+export const createAuthorizedRfq = createAuthorizedRfqFixture;
+
+export const createValidQuotation = async (
+    requestForQuotationApi: any,
+    quotationApi: any,
+    lookup: any,
+    rfqOverrides: any = {},
+    quotOverrides: any = {}
+): Promise<CreatedQuotationResult> => {
+    const rfqResult = await createAuthorizedRfqFixture(requestForQuotationApi, lookup, rfqOverrides);
+    const quotationPayload = buildValidQuotationPayload(rfqResult, quotOverrides);
+    const saveResponse = await quotationApi.save(quotationPayload);
+    expect(saveResponse.ok, `Quotation save failed: ${JSON.stringify(saveResponse.body)}`).toBe(true);
+
+    const quotationId = getCreatedId(saveResponse.body);
+    const getResponse = await quotationApi.getById(quotationId);
+    expect(getResponse.ok, `Fetching Quotation ${quotationId} failed`).toBe(true);
+
+    const quotationData = getResponseData(getResponse.body);
+    const lastModifiedDate = quotationData.lastModifiedDate;
+
+    return {
+        ...rfqResult,
+        quotationId,
+        quotationData,
+        lastModifiedDate,
+        quotationPayload
+    };
+};
+

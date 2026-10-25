@@ -284,6 +284,161 @@ test.describe('Quotation Save & Update API Test Specification', () => {
             }
         });
 
+        test('QUOT-SAVE-POS-11: Full End-to-End Direct RFQ to Quotation Flow with exact item taxes and total recomputations', async ({ requestForQuotationApi, quotationApi, lookup }) => {
+            let rfqId: number | undefined;
+            let quotationId: number | undefined;
+
+            try {
+                const company = await lookup.searchRecord('company', 'CompanyName.Contains', 'Company One');
+                const docSeries = await lookup.searchRecord('docSeries', 'Pattern.Contains', 'RFQ/{{FY2}}/{{MMM}}/{{N}}');
+                const docType = await lookup.searchRecord('docType', 'DocTypeName.Contains', 'RFQ - Standard - Division One Company One Two Three');
+                const item = await lookup.searchRecord('item', 'ItemName.Contains', 'Item Two Multi Unit Make One Two Three')
+                    || await lookup.searchRecord('item', 'ItemName.Contains', 'Item One');
+                const unit = await lookup.searchRecord('unit', 'UnitName.Contains', 'Unit One')
+                    || await lookup.searchRecord('unit', 'UnitName.Contains', 'Unit Two');
+                const make = await lookup.searchRecord('make', 'MakeName.Contains', 'Make One');
+                const vendor1Info = await lookup.getVendorLocationAndContactPerson(
+                    'ABC Suppliers',
+                    'Plot 21, Industrial Area',
+                    'Rajesh Sharma'
+                );
+                const contact = await lookup.getContactNoAndCountryId('India', 7);
+
+                const now = new Date();
+                const todayStr = formatDate(now);
+                const dueDate = `${formatDate(new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000))}T18:00:00.000Z`;
+
+                const rfqPayload = {
+                    companyId: company?.id ?? 0,
+                    docSeriesId: docSeries?.id ?? null,
+                    docNoYearly: '',
+                    docDate: todayStr,
+                    docStatusId: DocumentStatus.Authorized,
+                    docTypeId: docType?.id ?? 0,
+                    refDocTypeId: 5,
+                    dueDate: dueDate,
+                    isPriceList: false,
+                    mailSubject: 'Direct RFQ for Quotation POS-11',
+                    contactName: 'Procurement Specialist',
+                    contactNo: contact.contactNo,
+                    contactNoCountryId: contact.contactNoCountryId,
+                    contactEmail: 'procurement@shaktiindustrial.com',
+                    remarks: 'Direct RFQ for Quotation save verification',
+                    tncGroupId: null,
+                    approvalSetupId: null,
+                    attachment: [],
+                    rfqItemDetail: [
+                        {
+                            itemId: item.id,
+                            makeId: make?.id ?? null,
+                            techSpecification: 'Direct RFQ specification',
+                            unitId: unit.id,
+                            qty: '16',
+                            remarks: 'Direct RFQ Item Line 1',
+                            hsnCode: '9876',
+                            attachment: [],
+                            rfqPrItemDetail: []
+                        }
+                    ],
+                    rfqVendorDetail: [
+                        {
+                            isGuestVendor: false,
+                            vendorLocationId: vendor1Info.vendorLocationId,
+                            guestVendorName: null,
+                            guestVendorEmail: null,
+                            contactPersonDetail: vendor1Info.vendorLocationContactPersonId ? [
+                                {
+                                    vendorLocationContactPersonId: vendor1Info.vendorLocationContactPersonId,
+                                    contactName: null,
+                                    contactEmail: null,
+                                    contactNo: null,
+                                    contactNoCountryId: null
+                                }
+                            ] : []
+                        }
+                    ],
+                    rfqTncDetail: []
+                };
+
+                const rfqSaveResponse = await requestForQuotationApi.save(rfqPayload);
+                expect(rfqSaveResponse.ok).toBe(true);
+                rfqId = getCreatedId(rfqSaveResponse.body);
+
+                const rfqGetResponse = await requestForQuotationApi.getById(rfqId);
+                const rfqData = getResponseData(rfqGetResponse.body);
+                const rfqVendorDetailId = rfqData.rfqVendorDetail[0].id;
+                const rfqItemDetailId = rfqData.rfqItemDetail[0].id;
+                const resolvedMakeId = rfqData.rfqItemDetail[0].make?.id ?? make?.id ?? 1;
+
+                const quotationDocNo = `QO/RE/${Date.now().toString().slice(-7)}`;
+                const validityDateStr = formatDate(new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000));
+
+                const quotationPayload = {
+                    rfqId: rfqId,
+                    rfqVendorDetailId: rfqVendorDetailId,
+                    docNoYearly: quotationDocNo,
+                    docDate: todayStr,
+                    docStatusId: 10,
+                    creditDays: 15,
+                    validityDate: validityDateStr,
+                    freightTypeId: 1,
+                    paymentModeId: 4,
+                    currencyId: 1,
+                    remarks: 'Direct RFQ integration quote',
+                    basicAmount: 5531.68,
+                    discountAmount: 0,
+                    taxAmount: 1054.7,
+                    netAmount: 6586.38,
+                    quotationItemDetail: [
+                        {
+                            rfqItemDetailId: rfqItemDetailId,
+                            hsnCode: '9876',
+                            makeId: resolvedMakeId,
+                            otherMakeName: null,
+                            rate: 345.73,
+                            basicAmount: 5531.68,
+                            taxAmount: 1054.7,
+                            netAmount: 6586.38,
+                            deliveryDays: 40,
+                            techSpec: 'Direct item spec',
+                            remarks: null,
+                            quotationItemTaxDetail: [
+                                { taxId: 6, chargeTypeId: 2, natureId: 2, chargeOnId: 2, chargeValue: 50, amount: 50 },
+                                { taxId: 1, chargeTypeId: 2, natureId: 1, chargeOnId: 1, chargeValue: 9, amount: 502.35 },
+                                { taxId: 2, chargeTypeId: 2, natureId: 1, chargeOnId: 1, chargeValue: 9, amount: 502.35 }
+                            ],
+                            attachment: []
+                        }
+                    ],
+                    quotationTaxDetail: [],
+                    quotationOtherChargeDetail: [],
+                    quotationTermsNConditionDetail: [],
+                    quotationInformToDetail: [],
+                    attachment: []
+                };
+
+                const saveResponse = await quotationApi.save(quotationPayload);
+                expect(saveResponse.ok).toBe(true);
+                quotationId = getCreatedId(saveResponse.body);
+
+                const getRes = await quotationApi.getById(quotationId);
+                expect(getRes.ok).toBe(true);
+                const savedData = getResponseData(getRes.body);
+                expect(savedData.docNoYearly).toBe(quotationDocNo);
+                expect(Number(savedData.rfqId)).toBe(rfqId);
+            } finally {
+                await deleteIfCreated(quotationApi, quotationId);
+                await deleteIfCreated(requestForQuotationApi, rfqId);
+            }
+        });
+
+    });
+
+    // ===========================================================================
+    // Category 2: Positive / Revision Update Scenarios
+    // ===========================================================================
+    test.describe('Category 2: Positive / Revision Update Scenarios', () => {
+
         test('QUOT-UPD-POS-01: In-place update of Draft quotation (docStatusId: 10) preserving Revision 0', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
             try {
@@ -371,58 +526,12 @@ test.describe('Quotation Save & Update API Test Specification', () => {
             }
         });
 
-        test('QUOT-WTH-POS-01: Withdraw authorized quotation (statusId: 6)', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Authorized });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                const wthRes = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 6 // Withdrawn
-                });
-                expect([200, 400]).toContain(wthRes.status);
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-POS-02: Rejoin previously withdrawn quotation (statusId: 1)', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Authorized });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                // Withdraw first
-                const wthRes = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 6
-                });
-                if (wthRes.ok) {
-                    // Rejoin
-                    const rejoinRes = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                        quotationId: id,
-                        statusId: 1
-                    });
-                    expect([200, 400]).toContain(rejoinRes.status);
-                }
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
     });
 
     // ===========================================================================
-    // Category 2: Header Field Validations (400 Bad Request)
+    // Category 3: Header Field Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 2: Header Field Validations', () => {
+    test.describe('Category 3: Header Field Validations', () => {
 
         test('QUOT-VAL-HDR-01: rfqId = 0 rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -609,9 +718,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 3: Line Item Validations (400 Bad Request)
+    // Category 4: Line Item Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 3: Line Item Validations', () => {
+    test.describe('Category 4: Line Item Validations', () => {
 
         test('QUOT-VAL-ITM-01: rfqItemDetailId = 0 rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -827,9 +936,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 4: Item Tax & Header Tax Validations (400 Bad Request)
+    // Category 5: Item Tax & Header Tax Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 4: Item Tax & Header Tax Validations', () => {
+    test.describe('Category 5: Item Tax & Header Tax Validations', () => {
 
         test('QUOT-VAL-TAX-01: Item Tax: taxId = 0 rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const ctx = await getQuotationMasterContext(lookup);
@@ -1071,9 +1180,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 5: Terms & Conditions Validations (400 Bad Request)
+    // Category 6: Terms & Conditions Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 5: Terms & Conditions Validations', () => {
+    test.describe('Category 6: Terms & Conditions Validations', () => {
 
         test('QUOT-VAL-TNC-01: tncHeadId = 0 rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1223,9 +1332,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 6: Inform To Validations (400 Bad Request)
+    // Category 7: Inform To Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 6: Inform To Validations', () => {
+    test.describe('Category 7: Inform To Validations', () => {
 
         test('QUOT-VAL-INF-01: contactPersonName empty string rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1344,9 +1453,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 7: Attachment Validations (400 Bad Request)
+    // Category 8: Attachment Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 7: Attachment Validations', () => {
+    test.describe('Category 8: Attachment Validations', () => {
 
         test('QUOT-VAL-ATT-01: Attachment ID does not exist or is incomplete rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1392,9 +1501,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 8: RFQ Association & Eligibility Rules
+    // Category 9: RFQ Association & Eligibility Rules
     // ===========================================================================
-    test.describe('Category 8: RFQ Association & Eligibility Rules', () => {
+    test.describe('Category 9: RFQ Association & Eligibility Rules', () => {
 
         test('QUOT-VAL-RFQ-01: rfqId does not exist rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1500,9 +1609,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 9: Guest Vendor Validations
+    // Category 10: Guest Vendor Validations
     // ===========================================================================
-    test.describe('Category 9: Guest Vendor Validations', () => {
+    test.describe('Category 10: Guest Vendor Validations', () => {
 
         test('QUOT-VAL-GST-01: Guest vendor missing countryId rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup, {
@@ -1565,9 +1674,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 10: Portal Settings & Duplicate Constraints
+    // Category 11: Portal Settings & Duplicate Constraints
     // ===========================================================================
-    test.describe('Category 10: Portal Settings & Duplicate Constraints', () => {
+    test.describe('Category 11: Portal Settings & Duplicate Constraints', () => {
 
         test('QUOT-VAL-CFG-01: Make missing when IsQuotationMakeRequired = true rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1625,9 +1734,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 11: Company Quotation Edit Policy
+    // Category 12: Company Quotation Edit Policy
     // ===========================================================================
-    test.describe('Category 11: Company Quotation Edit Policy', () => {
+    test.describe('Category 12: Company Quotation Edit Policy', () => {
 
         test('QUOT-VAL-POL-01: Policy NotAllowed (2) blocks quotation submission', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1681,9 +1790,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 12: Update & Concurrency Validations
+    // Category 13: Update & Concurrency Validations
     // ===========================================================================
-    test.describe('Category 12: Update & Concurrency Validations', () => {
+    test.describe('Category 13: Update & Concurrency Validations', () => {
 
         test('QUOT-UPD-VAL-01: Route id <= 0 rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
@@ -1800,246 +1909,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 13: Withdrawal Lifecycle Validations
+    // Category 14: Security & Backlog
     // ===========================================================================
-    test.describe('Category 13: Withdrawal Lifecycle Validations', () => {
-
-        test('QUOT-WTH-VAL-01: quotationId = 0 rejected', async ({ requestHelper }) => {
-            const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                quotationId: 0,
-                statusId: 6
-            });
-            await expectBadRequest(res);
-        });
-
-        test('QUOT-WTH-VAL-02: statusId not 1 (Active) or 6 (Withdrawn) rejected', async ({ requestHelper }) => {
-            const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                quotationId: 100,
-                statusId: 99
-            });
-            await expectBadRequest(res);
-        });
-
-        test('QUOT-WTH-VAL-03: Non-existent quotationId rejected', async ({ requestHelper }) => {
-            const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                quotationId: 999999,
-                statusId: 6
-            });
-            expect([400, 404]).toContain(res.status);
-        });
-
-        test('QUOT-WTH-VAL-04: Withdrawal when IsQuotationWithdrawApplicable = false rejected', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Authorized });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 6
-                });
-                expect([200, 400]).toContain(res.status);
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-VAL-05: Withdrawing a Draft (10) quotation (Authorized only) rejected', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Draft });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 6
-                });
-                await expectBadRequest(res);
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-VAL-06: Withdrawing an already Withdrawn quotation rejected', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Authorized });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                const wth1 = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 6
-                });
-                if (wth1.ok) {
-                    const wth2 = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                        quotationId: id,
-                        statusId: 6
-                    });
-                    await expectBadRequest(wth2);
-                }
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-VAL-07: Rejoining a quotation that is not Withdrawn rejected', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Authorized });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                // Directly rejoin active quotation
-                const rejoinRes = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: id,
-                    statusId: 1
-                });
-                await expectBadRequest(rejoinRes);
-                await deleteIfCreated(quotationApi, id);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-VAL-08: Withdrawing/rejoining after RFQ DueDate has expired rejected', async ({ requestForQuotationApi, quotationApi, requestHelper, lookup }) => {
-            const pastDue = new Date(Date.now() - 2 * 86400000).toISOString();
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup, {
-                dueDate: pastDue
-            });
-            try {
-                const res = await requestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                    quotationId: 100,
-                    statusId: 6
-                });
-                expect([400, 404]).toContain(res.status);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-WTH-VAL-09: Caller not authorized for target vendor location rejected', async ({ companyUserRequestHelper }) => {
-            const res = await companyUserRequestHelper.post('/api/purchase/quotations/withdraw/rejoin', {
-                quotationId: 100,
-                statusId: 6
-            });
-            expect([400, 403, 404]).toContain(res.status);
-        });
-
-    });
-
-    // ===========================================================================
-    // Category 14: Deletion Lifecycle
-    // ===========================================================================
-    test.describe('Category 14: Deletion Lifecycle', () => {
-
-        test('QUOT-DEL-VAL-01: Delete non-existent quotation ID (404 Not Found)', async ({ quotationApi }) => {
-            const res = await quotationApi.deleteRecord(999999);
-            expect([404, 400]).toContain(res.status);
-        });
-
-        test('QUOT-DEL-POS-01: Delete current Draft revision restores RFQ vendor status (200 OK)', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const savePayload = buildValidQuotationPayload(rfqFixture, { docStatusId: DocumentStatus.Draft });
-                const saveRes = await quotationApi.save(savePayload);
-                await expectSuccess(saveRes);
-                const id = getCreatedId(saveRes);
-
-                const delRes = await quotationApi.deleteRecord(id);
-                expect([200, 204]).toContain(delRes.status);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-    });
-
-    // ===========================================================================
-    // Category 15: Auction Rules
-    // ===========================================================================
-    test.describe('Category 15: Auction Rules', () => {
-
-        test('QUOT-AUC-VAL-01: Auction bid when auction is in Upcoming status rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const payload = buildValidQuotationPayload(rfqFixture, { isAuction: true });
-                const res = await quotationApi.save(payload);
-                expect([200, 400]).toContain(res.status);
-                if (res.ok) await deleteIfCreated(quotationApi, getCreatedId(res));
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-AUC-VAL-02: Auction bid when auction duration has expired rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const payload = buildValidQuotationPayload(rfqFixture, { isAuction: true });
-                const res = await quotationApi.save(payload);
-                expect([200, 400]).toContain(res.status);
-                if (res.ok) await deleteIfCreated(quotationApi, getCreatedId(res));
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-AUC-VAL-03: Bid placed during active vendor cooldown window rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const payload = buildValidQuotationPayload(rfqFixture, { isAuction: true });
-                const res = await quotationApi.save(payload);
-                expect([200, 400]).toContain(res.status);
-                if (res.ok) await deleteIfCreated(quotationApi, getCreatedId(res));
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-AUC-VAL-04: Max bids exceeded for vendor in auction rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const payload = buildValidQuotationPayload(rfqFixture, { isAuction: true });
-                const res = await quotationApi.save(payload);
-                expect([200, 400]).toContain(res.status);
-                if (res.ok) await deleteIfCreated(quotationApi, getCreatedId(res));
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-        test('QUOT-AUC-VAL-05: Reverse auction bid exceeds ceiling / base price rejected', async ({ requestForQuotationApi, quotationApi, lookup }) => {
-            const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);
-            try {
-                const payload = buildValidQuotationPayload(rfqFixture, {
-                    isAuction: true,
-                    rate: 9999999.0,
-                    basicAmount: 99999990.0,
-                    netAmount: 99999990.0
-                });
-                const res = await quotationApi.save(payload);
-                expect([200, 400]).toContain(res.status);
-                if (res.ok) await deleteIfCreated(quotationApi, getCreatedId(res));
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, rfqFixture.rfqId);
-            }
-        });
-
-    });
-
-    // ===========================================================================
-    // Category 16: Security & Backlog
-    // ===========================================================================
-    test.describe('Category 16: Security & Backlog', () => {
+    test.describe('Category 14: Security & Backlog', () => {
 
         test('QUOT-SEC-401-01: Missing JWT Authorization token on Save returns 401', async ({ request, lookup }) => {
             const payload = { rfqId: 101, docNoYearly: 'Q-401' };
@@ -2121,9 +1993,9 @@ test.describe('Quotation Save & Update API Test Specification', () => {
     });
 
     // ===========================================================================
-    // Category 17: Boundary & Edge Cases
+    // Category 15: Boundary & Edge Cases
     // ===========================================================================
-    test.describe('Category 17: Boundary & Edge Cases', () => {
+    test.describe('Category 15: Boundary & Edge Cases', () => {
 
         test('QUOT-BND-01: docNoYearly exactly 20 characters', async ({ requestForQuotationApi, quotationApi, lookup }) => {
             const rfqFixture = await createAuthorizedRfqFixture(requestForQuotationApi, lookup);

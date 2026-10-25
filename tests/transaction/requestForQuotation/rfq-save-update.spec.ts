@@ -472,6 +472,315 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
             }
         });
 
+        test('RFQ-UPD-POS-05: Complete Draft Update Lifecycle - Mutate All Header, Item, Vendor and T&C Fields', async ({
+            requestForQuotationApi,
+            lookup
+        }) => {
+            let rfqId: number | undefined;
+            try {
+                const company = await lookup.searchRecord('company', 'CompanyName.Contains', 'Company One');
+                const docSeries = await lookup.searchRecord('docSeries', 'Pattern.Contains', 'RFQ/{{FY2}}/{{MMM}}/{{N}}');
+                const docType = await lookup.searchRecord('docType', 'DocTypeName.Contains', 'RFQ - Standard - Division One Company One Two Three');
+
+                const item1 = await lookup.searchRecord('item', 'ItemName.Contains', 'Item Two Multi Unit Make One Two Three')
+                    || await lookup.searchRecord('item', 'ItemName.Contains', 'Item One');
+                const unit1 = await lookup.searchRecord('unit', 'UnitName.Contains', 'Unit One')
+                    || await lookup.searchRecord('unit', 'UnitName.Contains', 'Unit Two');
+                const make1 = await lookup.searchRecord('make', 'MakeName.Contains', 'Make One');
+
+                const item2 = await lookup.searchRecord('item', 'ItemName.Contains', 'Item Three No Multi Unit All Make')
+                    || await lookup.searchRecord('item', 'ItemName.Contains', 'Item Two Multi Unit Make One Two Three');
+                const unit2 = await lookup.searchRecord('unit', 'UnitName.Contains', 'Unit Two');
+                const make2 = await lookup.searchRecord('make', 'MakeName.Contains', 'Make Two');
+
+                const vendor1Info = await lookup.getVendorLocationAndContactPerson('ABC Suppliers', 'Plot 21, Industrial Area', 'Rajesh Sharma');
+                const vendor2Info = await lookup.getVendorLocationAndContactPerson('QWE Engineering Traders', 'MIDC Estate', 'Amit Verma');
+
+                const tncGroup = await lookup.getRecord('termsAndConditionGroup', 'TNC Group One')
+                    || await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'TNC Group');
+                let initialTncDetails: any[] = [];
+                if (tncGroup?.id) {
+                    const tncHeads = await lookup.getTncGroupDetails(tncGroup.id);
+                    for (const item of tncHeads) {
+                        initialTncDetails.push({
+                            tncHeadId: item.tncHead?.id || item.tncHeadId,
+                            tncValue: 'Initial payment within 30 days of delivery'
+                        });
+                    }
+                }
+
+                const contact1 = await lookup.getContactNoAndCountryId('India', 7);
+                const contact2 = await lookup.getContactNoAndCountryId('India', 8);
+
+                const now = new Date();
+                const todayStr = formatDate(now);
+                const dueDate1 = `${formatDate(new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000))}T18:00:00.000Z`;
+                const dueDate2 = `${formatDate(new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000))}T18:00:00.000Z`;
+
+                const initialPayload = {
+                    companyId: company?.id ?? 0,
+                    docSeriesId: docSeries?.id ?? null,
+                    docNoYearly: '',
+                    docDate: todayStr,
+                    docStatusId: DocumentStatus.Draft,
+                    docTypeId: docType?.id ?? 0,
+                    refDocTypeId: RefDocType.DirectRFQ,
+                    dueDate: dueDate1,
+                    isPriceList: false,
+                    mailSubject: 'Initial Request for Quotation - Project Alpha',
+                    contactName: 'Initial Contact Specialist',
+                    contactNo: contact1.contactNo,
+                    contactNoCountryId: contact1.contactNoCountryId,
+                    contactEmail: 'initial.procurement@shaktiindustrial.com',
+                    remarks: 'Initial Draft RFQ Remarks - Complete Field Flow',
+                    tncGroupId: tncGroup?.id ?? null,
+                    approvalSetupId: null,
+                    attachment: [],
+                    rfqItemDetail: [
+                        {
+                            itemId: item1.id,
+                            makeId: make1?.id ?? null,
+                            techSpecification: 'Initial Tech Specification - Grade A Industrial',
+                            unitId: unit1.id,
+                            qty: '100',
+                            remarks: 'Initial Item Remarks Line 1',
+                            hsnCode: '847130',
+                            attachment: [],
+                            rfqPrItemDetail: []
+                        }
+                    ],
+                    rfqVendorDetail: [
+                        {
+                            isGuestVendor: false,
+                            vendorLocationId: vendor1Info.vendorLocationId,
+                            guestVendorName: null,
+                            guestVendorEmail: null,
+                            contactPersonDetail: vendor1Info.vendorLocationContactPersonId ? [
+                                {
+                                    vendorLocationContactPersonId: vendor1Info.vendorLocationContactPersonId,
+                                    contactName: null,
+                                    contactEmail: null,
+                                    contactNo: null,
+                                    contactNoCountryId: null
+                                }
+                            ] : []
+                        }
+                    ],
+                    rfqTncDetail: initialTncDetails
+                };
+
+                const saveResponse = await requestForQuotationApi.save(initialPayload);
+                await expectSuccess(saveResponse);
+                rfqId = getCreatedId(saveResponse);
+
+                const getInitialResponse = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(getInitialResponse);
+                const initialRfqData = getResponseData(getInitialResponse.body);
+
+                expect(Number(initialRfqData.id)).toBe(rfqId);
+                expect(Number(initialRfqData.docStatus.id)).toBe(DocumentStatus.Draft);
+                expect(Number(initialRfqData.refDocType.id)).toBe(RefDocType.DirectRFQ);
+                expect(initialRfqData.mailSubject).toBe('Initial Request for Quotation - Project Alpha');
+
+                const lastModifiedDate = initialRfqData.lastModifiedDate || initialRfqData.modifiedDate || new Date().toISOString();
+                const displayDocNo = initialRfqData.displayDocNoYearly || initialRfqData.docNoYearly || '';
+
+                const updatedTncDetails: any[] = [];
+                if (initialRfqData.rfqTNCDetail && initialRfqData.rfqTNCDetail.length > 0) {
+                    for (const tnc of initialRfqData.rfqTNCDetail) {
+                        updatedTncDetails.push({
+                            tncHeadId: tnc.tncHead?.id || tnc.tncHeadId,
+                            tncValue: 'Updated Payment Terms: Net 60 days with 2% early payment discount'
+                        });
+                    }
+                }
+
+                const updatePayload = {
+                    id: rfqId,
+                    lastModifiedDate: lastModifiedDate,
+                    docNoYearly: displayDocNo,
+                    docDate: todayStr,
+                    docSeriesId: initialPayload.docSeriesId,
+                    docTypeId: initialPayload.docTypeId,
+                    docStatusId: DocumentStatus.Draft,
+                    companyId: initialPayload.companyId,
+                    refDocTypeId: RefDocType.DirectRFQ,
+                    dueDate: dueDate2,
+                    isPriceList: true,
+                    mailSubject: 'Updated Request for Quotation - Project Alpha Comprehensive Review',
+                    contactName: 'Updated Senior Procurement Specialist',
+                    contactNo: contact2.contactNo,
+                    contactNoCountryId: contact2.contactNoCountryId,
+                    contactEmail: 'updated.procurement@shaktiindustrial.com',
+                    remarks: 'Updated Draft RFQ Remarks - Verified All Modifiable Fields',
+                    tncGroupId: initialPayload.tncGroupId,
+                    approvalSetupId: null,
+                    attachment: [],
+                    rfqItemDetail: [
+                        {
+                            itemId: item2.id,
+                            makeId: make2?.id ?? null,
+                            techSpecification: 'Updated Tech Specification - Grade B High Precision',
+                            unitId: unit2.id,
+                            qty: '250.5',
+                            remarks: 'Updated Remarks for Line 1 - Heavy Duty',
+                            hsnCode: '903180',
+                            attachment: [],
+                            rfqPrItemDetail: []
+                        }
+                    ],
+                    rfqVendorDetail: [
+                        {
+                            isGuestVendor: false,
+                            vendorLocationId: vendor2Info.vendorLocationId,
+                            guestVendorName: null,
+                            guestVendorEmail: null,
+                            contactPersonDetail: vendor2Info.vendorLocationContactPersonId ? [
+                                {
+                                    vendorLocationContactPersonId: vendor2Info.vendorLocationContactPersonId,
+                                    contactName: null,
+                                    contactEmail: null,
+                                    contactNo: null,
+                                    contactNoCountryId: null
+                                }
+                            ] : []
+                        }
+                    ],
+                    rfqTncDetail: updatedTncDetails
+                };
+
+                const updateResponse = await requestForQuotationApi.update(rfqId, updatePayload);
+                await expectSuccess(updateResponse);
+
+                const getUpdatedResponse = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(getUpdatedResponse);
+                const updatedRfqData = getResponseData(getUpdatedResponse.body);
+
+                expect(Number(updatedRfqData.id)).toBe(rfqId);
+                expect(updatedRfqData.mailSubject).toBe('Updated Request for Quotation - Project Alpha Comprehensive Review');
+                expect(updatedRfqData.contactName).toBe('Updated Senior Procurement Specialist');
+                expect(Boolean(updatedRfqData.isPriceList)).toBe(true);
+                expect(Number(updatedRfqData.rfqItemDetail[0].item.id)).toBe(item2.id);
+                expect(Number(updatedRfqData.rfqVendorDetail[0].vendorLocation?.id)).toBe(vendor2Info.vendorLocationId);
+            } finally {
+                await deleteIfCreated(requestForQuotationApi, rfqId);
+            }
+        });
+
+        test('RFQ-UPD-POS-06: Sourcing Transition Lifecycle - Direct RFQ to Against PR and Revert Back to Direct RFQ', async ({
+            requestForQuotationApi,
+            PRApi,
+            lookup
+        }) => {
+            const ctx = await getRfqMasterContext(lookup);
+            const { prId, prItemDetailIds } = await createPrPrerequisite(PRApi, ctx, [{ qty: 20.0 }], DocumentStatus.Authorized);
+            let rfqId: number | undefined;
+
+            try {
+                // Phase 1: Create Direct RFQ
+                const directRfqPayload = getValidDirectRfqPayload(ctx, {
+                    docSeriesId: null,
+                    docNoYearly: `RFQ-TRNS-${Date.now().toString().slice(-6)}`,
+                    mailSubject: 'Phase 1: Direct RFQ Initiation',
+                    remarks: 'Direct RFQ created initially without PR linkage'
+                });
+
+                const rfqSaveRes = await requestForQuotationApi.save(directRfqPayload);
+                await expectSuccess(rfqSaveRes);
+                rfqId = getCreatedId(rfqSaveRes);
+
+                // Verify Phase 1
+                const rfqGetPhase1 = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(rfqGetPhase1);
+                const rfqDataPhase1 = getResponseData(rfqGetPhase1.body);
+                expect(Number(rfqDataPhase1.refDocType.id)).toBe(RefDocType.DirectRFQ);
+                expect(rfqDataPhase1.rfqItemDetail[0].rfqPRItemDetail?.length ?? 0).toBe(0);
+
+                const lastModifiedPhase1 = rfqDataPhase1.lastModifiedDate || rfqDataPhase1.modifiedDate || new Date().toISOString();
+                const displayDocNo = rfqDataPhase1.displayDocNoYearly || rfqDataPhase1.docNoYearly || directRfqPayload.docNoYearly;
+
+                // Phase 2: Update RFQ to Against PR
+                const againstPrPayload = {
+                    ...directRfqPayload,
+                    id: rfqId,
+                    lastModifiedDate: lastModifiedPhase1,
+                    docNoYearly: displayDocNo,
+                    refDocTypeId: RefDocType.PurchaseRequestRFQ,
+                    isPriceList: false,
+                    mailSubject: 'Phase 2: Updated RFQ Against PR Linkage',
+                    rfqItemDetail: [
+                        {
+                            itemId: ctx.item1Id,
+                            unitId: ctx.unit1Id,
+                            qty: 20.0,
+                            rfqPrItemDetail: [
+                                {
+                                    prItemDetailId: prItemDetailIds[0],
+                                    itemId: ctx.item1Id,
+                                    makeId: ctx.make1Id,
+                                    rfqMakeId: ctx.make1Id,
+                                    unitId: ctx.unit1Id,
+                                    rfqUnitId: ctx.unit1Id,
+                                    firstCf: 1,
+                                    secondCf: 1,
+                                    rfqQty: 20.0,
+                                    techSpecification: 'Linked to PR Spec',
+                                    remarks: 'Linked to PR item detail row'
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const updateToPrRes = await requestForQuotationApi.update(rfqId, againstPrPayload);
+                await expectSuccess(updateToPrRes);
+
+                // Verify Phase 2
+                const rfqGetPhase2 = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(rfqGetPhase2);
+                const rfqDataPhase2 = getResponseData(rfqGetPhase2.body);
+                expect(Number(rfqDataPhase2.refDocType.id)).toBe(RefDocType.PurchaseRequestRFQ);
+                expect(rfqDataPhase2.rfqItemDetail[0].rfqPRItemDetail.length).toBe(1);
+                expect(Number(rfqDataPhase2.rfqItemDetail[0].rfqPRItemDetail[0].prItemDetailId)).toBe(prItemDetailIds[0]);
+
+                const lastModifiedPhase2 = rfqDataPhase2.lastModifiedDate || rfqDataPhase2.modifiedDate || new Date().toISOString();
+
+                // Phase 3: Change RFQ back to Direct RFQ
+                const backToDirectPayload = {
+                    ...directRfqPayload,
+                    id: rfqId,
+                    lastModifiedDate: lastModifiedPhase2,
+                    docNoYearly: displayDocNo,
+                    refDocTypeId: RefDocType.DirectRFQ,
+                    isPriceList: false,
+                    mailSubject: 'Phase 3: Reverted RFQ back to Direct',
+                    remarks: 'Reverted back to Direct RFQ with PR line details cleared',
+                    rfqItemDetail: [
+                        {
+                            itemId: ctx.item1Id,
+                            unitId: ctx.unit1Id,
+                            qty: 20.0,
+                            rfqPrItemDetail: []
+                        }
+                    ]
+                };
+
+                const updateBackToDirectRes = await requestForQuotationApi.update(rfqId, backToDirectPayload);
+                await expectSuccess(updateBackToDirectRes);
+
+                // Verify Phase 3
+                const rfqGetPhase3 = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(rfqGetPhase3);
+                const rfqDataPhase3 = getResponseData(rfqGetPhase3.body);
+                expect(Number(rfqDataPhase3.refDocType.id)).toBe(RefDocType.DirectRFQ);
+                expect(rfqDataPhase3.rfqItemDetail[0].rfqPRItemDetail?.length ?? 0).toBe(0);
+                expect(rfqDataPhase3.mailSubject).toBe('Phase 3: Reverted RFQ back to Direct');
+            } finally {
+                await deleteIfCreated(requestForQuotationApi, rfqId);
+                await deleteIfCreated(PRApi, prId);
+            }
+        });
+
     });
 
     // ===========================================================================
@@ -1573,6 +1882,87 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                 await expectBadRequest(updRes);
             } finally {
                 await deleteIfCreated(requestForQuotationApi, id);
+            }
+        });
+
+        test('RFQ-UPD-VAL-07: Restricted Header Fields Immutability on Update (Company, DocType, DocNoYearly)', async ({
+            requestForQuotationApi,
+            lookup
+        }) => {
+            const ctx = await getRfqMasterContext(lookup);
+            const manualDocNo = `RFQ-IMMUT-${Date.now().toString().slice(-6)}`;
+            const basePayload = getValidDirectRfqPayload(ctx, {
+                docSeriesId: null,
+                docNoYearly: manualDocNo
+            });
+
+            const saveRes = await requestForQuotationApi.save(basePayload);
+            await expectSuccess(saveRes);
+            const rfqId = getCreatedId(saveRes);
+
+            try {
+                const getRes = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(getRes);
+                const savedData = getResponseData(getRes.body);
+                const lastModifiedDate = savedData.lastModifiedDate || savedData.modifiedDate || new Date().toISOString();
+
+                // Resolving alternate DocType (PR docType not linked to RFQ)
+                const prDocType = await lookup.searchRecord('docType', 'DocTypeName.Contains', 'PR - Standard - Division One Company One Two Three');
+
+                const validUpdateBase = {
+                    ...basePayload,
+                    id: rfqId,
+                    lastModifiedDate: lastModifiedDate,
+                    docNoYearly: manualDocNo
+                };
+
+                // Step A: Modifying docTypeId to a non-RFQ DocType should fail
+                if (prDocType?.id) {
+                    const payloadWithChangedDocType = {
+                        ...validUpdateBase,
+                        docTypeId: prDocType.id
+                    };
+                    const resDocType = await requestForQuotationApi.update(rfqId, payloadWithChangedDocType);
+                    await expectBadRequest(resDocType);
+                }
+
+                // Step B: Changing Company to invalid company on Update should fail
+                const payloadWithChangedCompany = {
+                    ...validUpdateBase,
+                    companyId: 999999
+                };
+                const resCompany = await requestForQuotationApi.update(rfqId, payloadWithChangedCompany);
+                await expectBadRequest(resCompany);
+
+                // Step C: Duplicate manual docNoYearly on Update should fail
+                const secondManualDocNo = `RFQ-IMMUT2-${Date.now().toString().slice(-6)}`;
+                const saveSecondRes = await requestForQuotationApi.save(getValidDirectRfqPayload(ctx, {
+                    docSeriesId: null,
+                    docNoYearly: secondManualDocNo
+                }));
+                if (saveSecondRes.ok) {
+                    const secondRfqId = getCreatedId(saveSecondRes);
+                    try {
+                        const payloadWithDuplicateDocNo = {
+                            ...validUpdateBase,
+                            docNoYearly: secondManualDocNo
+                        };
+                        const resDup = await requestForQuotationApi.update(rfqId, payloadWithDuplicateDocNo);
+                        await expectBadRequest(resDup);
+                    } finally {
+                        await deleteIfCreated(requestForQuotationApi, secondRfqId);
+                    }
+                }
+
+                // Verify original RFQ was not corrupted
+                const verifyResp = await requestForQuotationApi.getById(rfqId);
+                await expectSuccess(verifyResp);
+                const currentData = getResponseData(verifyResp.body);
+                expect(Number(currentData.id)).toBe(rfqId);
+                expect(Number(currentData.company.id)).toBe(basePayload.companyId);
+                expect(Number(currentData.docType.id)).toBe(basePayload.docTypeId);
+            } finally {
+                await deleteIfCreated(requestForQuotationApi, rfqId);
             }
         });
 

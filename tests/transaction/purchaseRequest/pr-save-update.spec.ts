@@ -496,6 +496,101 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
             }
         });
 
+        test('PR-UPD-POS-05: Exhaustive Field Update Lifecycle in Draft Mode', async ({ PRApi, lookup }) => {
+            const ctx = await getMasterContext(lookup);
+            const todayStr = formatDate(new Date());
+            const scheduleDate1 = formatDate(new Date(Date.now() + 7 * 86400000));
+            const scheduleDate2 = formatDate(new Date(Date.now() + 14 * 86400000));
+            const refDate2 = formatDate(new Date(Date.now() - 2 * 86400000));
+
+            const initialPayload = getValidPrPayload(ctx, {
+                refNo: 'REF-DRAFT-INIT',
+                refDate: todayStr,
+                requestedBy: 'Initial Requester',
+                requestedByContactNo: ctx.contactNo,
+                requestedByContactNoCountryId: ctx.countryId,
+                requestedByEmailId: 'initial.requester@test.com',
+                remarks: 'Initial Draft Remarks',
+                netAmount: 1000.00,
+                purchaseRequestItemDetail: [
+                    {
+                        rowNo: 1,
+                        itemId: ctx.item1Id,
+                        unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
+                        requiredQty: 10,
+                        prQty: 10,
+                        rate: 100,
+                        amount: 1000,
+                        scheduleDate: scheduleDate1,
+                        priorityId: ctx.priority1Id,
+                        costCenterId: ctx.costCenter1Id,
+                        techSpecification: 'Initial Tech Spec',
+                        remarks: 'Initial Item Remarks'
+                    }
+                ],
+                purchaseRequestInformTo: [{ userId: ctx.user1Id }]
+            });
+
+            const saveRes = await PRApi.save(initialPayload);
+            expectSuccess(saveRes);
+            const prId = getCreatedId(saveRes.body);
+
+            try {
+                const getInitial = await PRApi.getById(prId);
+                const initData = getResponseData(getInitial.body);
+                const lastModifiedDate = initData.lastModifiedDate || initData.modifiedDate;
+                const displayDocNo = initData.displayDocNoYearly || initData.docNoYearly;
+
+                const updatePayload = {
+                    ...initialPayload,
+                    id: prId,
+                    lastModifiedDate: lastModifiedDate,
+                    lastModifiedDateTime: lastModifiedDate,
+                    docNoYearly: displayDocNo,
+                    departmentId: ctx.departmentId,
+                    expenditureTypeId: ExpenditureType.Opex,
+                    refNo: 'REF-DRAFT-UPD',
+                    refDate: refDate2,
+                    requestedBy: 'Updated Requester Name',
+                    requestedByEmailId: 'updated.requester@test.com',
+                    remarks: 'Updated Draft Remarks',
+                    netAmount: 2500.00,
+                    purchaseRequestItemDetail: [
+                        {
+                            rowNo: 1,
+                            itemId: ctx.item2Id,
+                            unitId: ctx.unit2Id,
+                            makeId: ctx.make2Id,
+                            requiredQty: 25,
+                            prQty: 25,
+                            rate: 100,
+                            amount: 2500,
+                            scheduleDate: scheduleDate2,
+                            priorityId: ctx.priority2Id,
+                            costCenterId: ctx.costCenter2Id,
+                            techSpecification: 'Updated Tech Spec',
+                            remarks: 'Updated Item Remarks'
+                        }
+                    ],
+                    purchaseRequestInformTo: [{ userId: ctx.user2Id }]
+                };
+
+                const updateRes = await PRApi.update(updatePayload);
+                expectSuccess(updateRes);
+
+                // Verify updated fields in GetById
+                const getUpdated = await PRApi.getById(prId);
+                expectSuccess(getUpdated);
+                const updatedData = getResponseData(getUpdated.body);
+                expect(updatedData.remarks).toBe('Updated Draft Remarks');
+                expect(Number(updatedData.netAmount)).toBe(2500);
+                expect(Number(updatedData.purchaseRequestItemDetail[0].prQty)).toBe(25);
+            } finally {
+                await deleteIfCreated(PRApi, prId);
+            }
+        });
+
     });
 
     // ===========================================================================
@@ -916,6 +1011,45 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
             };
             const res = await PRApi.update(payload);
             expect([400, 404]).toContain(res.status);
+        });
+
+        test('PR-UPD-VAL-07: Reject Changing Restricted Header Fields on Update (Company, Division, DocType, DocSeries)', async ({ PRApi, lookup }) => {
+            const ctx = await getMasterContext(lookup);
+            const savePayload = getValidPrPayload(ctx);
+            const saveRes = await PRApi.save(savePayload);
+            expectSuccess(saveRes);
+            const id = getCreatedId(saveRes.body);
+
+            try {
+                const getRes = await PRApi.getById(id);
+                const fetched = getResponseData(getRes.body);
+                const lastModifiedDate = fetched.lastModifiedDate || fetched.modifiedDate;
+                const docNo = fetched.displayDocNoYearly || fetched.docNoYearly;
+
+                // Attempt to change companyId on update
+                const invalidCompanyUpdate = {
+                    ...savePayload,
+                    id: id,
+                    lastModifiedDate: lastModifiedDate,
+                    docNoYearly: docNo,
+                    companyId: 999999
+                };
+                const compRes = await PRApi.update(invalidCompanyUpdate);
+                expectBadRequest(compRes);
+
+                // Attempt to change divisionId on update
+                const invalidDivisionUpdate = {
+                    ...savePayload,
+                    id: id,
+                    lastModifiedDate: lastModifiedDate,
+                    docNoYearly: docNo,
+                    divisionId: 999999
+                };
+                const divRes = await PRApi.update(invalidDivisionUpdate);
+                expectBadRequest(divRes);
+            } finally {
+                await deleteIfCreated(PRApi, id);
+            }
         });
 
     });
