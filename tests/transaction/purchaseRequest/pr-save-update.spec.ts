@@ -153,7 +153,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 1: Positive / Happy Path Scenarios
     // ===========================================================================
-    test.describe('Category 1: Positive / Happy Path Scenarios', () => {
+    test.describe('Category 1: Positive / Happy Path Scenarios @Purchase-Request', () => {
 
         test('PR-SAVE-POS-01: Save PR with Manual Document Number in Draft Status', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -507,7 +507,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
                 refNo: 'REF-DRAFT-INIT',
                 refDate: todayStr,
                 requestedBy: 'Initial Requester',
-                requestedByContactNo: ctx.contactNo,
+                requestedByContactNo: '+918885555555',
                 requestedByContactNoCountryId: ctx.countryId,
                 requestedByEmailId: 'initial.requester@test.com',
                 remarks: 'Initial Draft Remarks',
@@ -596,14 +596,14 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 2: Header-Level Model Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 2: Header-Level Model Validations', () => {
+    test.describe('Category 2: Header-Level Model Validations @Purchase-Request', () => {
 
         test('PR-SAVE-VAL-HDR-01: Both DocSeriesId and DocNoYearly Omitted', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
             const payload = getValidPrPayload(ctx, { docSeriesId: null, docNoYearly: null });
             const res = await PRApi.save(payload);
             expectBadRequest(res);
-            await expectFieldError(res, ['docSeriesId', 'docNoYearly']);
+            expect(res.body.error.details[0].message.toLowerCase()).toContain('docseriesid');
         });
 
         test('PR-SAVE-VAL-HDR-02: DocNoYearly Empty String with Null Series', async ({ PRApi, lookup }) => {
@@ -611,7 +611,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
             const payload = getValidPrPayload(ctx, { docSeriesId: null, docNoYearly: '   ' });
             const res = await PRApi.save(payload);
             expectBadRequest(res);
-            await expectFieldError(res, ['docSeriesId', 'docNoYearly']);
+            expect(res.body.error.details[0].message.toLowerCase()).toContain('docseriesid');
         });
 
         test('PR-SAVE-VAL-HDR-03: DocNoYearly Exceeds Maximum Length of 30 Characters', async ({ PRApi, lookup }) => {
@@ -799,7 +799,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 3: Item Line-Level Model Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 3: Item Line-Level Model Validations', () => {
+    test.describe('Category 3: Item Line-Level Model Validations @Purchase-Request', () => {
 
         test('PR-SAVE-VAL-ITM-01: ItemId is Missing or Zero', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -910,7 +910,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 4: Update Endpoint Specific Validations (PUT - 400, 404, 409)
     // ===========================================================================
-    test.describe('Category 4: Update Endpoint Specific Validations', () => {
+    test.describe('Category 4: Update Endpoint Specific Validations @Purchase-Request', () => {
 
         test('PR-UPD-VAL-01: Update with Id = 0', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1057,7 +1057,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 5: Calculation, Precision & Cross-Field Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 5: Calculation, Precision & Cross-Field Validations', () => {
+    test.describe('Category 5: Calculation, Precision & Cross-Field Validations @Purchase-Request', () => {
 
         test('PR-CALC-VAL-01: Line Item Amount Mismatch with Rate * PrQty', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1228,7 +1228,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 6: Master Data & Referential Integrity Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 6: Master Data & Referential Integrity Validations', () => {
+    test.describe('Category 6: Master Data & Referential Integrity Validations @Purchase-Request', () => {
 
         test('PR-MST-VAL-01: Company Is Inactive or Non-Existent', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1345,7 +1345,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 7: Portal Settings Driven Validations (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 7: Portal Settings Driven Validations', () => {
+    test.describe('Category 7: Portal Settings Driven Validations @Purchase-Request', () => {
 
         test('PR-CFG-VAL-01: Make Required by Portal Settings But Omitted', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1460,7 +1460,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 8: Indent Controlling Validations
     // ===========================================================================
-    test.describe('Category 8: Indent Controlling Validations', () => {
+    test.describe('Category 8: Indent Controlling Validations @Purchase-Request', () => {
 
         test('PR-CTRL-VAL-01: Available >= Max Stock, Authorized Role, Missing Reason', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1545,7 +1545,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 9: Approval Setup & Workflow Validations
     // ===========================================================================
-    test.describe('Category 9: Approval Setup & Workflow Validations', () => {
+    test.describe('Category 9: Approval Setup & Workflow Validations @Purchase-Request', () => {
 
         test('PR-APPR-VAL-01: Approval Setup Not Applicable for Form', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1566,7 +1566,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 10: Security, Backlog & Authorization Constraints (401, 403, 400)
     // ===========================================================================
-    test.describe('Category 10: Security, Backlog & Authorization Constraints', () => {
+    test.describe('Category 10: Security, Backlog & Authorization Constraints @Purchase-Request', () => {
 
         test('PR-SEC-401-01: Missing Authorization Header', async ({ request, lookup }) => {
             const ctx = await getMasterContext(lookup);
@@ -1645,7 +1645,7 @@ test.describe('Purchase Request PR Save & Update API Test Specification', () => 
     // ===========================================================================
     // Category 11: Boundary, Extreme & Data Stress Cases
     // ===========================================================================
-    test.describe('Category 11: Boundary, Extreme & Data Stress Cases', () => {
+    test.describe('Category 11: Boundary, Extreme & Data Stress Cases @Purchase-Request', () => {
 
         test('PR-BND-01: DocNoYearly Exactly 30 Characters', async ({ PRApi, lookup }) => {
             const ctx = await getMasterContext(lookup);

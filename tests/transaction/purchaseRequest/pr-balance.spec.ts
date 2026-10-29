@@ -1,5 +1,5 @@
 import { test, expect } from '../../../fixtures/apiFixtures';
-import { DueBasis, FreightType, PaymentMode } from '../../../helpers/globalEnums';
+import { DueBasis, FreightType, PaymentMode, VehicleType } from '../../../helpers/globalEnums';
 import { priorityData } from '../../master/masterData';
 
 const getResponseData = (body: any): any => body?.data ?? body;
@@ -151,6 +151,8 @@ const buildPoPayloadForPr = async (
     validityDate: new Date().toISOString().split('T')[0],
     currencyId: 1,
     dueBasisId: DueBasis.GRN,
+    VehicleTypeId: VehicleType.BUS,
+    dueDays: 3,
     freightTypeId: FreightType.FOR,
     paymentModeId: PaymentMode.BG,
     exchangeRate: 1,
@@ -173,7 +175,7 @@ const buildPoPayloadForPr = async (
   };
 };
 
-test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
+test.describe('Purchase Request Balance Flow Tests RFQ & PO @PR-BAL', () => {
   test.setTimeout(180000);
 
   test('PR-BAL-001: PR to RFQ Balance Flow (Draft validation -> Authorize -> Partial RFQ -> Remaining RFQ)', async ({
@@ -212,7 +214,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         const draftPrItemDetailId = prData.purchaseRequestItemDetail[0].id;
 
         // Query by prId -> Should NOT return data for Draft PR
-        const pendingByPrResponse = await PRApi.getPendingItemsForRfq({ prIds: [draftPrId!], companyId: companyId, divisionId: divisionId });
+        const pendingByPrResponse = await PRApi.getPendingItemsForRfq({ prIds: [draftPrId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByPrResponse.ok).toBe(true);
         const pendingItemsByPr = getResponseData(pendingByPrResponse.body);
         const matchedByPr = Array.isArray(pendingItemsByPr)
@@ -221,7 +223,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         expect(matchedByPr, 'Draft PR should NOT be returned when querying pending RFQ items by prId').toBeFalsy();
 
         // Query by prItemDetailId -> Verify status reflects Draft
-        const pendingByItemResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [draftPrItemDetailId], companyId: companyId, divisionId: divisionId });
+        const pendingByItemResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [draftPrItemDetailId], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByItemResponse.ok).toBe(true);
         const pendingItemsByItem = getResponseData(pendingByItemResponse.body);
         const matchedByItem = Array.isArray(pendingItemsByItem)
@@ -255,7 +257,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
         expect(Number(prItem.prQty)).toBe(10);
 
-        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -263,7 +265,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         expect(Number(matchedItem.prItemDetailId)).toBe(prItemDetailId);
         expect(Number(matchedItem.prQty)).toBe(10);
         expect(Number(matchedItem.prevRfqQty ?? 0)).toBe(0);
-        expect(Number(matchedItem.balanceQty)).toBe(10);
+        expect(Number(matchedItem.rfqBalanceQty)).toBe(10);
         expect(matchedItem.status?.statusName || matchedItem.status?.id || matchedItem.status).toBeDefined();
       });
 
@@ -278,7 +280,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
       // Step 6: Verify Balance after Partial RFQ (prevRfqQty = 4, balanceQty = 6)
       await test.step('Step 6: Verify Balance after Partial RFQ (prevRfqQty = 4, balanceQty = 6)', async () => {
-        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -286,7 +288,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         expect(Number(matchedItem.prItemDetailId)).toBe(prItemDetailId);
         expect(Number(matchedItem.prQty)).toBe(10);
         expect(Number(matchedItem.prevRfqQty)).toBe(4);
-        expect(Number(matchedItem.balanceQty)).toBe(6);
+        expect(Number(matchedItem.rfqBalanceQty)).toBe(6);
       });
 
       // Step 7: Create 2nd RFQ against PR for Remaining Quantity (rfqQty = 6)
@@ -300,7 +302,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
       // Step 8: Verify Final Balance after Remaining RFQ (prevRfqQty = 10, balanceQty = 0)
       await test.step('Step 8: Verify Final Balance after Remaining RFQ (prevRfqQty = 10, balanceQty = 0)', async () => {
-        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForRfq({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -308,9 +310,9 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         expect(Number(matchedItem.prItemDetailId)).toBe(prItemDetailId);
         expect(Number(matchedItem.prQty)).toBe(10);
         expect(Number(matchedItem.prevRfqQty)).toBe(10);
-        expect(Number(matchedItem.balanceQty)).toBe(0);
+        expect(Number(matchedItem.rfqBalanceQty)).toBe(0);
 
-        const pendingByPrResponse = await PRApi.getPendingItemsForRfq({ prIds: [authPrId!], companyId: companyId, divisionId: divisionId });
+        const pendingByPrResponse = await PRApi.getPendingItemsForRfq({ prIds: [authPrId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByPrResponse.ok).toBe(true);
         const pendingItemsByPr = getResponseData(pendingByPrResponse.body);
         const matchedItemByPr = Array.isArray(pendingItemsByPr)
@@ -363,7 +365,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         const prData = getResponseData(prGetResponse.body);
         const draftPrItemDetailId = prData.purchaseRequestItemDetail[0].id;
 
-        const pendingByPrResponse = await PRApi.getPendingItemsForPo({ prIds: [draftPrId!], companyId: companyId, divisionId: divisionId });
+        const pendingByPrResponse = await PRApi.getPendingItemsForPo({ prIds: [draftPrId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByPrResponse.ok).toBe(true);
         const pendingItemsByPr = getResponseData(pendingByPrResponse.body);
         const matchedByPr = Array.isArray(pendingItemsByPr)
@@ -371,7 +373,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
           : null;
         expect(matchedByPr, 'Draft PR should NOT be returned when querying pending PO items by prId').toBeFalsy();
 
-        const pendingByItemResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [draftPrItemDetailId], companyId: companyId, divisionId: divisionId });
+        const pendingByItemResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [draftPrItemDetailId], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByItemResponse.ok).toBe(true);
         const pendingItemsByItem = getResponseData(pendingByItemResponse.body);
         const matchedByItem = Array.isArray(pendingItemsByItem)
@@ -405,7 +407,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
         expect(Number(prItem.prQty)).toBe(10);
 
-        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -428,7 +430,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
       // Step 6: Verify Balance after Partial PO (prevPoQty = 4, balanceQty = 6)
       await test.step('Step 6: Verify Balance after Partial PO (prevPoQty = 4, balanceQty = 6)', async () => {
-        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -450,7 +452,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
 
       // Step 8: Verify Final Balance after Remaining PO (prevPoQty = 10, balanceQty = 0)
       await test.step('Step 8: Verify Final Balance after Remaining PO (prevPoQty = 10, balanceQty = 0)', async () => {
-        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId });
+        const pendingResponse = await PRApi.getPendingItemsForPo({ prItemDetailIds: [prItemDetailId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingResponse.ok).toBe(true);
         const pendingItems = getResponseData(pendingResponse.body);
         const matchedItem = pendingItems.find((item: any) => Number(item.prItemDetailId) === Number(prItemDetailId));
@@ -460,7 +462,7 @@ test.describe('Purchase Request Balance Flow Tests (RFQ & PO) @PR-BAL', () => {
         expect(Number(matchedItem.prevPoQty)).toBe(10);
         expect(Number(matchedItem.balanceQty)).toBe(0);
 
-        const pendingByPrResponse = await PRApi.getPendingItemsForPo({ prIds: [authPrId!], companyId: companyId, divisionId: divisionId });
+        const pendingByPrResponse = await PRApi.getPendingItemsForPo({ prIds: [authPrId!], companyId: companyId, divisionId: divisionId, tillDate: "2030-12-31" });
         expect(pendingByPrResponse.ok).toBe(true);
         const pendingItemsByPr = getResponseData(pendingByPrResponse.body);
         const matchedItemByPr = Array.isArray(pendingItemsByPr)

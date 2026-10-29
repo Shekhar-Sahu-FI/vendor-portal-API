@@ -45,8 +45,8 @@ export class MasterApi extends BaseApi {
    * Delete a master record
    * DELETE /api/<masterName>/<id>
    */
-  public async deleteRecord<T = any>(id: string | number): Promise<ApiResponse<T>> {
-    return this.delete<T>(`/${id}`);
+  public async deleteRecord<T = any>(id: string | number, body: any): Promise<ApiResponse<T>> {
+    return this.delete<T>(`/${id}`, body);
   }
 
 

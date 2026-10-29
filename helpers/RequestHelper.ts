@@ -35,8 +35,8 @@ export class RequestHelper {
     return this.execute<T>('PATCH', url, { headers, body });
   }
 
-  public async delete<T = any>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.execute<T>('DELETE', url, { headers });
+  public async delete<T = any>(url: string, body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+    return this.execute<T>('DELETE', url, { headers, body });
   }
 
   /**

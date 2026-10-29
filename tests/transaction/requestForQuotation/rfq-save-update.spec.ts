@@ -21,7 +21,7 @@ import {
     RFQ_ERROR_CODES
 } from './rfqTestData';
 
-test.describe('Request for Quotation (RFQ) Save & Update API Test Specification', () => {
+test.describe('Request for Quotation RFQ Save & Update API Test Specification', () => {
     test.setTimeout(180000);
 
     // ===========================================================================
@@ -42,6 +42,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 15.0,
                         remarks: 'Line item note'
                     }
@@ -66,6 +67,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 20.0
                     }
                 ]
@@ -92,6 +94,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 50.0
                     }
                 ]
@@ -120,6 +123,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 10.0
                     }
                 ]
@@ -162,12 +166,14 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 10.0,
                         hsnCode: '84818090'
                     },
                     {
                         itemId: ctx.item2Id,
                         unitId: ctx.unit2Id,
+                        makeId: ctx.make2Id,
                         qty: 25.0,
                         hsnCode: '84818090'
                     }
@@ -178,9 +184,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         vendorLocationId: ctx.vendorLocation1Id,
                         contactPersonDetail: [
                             {
-                                vendorLocationContactPersonId: ctx.vendorLocation1ContactPersonId,
-                                contactName: ctx.vendorLocation1ContactName,
-                                contactEmail: ctx.vendorLocation1ContactEmail
+                                vendorLocationContactPersonId: ctx.vendorLocation1ContactPersonId
                             }
                         ]
                     },
@@ -189,9 +193,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         vendorLocationId: ctx.vendorLocation2Id,
                         contactPersonDetail: [
                             {
-                                vendorLocationContactPersonId: ctx.vendorLocation2ContactPersonId,
-                                contactName: ctx.vendorLocation2ContactName,
-                                contactEmail: ctx.vendorLocation2ContactEmail
+                                vendorLocationContactPersonId: ctx.vendorLocation2ContactPersonId
                             }
                         ]
                     }
@@ -266,17 +268,20 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                 const payload = getValidDirectRfqPayload(ctx, {
                     docSeriesId: null,
                     docNoYearly: `RFQ-PR-CONSOL-${Date.now().toString().slice(-6)}`,
-                    refDocTypeId: RefDocType.RfqPurchaseRequest,
+                    refDocTypeId: RefDocType.PurchaseRequestRFQ,
                     rfqItemDetail: [
                         {
                             itemId: ctx.item1Id,
                             unitId: ctx.unit1Id,
+                            makeId: ctx.make1Id,
                             qty: 20.0,
                             rfqPrItemDetail: [
                                 {
                                     prItemDetailId: prItemDetailIds[0],
                                     itemId: ctx.item1Id,
                                     unitId: ctx.unit1Id,
+                                    makeId: ctx.make1Id,
+                                    rfqMakeId: ctx.make1Id,
                                     rfqUnitId: ctx.unit1Id,
                                     firstCf: 1.0,
                                     secondCf: 1.0,
@@ -286,6 +291,8 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                                     prItemDetailId: prItemDetailIds[1],
                                     itemId: ctx.item1Id,
                                     unitId: ctx.unit1Id,
+                                    makeId: ctx.make1Id,
+                                    rfqMakeId: ctx.make1Id,
                                     rfqUnitId: ctx.unit1Id,
                                     firstCf: 1.0,
                                     secondCf: 1.0,
@@ -310,13 +317,14 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
             const payload = getValidDirectRfqPayload(ctx, {
                 docSeriesId: null,
                 docNoYearly: `RFQ-PRICELIST-${Date.now().toString().slice(-6)}`,
-                refDocTypeId: RefDocType.RfqDirect,
+                refDocTypeId: RefDocType.DirectRFQ,
                 isPriceList: true,
                 remarks: 'Annual rate contract inquiry',
                 rfqItemDetail: [
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 1.0
                     }
                 ]
@@ -392,6 +400,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         {
                             itemId: ctx.item1Id,
                             unitId: ctx.unit1Id,
+                            makeId: ctx.make1Id,
                             qty: 30.0
                         }
                     ],
@@ -712,6 +721,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         {
                             itemId: ctx.item1Id,
                             unitId: ctx.unit1Id,
+                            makeId: ctx.make1Id,
                             qty: 20.0,
                             rfqPrItemDetail: [
                                 {
@@ -720,6 +730,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                                     makeId: ctx.make1Id,
                                     rfqMakeId: ctx.make1Id,
                                     unitId: ctx.unit1Id,
+                                    makeId: ctx.make1Id,
                                     rfqUnitId: ctx.unit1Id,
                                     firstCf: 1,
                                     secondCf: 1,
@@ -759,6 +770,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         {
                             itemId: ctx.item1Id,
                             unitId: ctx.unit1Id,
+                            makeId: ctx.make1Id,
                             qty: 20.0,
                             rfqPrItemDetail: []
                         }
@@ -948,7 +960,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
         test('RFQ-VAL-HDR-18: IsPriceList True with PR Reference (RefDocTypeId: 2)', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
             const payload = getValidDirectRfqPayload(ctx, {
-                refDocTypeId: RefDocType.RfqPurchaseRequest,
+                refDocTypeId: RefDocType.PurchaseRequestRFQ,
                 isPriceList: true
             });
             const res = await requestForQuotationApi.save(payload);
@@ -1042,12 +1054,14 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                         itemId: ctx.item1Id,
                         makeId: ctx.make1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 10.0
                     },
                     {
                         itemId: ctx.item1Id,
                         makeId: ctx.make1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 20.0
                     }
                 ]
@@ -1112,17 +1126,19 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
         test('RFQ-VAL-PR-01: Direct RFQ with Populated PR Line Details', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
             const payload = getValidDirectRfqPayload(ctx, {
-                refDocTypeId: RefDocType.RfqDirect,
+                refDocTypeId: RefDocType.DirectRFQ,
                 rfqItemDetail: [
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 10.0,
                         rfqPrItemDetail: [
                             {
                                 prItemDetailId: 101,
                                 itemId: ctx.item1Id,
                                 unitId: ctx.unit1Id,
+                                makeId: ctx.make1Id,
                                 rfqUnitId: ctx.unit1Id,
                                 firstCf: 1.0,
                                 secondCf: 1.0,
@@ -1140,11 +1156,12 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
         test('RFQ-VAL-PR-02: PR-Referenced RFQ with Empty PR Lines', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
             const payload = getValidDirectRfqPayload(ctx, {
-                refDocTypeId: RefDocType.RfqPurchaseRequest,
+                refDocTypeId: RefDocType.PurchaseRequestRFQ,
                 rfqItemDetail: [
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: 10.0,
                         rfqPrItemDetail: []
                     }
@@ -2113,6 +2130,7 @@ test.describe('Request for Quotation (RFQ) Save & Update API Test Specification'
                     {
                         itemId: ctx.item1Id,
                         unitId: ctx.unit1Id,
+                        makeId: ctx.make1Id,
                         qty: BOUNDARY_DATA.MIN_QTY
                     }
                 ]

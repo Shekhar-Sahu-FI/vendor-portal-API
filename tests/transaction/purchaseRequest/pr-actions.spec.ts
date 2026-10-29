@@ -119,12 +119,10 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
       const prId = getCreatedId(saveRes.body);
 
       // Send DELETE with JSON body containing deleteReason
-      const response = await request.delete(`/api/purchase-requests/${prId}`, {
-        data: {
-          deleteReason: 'Cancelled due to requisition budget adjustment'
-        }
+      const response = await PRApi.deleteRecord(prId, {
+        deleteReason: 'Cancelled due to requisition budget adjustment'
       });
-      expect([200, 204]).toContain(response.status());
+      expectSuccess(response);
 
       const getRes = await PRApi.getById(prId);
       expectNotFound(getRes);

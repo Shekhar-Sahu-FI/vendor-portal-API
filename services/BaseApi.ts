@@ -39,7 +39,7 @@ export abstract class BaseApi {
     return this.requestHelper.patch<T>(this.buildUrl(relativePath), body, headers);
   }
 
-  protected async delete<T = any>(relativePath: string = '', headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.requestHelper.delete<T>(this.buildUrl(relativePath), headers);
+  protected async delete<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+    return this.requestHelper.delete<T>(this.buildUrl(relativePath), body, headers);
   }
 }

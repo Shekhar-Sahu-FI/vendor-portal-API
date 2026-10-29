@@ -1,6 +1,6 @@
 import { expect } from '../../../../fixtures/apiFixtures';
 import { DocumentStatus, RefDocType } from '../../../../helpers/globalEnums';
-import { formatDate, getCreatedId, getResponseData, deleteIfCreated } from '../../csTestData';
+import { formatDate, getCreatedId, getResponseData, deleteIfCreated } from '../csTestData';
 
 /**
  * Negotiation Enumerations matching negotiation.md Section 1.3
@@ -341,17 +341,17 @@ export const deleteNegotiationHierarchy = async (
     if (csId && csId > 0) {
         try {
             await comparativeStatementApi.deleteRecord(csId);
-        } catch {}
+        } catch { }
     }
     if (quotationId && quotationId > 0) {
         try {
             await quotationApi.deleteRecord(quotationId);
-        } catch {}
+        } catch { }
     }
     if (rfqId && rfqId > 0) {
         try {
             await rfqApi.deleteRecord(rfqId);
-        } catch {}
+        } catch { }
     }
 };
 

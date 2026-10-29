@@ -157,13 +157,13 @@ export const getRfqMasterContext = async (lookup: any): Promise<RfqMasterContext
     // 6. Terms and Conditions
     const tncGroup = await lookup.searchRecord('termsAndConditionGroup', 'TncGroupName.Contains', 'TNC Group One')
         || await lookup.searchRecord('termsAndConditionGroup', 'StatusId.Eq', '1');
-    const tncHead1 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'TNC Head One')
+    const tncHead1 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Head One')
         || await lookup.searchRecord('termsAndConditionHead', 'StatusId.Eq', '1');
-    const tncHead2 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'TNC Head Two')
+    const tncHead2 = await lookup.searchRecord('termsAndConditionHead', 'TncHeadName.Contains', 'Head Two')
         || { id: 2 };
 
     // 7. Contact, Country & Approval Setup
-    const contact = await lookup.getContactNoAndCountryId('India', 10);
+    const contact = await lookup.getContactNoAndCountryId('India', 8);
     const approvalSetup = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
     const user = await lookup.getRecord('user', 'admin') || await lookup.getRecord('user', 'UN9');
 
@@ -220,13 +220,13 @@ export const getValidDirectRfqPayload = (ctx: RfqMasterContext, overrides: any =
         docNoYearly: '',
         docDate: today,
         docTypeId: ctx.rfqDocTypeId,
-        refDocTypeId: RefDocType.RfqDirect, // 1
+        refDocTypeId: RefDocType.RFQ_Direct, // 1
         dueDate: dueDate,
         companyId: ctx.companyId,
         isPriceList: false,
         mailSubject: 'Standard RFQ Inquiry for Industrial Materials',
         contactEmail: 'procurement@company.com',
-        contactNo: '9876543210',
+        contactNo: '+918765432108',
         contactNoCountryId: ctx.contactNoCountryId,
         remarks: 'Standard test direct RFQ document',
         approvalSetupId: null,
@@ -251,9 +251,7 @@ export const getValidDirectRfqPayload = (ctx: RfqMasterContext, overrides: any =
                 guestVendorEmail: null,
                 contactPersonDetail: [
                     {
-                        vendorLocationContactPersonId: ctx.vendorLocation1ContactPersonId,
-                        contactName: ctx.vendorLocation1ContactName,
-                        contactEmail: ctx.vendorLocation1ContactEmail
+                        vendorLocationContactPersonId: ctx.vendorLocation1ContactPersonId
                     }
                 ]
             }
@@ -282,7 +280,7 @@ export const getValidPrRfqPayload = (
         docNoYearly: '',
         docDate: today,
         docTypeId: ctx.rfqDocTypeId,
-        refDocTypeId: RefDocType.RfqPurchaseRequest, // 2
+        refDocTypeId: RefDocType.RFQ_PurchaseRequest, // 2
         dueDate: dueDate,
         companyId: ctx.companyId,
         isPriceList: false,
