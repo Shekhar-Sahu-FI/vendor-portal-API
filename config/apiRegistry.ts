@@ -85,7 +85,7 @@ export const API_REGISTRY = {
     expenditureType: { url: '/api/globaldata/expenditure-type', matchField: 'expenditureTypeName', globaldata: true },
     expenseNature: { url: '/api/globaldata/expense-natures', matchField: 'expenseNatureName', globaldata: true },
     extensionType: { url: '/api/globaldata/extension-types', matchField: 'name', globaldata: true },
-    forms: { url: '/api/globaldata/forms', matchField: 'formCaption', globaldata: true },
+    forms: { url: '/api/globaldata/forms', matchField: 'formCode', globaldata: true },
     formsMenu: { url: '/api/globaldata/forms/menu', matchField: 'name', globaldata: true },
     freightRateType: { url: '/api/globaldata/freight-rate-type', matchField: 'freightRateTypeName', globaldata: true },
     freightType: { url: '/api/globaldata/freight-type', matchField: 'freightTypeName', globaldata: true },

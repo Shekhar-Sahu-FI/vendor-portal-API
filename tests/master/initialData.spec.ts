@@ -356,7 +356,8 @@ test.describe('Initial Data Setup', () => {
     test('should seed User Master initial data', async ({ userApi, workflow, lookup }) => {
         await workflow.seedInitialData(userApi, userData, "User Master", async (payload) => {
             const contactInfo = await lookup.getContactNoAndCountryId(payload.countryName, userData.indexOf(payload));
-            const contactNo = contactInfo.contactNo || payload.contactNo;
+            console.log("payload contact @123", contactInfo)
+            const contactNo = contactInfo.phoneCode + payload.contactNo;
             const contactNoCountryId = contactInfo.contactNoCountryId || payload.contactNoCountryId;
 
             const userRoleDetail = [];
@@ -438,11 +439,12 @@ test.describe('Initial Data Setup', () => {
     });
 
     test('should seed Document Series initial data', async ({ documentSeriesApi, workflow, lookup }) => {
+        console.log("Doc Series Data @123", documentSeriesData)
         await workflow.seedInitialData(documentSeriesApi, documentSeriesData, "Document Series", async (payload) => {
             const documentSeriesFormDetail = [];
             if (payload.documentSeriesFormDetail) {
                 for (const formDetail of payload.documentSeriesFormDetail) {
-                    const form = await lookup.getGlobalRecord("forms", formDetail.formName);
+                    const form = await lookup.getGlobalRecord("forms", formDetail.formName, 'FormCode.Eq');
                     const { formName, ...restForm } = formDetail;
                     documentSeriesFormDetail.push({
                         ...restForm,
@@ -525,7 +527,7 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed Approval Setup Master initial data', async ({ approvalSetupApi, workflow, lookup }) => {
         await workflow.seedInitialData(approvalSetupApi, approvalSetupData, "Approval Setup Master", async (payload) => {
-            const form = await lookup.getGlobalRecord("forms", payload.formName, 'FormCaption.Eq');
+            const form = await lookup.getGlobalRecord("forms", payload.formName, 'FormCode.Eq');
             const formId = form?.id;
 
             let approvalScopeId = 2;

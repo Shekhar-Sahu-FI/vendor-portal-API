@@ -278,6 +278,7 @@ export class LookupHelper {
    * Caches results to prevent redundant API queries.
    */
   public async getGlobalRecord(globalName: string, recordName: string, queryParam?: string | null = null): Promise<any> {
+    console.log("global@123", globalName, recordName, queryParam)
     const normalizedGlobal = globalName.toLowerCase().trim();
     const normalizedRecord = recordName.toLowerCase().trim();
 
@@ -361,16 +362,17 @@ export class LookupHelper {
   /**
    * Resolves contact number and country ID based on country name.
    */
-  public async getContactNoAndCountryId(countryName: string = "India", index: number = 8): Promise<{ contactNo: string | null; contactNoCountryId: number | null }> {
+  public async getContactNoAndCountryId(countryName: string = "India", index: number = 8): Promise<{ contactNo: string | null; contactNoCountryId: number | null, phoneCode: string | null }> {
 
     const country = await this.getRecord("country", countryName);
     if (!country) {
-      return { contactNo: null, contactNoCountryId: null };
+      return { phoneCode: country.phoneCode || null, contactNo: null, contactNoCountryId: null };
     }
     const phoneCodeStr = String(country.phoneCode || "");
     const repeatCount = Math.max(0, Number(country.minContactNoLength || 10) - phoneCodeStr.length);
     const contactNo = country.phoneCode + String(index).repeat(repeatCount) || null;
     return {
+      phoneCode: country.phoneCode || null,
       contactNo,
       contactNoCountryId: country.id
     };

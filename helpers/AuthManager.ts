@@ -157,6 +157,8 @@ export class AuthManager {
         },
       });
 
+
+
       const duration = Date.now() - startTime;
       const status = response.status();
 
@@ -166,7 +168,7 @@ export class AuthManager {
       } catch (err) {
         responseBody = await response.text();
       }
-
+      console.log("Login Response@001", response);
       Logger.response(status, duration, {}, responseBody);
 
       if (!response.ok()) {

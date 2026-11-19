@@ -2978,77 +2978,77 @@ export const roleData = [
 ];
 
 export const userData = [
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 1,
-        "supplierAccountId": null,
-        "username": "UN1",
-        "displayName": "System Administrator",
-        "countryName": "India",
-        "contactNo": "+9876500001",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "admin@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": null,
-        "departmentTypeId": null,
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 1,
+    //     "supplierAccountId": null,
+    //     "username": "UN1",
+    //     "displayName": "System Administrator",
+    //     "countryName": "India",
+    //     "contactNo": "+9876500001",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "admin@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": null,
+    //     "departmentTypeId": null,
 
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN2",
-        "displayName": "Rajesh Verma",
-        "contactNo": "9876500002",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "rajesh.verma@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": 1,
-        "departmentTypeId": 1,
-        "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Company One" }
-        ],
-        "userDivisionDetail": [
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN2",
+    //     "displayName": "Rajesh Verma",
+    //     "contactNo": "9876500002",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "rajesh.verma@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 1,
+    //     "departmentTypeId": 1,
+    //     "userRoleDetail": [
+    //         { "roleName": "Purchase Manager", "companyName": "Company One" }
+    //     ],
+    //     "userDivisionDetail": [
 
-        ],
-        "userDepartmentDetail": [
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN3",
-        "displayName": "Sanjay Kulkarni",
-        "contactNo": "9876500003",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "sanjay.kulkarni@metroengg.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Approving Authority", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" },
-            { "divisionName": "Division Two Company Two Three" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
-        ],
-        "password": "QWer12!@"
-    },
+    //     ],
+    //     "userDepartmentDetail": [
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN3",
+    //     "displayName": "Sanjay Kulkarni",
+    //     "contactNo": "9876500003",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "sanjay.kulkarni@metroengg.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Approving Authority", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division One Company One Two Three" },
+    //         { "divisionName": "Division Two Company Two Three" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department One Division One Two Three" },
+    //         { "departmentName": "Department Two Division Two Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
     {
         "statusId": 1,
         "statusRemarks": "",
@@ -3056,7 +3056,7 @@ export const userData = [
         "supplierAccountId": null,
         "username": "UN4",
         "displayName": "Priya Iyer",
-        "contactNo": "9876500004",
+        "contactNo": "9876595004",
         "contactNoCountryId": 1,
         "countryName": "India",
         "timeZonesId": 1,
@@ -3101,89 +3101,89 @@ export const userData = [
         "userDepartmentDetail": [],
         "password": "QWer12!@"
     },
-    {
-        "statusId": 2,
-        "statusRemarks": "inactive user - relieved from organization",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN6",
-        "displayName": "Anil Deshmukh",
-        "contactNo": "9876500006",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "anil.deshmukh@metroengg.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Four Company Two Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Five Division Two" }
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN9",
-        "displayName": "Nabanita Chatterjee",
-        "contactNo": "9876500007",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "nabanita.chatterjee@shaktiindustrial.com",
-        "erpUserId": "ERPUSR-3345",
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" },
-            { "divisionName": "Division Two Company Two Three" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN7",
-        "displayName": "Kiran Reddy",
-        "contactNo": "9876500008",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "kiran.reddy@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Company Three" },
-            { "roleName": "Compliance Auditor", "companyName": "Company Three" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Two Company Two Three" },
-            { "divisionName": "Division Four Company Three Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Two Division Two Three" },
-            { "departmentName": "Department Four Division Three" }
-        ],
-        "password": "QWer12!@"
-    },
+    // {
+    //     "statusId": 2,
+    //     "statusRemarks": "inactive user - relieved from organization",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN6",
+    //     "displayName": "Anil Deshmukh",
+    //     "contactNo": "9876500006",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "anil.deshmukh@metroengg.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Four Company Two Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Five Division Two" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN9",
+    //     "displayName": "Nabanita Chatterjee",
+    //     "contactNo": "9876500007",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "nabanita.chatterjee@shaktiindustrial.com",
+    //     "erpUserId": "ERPUSR-3345",
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division One Company One Two Three" },
+    //         { "divisionName": "Division Two Company Two Three" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department One Division One Two Three" },
+    //         { "departmentName": "Department Two Division Two Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN7",
+    //     "displayName": "Kiran Reddy",
+    //     "contactNo": "9876500008",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "kiran.reddy@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Purchase Manager", "companyName": "Company Three" },
+    //         { "roleName": "Compliance Auditor", "companyName": "Company Three" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Two Company Two Three" },
+    //         { "divisionName": "Division Four Company Three Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Two Division Two Three" },
+    //         { "departmentName": "Department Four Division Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
     {
         "statusId": 1,
         "statusRemarks": "",
@@ -3191,7 +3191,7 @@ export const userData = [
         "supplierAccountId": null,
         "username": "UN8",
         "displayName": "Jonathan Miller",
-        "contactNo": "7135550142",
+        "contactNo": "7188550142",
         "countryName": "India",
         "contactNoCountryId": 2,
         "timeZonesId": 2,
@@ -3212,32 +3212,32 @@ export const userData = [
         ],
         "password": "QWer12!@"
     },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN10",
-        "displayName": "Sunita Pillai",
-        "contactNo": "9876500009",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "sunita.pillai@bharatpetrochem.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Four Company Three Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Four Division Three" }
-        ],
-        "password": "QWer12!@"
-    }
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN10",
+    //     "displayName": "Sunita Pillai",
+    //     "contactNo": "9876500009",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "sunita.pillai@bharatpetrochem.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Four Company Three Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Four Division Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // }
 ];
 
 export const supplierAccountData = [
@@ -3688,7 +3688,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Purchase Request" }
+            { "formName": "MMPR01" }
         ],
         "documentSeriesCompanyDetail": [
             { "companyName": "Company One", "statusId": 1 },
@@ -3718,7 +3718,7 @@ export const documentSeriesData = [
         "numberStartFrom": 100,
         "effectiveDate": "2026-02-01",
         "documentSeriesFormDetail": [
-            { "formName": "Purchase Order" }
+            { "formName": "PMPO01" }
         ],
         "documentSeriesCompanyDetail": [
             { "companyName": "Company One", "statusId": 1 },
@@ -3748,7 +3748,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1000,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Request For Quotation" }
+            { "formName": "PRFQ01" }
         ],
         "documentSeriesDocTypeDetail": [
             { "docTypeName": "RFQ - Standard - Division One Company One Two Three", "statusId": 1 },
@@ -3767,7 +3767,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Comparative Statement" }
+            { "formName": "PMCS01" }
         ],
         "documentSeriesDocTypeDetail": [
             { "docTypeName": "CS - Standard - Division One Company One Two Three", "statusId": 1 },
