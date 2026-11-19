@@ -525,7 +525,7 @@ test.describe('Initial Data Setup', () => {
 
     test('should seed Approval Setup Master initial data', async ({ approvalSetupApi, workflow, lookup }) => {
         await workflow.seedInitialData(approvalSetupApi, approvalSetupData, "Approval Setup Master", async (payload) => {
-            const form = await lookup.getGlobalRecord("forms", payload.formName);
+            const form = await lookup.getGlobalRecord("forms", payload.formName, 'FormCaption.Eq');
             const formId = form?.id;
 
             let approvalScopeId = 2;

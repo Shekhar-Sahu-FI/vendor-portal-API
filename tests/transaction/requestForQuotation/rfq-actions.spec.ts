@@ -28,7 +28,7 @@ const deleteIfCreated = async (api: any, id?: number): Promise<void> => {
 
 const formatDate = (d: Date): string => d.toISOString().split('T')[0];
 
-test.describe('Request for Quotation (RFQ) Actions & Lifecycle Operations @RFQ-ACT', () => {
+test.describe('Request for Quotation = Actions & Lifecycle Operations @RFQ-ACT', () => {
   test.setTimeout(120000);
 
   let cachedContext: any = null;

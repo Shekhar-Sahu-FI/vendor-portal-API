@@ -277,7 +277,7 @@ export class LookupHelper {
    * Resolves a human-readable name to its corresponding full record data for any Global Data API.
    * Caches results to prevent redundant API queries.
    */
-  public async getGlobalRecord(globalName: string, recordName: string): Promise<any> {
+  public async getGlobalRecord(globalName: string, recordName: string, queryParam?: string | null = null): Promise<any> {
     const normalizedGlobal = globalName.toLowerCase().trim();
     const normalizedRecord = recordName.toLowerCase().trim();
 
@@ -299,7 +299,14 @@ export class LookupHelper {
     }
 
     // Global data is retrieved by passing KeywordSearch query param
-    const endpoint = `${config.url}?KeywordSearch=${encodeURIComponent(recordName)}`;
+    let endpoint = '';
+
+    if (queryParam) {
+      endpoint = `${config.url}?${queryParam}=${encodeURIComponent(recordName)}`;
+    }
+    else {
+      endpoint = `${config.url}?$Keyword=${encodeURIComponent(recordName)}`;
+    }
     const response = await this.requestHelper.get<any>(endpoint);
 
     if (!response.ok) {
@@ -404,17 +411,17 @@ export class LookupHelper {
     const normalizedRecord = docTypeName.toLowerCase().trim();
     const cacheKey = "docType_" + formId;
 
-    if (this.recordCache.has(cacheKey)) {
-      const masterCache = this.recordCache.get(cacheKey)!;
-      if (masterCache.has(normalizedRecord)) {
-        Logger.info(`[CACHE HIT] Lookup for docType '${docTypeName}' with formId '${formId}' resolved`);
-        return masterCache.get(normalizedRecord);
-      }
-    }
+    // if (this.recordCache.has(cacheKey)) {
+    //   const masterCache = this.recordCache.get(cacheKey)!;
+    //   if (masterCache.has(normalizedRecord)) {
+    //     Logger.info(`[CACHE HIT] Lookup for docType '${docTypeName}' with formId '${formId}' resolved`);
+    //     return masterCache.get(normalizedRecord);
+    //   }
+    // }
 
     Logger.info(`[CACHE MISS] Lookup for docType '${docTypeName}' with formId '${formId}'. Initiating query...`);
     const masterApi = new MasterApi(this.requestHelper, masterName);
-    const response = await masterApi.getDocTypesByFormId(formId);
+    const response = await masterApi.getDocTypesByFormId(formId, docTypeName);
 
     if (!response.ok) {
       throw new Error(`Lookup failed for docType '${docTypeName}' and formId '${formId}'. API status: ${response.status}`);
@@ -561,7 +568,7 @@ export class LookupHelper {
 
     const normalizedLocName = vendorLocationName.toLowerCase().trim();
     let matchedLocation = locations.find((l: any) =>
-      (l.addressLine1 && String(l.addressLine1).toLowerCase().trim().includes(normalizedLocName)) 
+      (l.addressLine1 && String(l.addressLine1).toLowerCase().trim().includes(normalizedLocName))
     );
 
     if (!matchedLocation && locations.length > 0) {

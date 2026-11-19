@@ -52,6 +52,7 @@ export interface RFQPrItemDetailParam {
 }
 
 export interface RFQItemParam {
+  prItemDetailId: string | number;
   itemName?: string;
   itemId?: number;
   makeName?: string;
@@ -59,6 +60,7 @@ export interface RFQItemParam {
   unitName?: string;
   unitId?: number;
   techSpecification?: string;
+  rfqQty: number | string;
   qty?: number | string;
   remarks?: string;
   hsnCode?: string | null;

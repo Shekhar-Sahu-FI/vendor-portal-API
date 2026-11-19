@@ -45,7 +45,7 @@ export class MasterApi extends BaseApi {
    * Delete a master record
    * DELETE /api/<masterName>/<id>
    */
-  public async deleteRecord<T = any>(id: string | number, body: any): Promise<ApiResponse<T>> {
+  public async deleteRecord<T = any>(id: string | number, body?: any): Promise<ApiResponse<T>> {
     return this.delete<T>(`/${id}`, body);
   }
 
@@ -105,9 +105,34 @@ export class MasterApi extends BaseApi {
    * Retrieve doctypes by form ID
    * GET /api/<masterName>/forms/<formId>
    */
-  public async getDocTypesByFormId<T = any>(formId: string | number): Promise<ApiResponse<T>> {
-    return super.get<T>(`/forms/${formId}`);
+  public async getDocTypesByFormId<T = any>(formId: string | number, doctypeName: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`/form?FormId=${formId}&KeywordSearch=${encodeURIComponent(doctypeName)}`);
   }
+
+  /**
+   * Auto-generate next code
+   * GET /api/<masterName>/next-code or /api/<masterName>/next-code/<id>
+   */
+  public async getNextCode<T = any>(param?: string | number): Promise<ApiResponse<T>> {
+    return super.get<T>(param !== undefined ? `/next-code/${param}` : `/next-code`);
+  }
+
+  /**
+   * Fetch units for item master
+   * GET /api/<masterName>/unit
+   */
+  public async getItemUnits<T = any>(): Promise<ApiResponse<T>> {
+    return super.get<T>('/unit');
+  }
+
+  /**
+   * Fetch makes for item master
+   * GET /api/<masterName>/make
+   */
+  public async getItemMakes<T = any>(): Promise<ApiResponse<T>> {
+    return super.get<T>('/make');
+  }
+
   /**
    * Get a master record by specific operation param
    * GET /api/<masterName>/get?<operationParam>=<value>
@@ -118,6 +143,15 @@ export class MasterApi extends BaseApi {
 
   public async searchByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
     return super.get<T>(`?${operationParam}=${encodeURIComponent(value)}`);
+  }
+
+  /**
+   * Query active records for dropdown / lookup
+   * GET /api/<masterName>/get
+   */
+  public async getDropdown<T = any>(queryParams?: Record<string, any>): Promise<ApiResponse<T>> {
+    const queryString = queryParams ? `?${this.buildQueryString(queryParams)}` : '';
+    return this.get<T>(`/get${queryString}`);
   }
 
   /**

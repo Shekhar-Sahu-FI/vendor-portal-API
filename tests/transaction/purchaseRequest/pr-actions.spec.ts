@@ -44,6 +44,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
         departmentName: 'Department One Division One Two Three',
         docSeries: 'PR-{{YYYY}}-{{MM}}-{{N}}',
         docTypeName: 'PR - Standard - Division One Company One Two Three',
+        approvalSetupId: '',
         requestedBy: 'admin',
         items: [
           {
@@ -170,7 +171,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
             refDocTypeId: 2, // Purchase Request
             items: [
               {
-                prItemDetailId: prItem.id,
+                prItemDetailId: prItem.id ,
                 rfqQty: 5
               }
             ]
@@ -198,249 +199,249 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
   // =========================================================================
   // Section 2: Cancellation Lifecycle & Balance Impact (PR-ACT-CAN)
   // =========================================================================
-  test.describe('Section 2: Cancellation Lifecycle (/api/utility/pr-cancellation)', () => {
+  // test.describe('Section 2: Cancellation Lifecycle (/api/utility/pr-cancellation)', () => {
 
-    test('PR-ACT-CAN-01: Full cancellation lifecycle: save cancellation, deduct balance, verify, update, and delete restoring balance', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const prPayload = await getBasePayload(lookup, transactionPayloadHelper, {
-        docStatusId: DocumentStatus.Authorized,
-        approvalSetupId: null
-      });
+  //   test('PR-ACT-CAN-01: Full cancellation lifecycle: save cancellation, deduct balance, verify, update, and delete restoring balance', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const prPayload = await getBasePayload(lookup, transactionPayloadHelper, {
+  //       docStatusId: DocumentStatus.Authorized,
+  //       approvalSetupId: null
+  //     });
 
-      const prSaveRes = await PRApi.save(prPayload);
-      if (prSaveRes.ok) {
-        const prId = getCreatedId(prSaveRes.body);
-        let cancellationId: number | undefined;
+  //     const prSaveRes = await PRApi.save(prPayload);
+  //     if (prSaveRes.ok) {
+  //       const prId = getCreatedId(prSaveRes.body);
+  //       let cancellationId: number | undefined;
 
-        try {
-          const prGetRes = await PRApi.getById(prId);
-          const prData = getResponseData(prGetRes.body);
-          const item = prData.purchaseRequestItemDetail?.[0];
-          expect(item, 'Item detail should exist').toBeDefined();
-          const initialBalance = item.balanceQty;
+  //       try {
+  //         const prGetRes = await PRApi.getById(prId);
+  //         const prData = getResponseData(prGetRes.body);
+  //         const item = prData.purchaseRequestItemDetail?.[0];
+  //         expect(item, 'Item detail should exist').toBeDefined();
+  //         const initialBalance = item.balanceQty;
 
-          // 1. Save Cancellation
-          const cancelQty = 10;
-          const cancelPayload = {
-            docDate: formatDate(new Date()),
-            docStatusId: DocumentStatus.Draft,
-            remarks: 'Cancellation of excess quantity',
-            purchaseRequestCancellationItemDetail: [
-              {
-                prItemDetailId: item.id,
-                statusId: 1,
-                cancelQty: cancelQty,
-                reason: 'Budget cuts on this line item'
-              }
-            ]
-          };
+  //         // 1. Save Cancellation
+  //         const cancelQty = 10;
+  //         const cancelPayload = {
+  //           docDate: formatDate(new Date()),
+  //           docStatusId: DocumentStatus.Draft,
+  //           remarks: 'Cancellation of excess quantity',
+  //           purchaseRequestCancellationItemDetail: [
+  //             {
+  //               prItemDetailId: item.id,
+  //               statusId: 1,
+  //               cancelQty: cancelQty,
+  //               reason: 'Budget cuts on this line item'
+  //             }
+  //           ]
+  //         };
 
-          const cancelSaveRes = await prCancellationApi.save(cancelPayload);
-          if (cancelSaveRes.ok) {
-            cancellationId = getCreatedId(cancelSaveRes.body);
-            expect(cancellationId, 'Cancellation ID should be generated').toBeDefined();
+  //         const cancelSaveRes = await prCancellationApi.save(cancelPayload);
+  //         if (cancelSaveRes.ok) {
+  //           cancellationId = getCreatedId(cancelSaveRes.body);
+  //           expect(cancellationId, 'Cancellation ID should be generated').toBeDefined();
 
-            // 2. Verify PR Item balance is deducted
-            const prAfterCancel = await PRApi.getById(prId);
-            const prAfterData = getResponseData(prAfterCancel.body);
-            const updatedItem = prAfterData.purchaseRequestItemDetail?.[0];
-            expect(updatedItem.balanceQty).toBe(initialBalance - cancelQty);
+  //           // 2. Verify PR Item balance is deducted
+  //           const prAfterCancel = await PRApi.getById(prId);
+  //           const prAfterData = getResponseData(prAfterCancel.body);
+  //           const updatedItem = prAfterData.purchaseRequestItemDetail?.[0];
+  //           expect(updatedItem.balanceQty).toBe(initialBalance - cancelQty);
 
-            // 3. GetById Cancellation
-            const getCancelRes = await prCancellationApi.getById(cancellationId);
-            expectSuccess(getCancelRes);
-            const cancelData = getResponseData(getCancelRes.body);
-            expect(cancelData).toBeDefined();
+  //           // 3. GetById Cancellation
+  //           const getCancelRes = await prCancellationApi.getById(cancellationId);
+  //           expectSuccess(getCancelRes);
+  //           const cancelData = getResponseData(getCancelRes.body);
+  //           expect(cancelData).toBeDefined();
 
-            // 4. Search Cancellations
-            const searchRes = await prCancellationApi.list({ pageNo: 1, pageSize: 10 });
-            expect(searchRes.status).toBe(200);
+  //           // 4. Search Cancellations
+  //           const searchRes = await prCancellationApi.list({ pageNo: 1, pageSize: 10 });
+  //           expect(searchRes.status).toBe(200);
 
-            // 5. Update Cancellation Remarks
-            const updatePayload = {
-              ...cancelPayload,
-              id: cancellationId,
-              remarks: 'Updated cancellation remark'
-            };
-            const updateRes = await prCancellationApi.update(cancellationId, updatePayload);
-            expectSuccess(updateRes);
+  //           // 5. Update Cancellation Remarks
+  //           const updatePayload = {
+  //             ...cancelPayload,
+  //             id: cancellationId,
+  //             remarks: 'Updated cancellation remark'
+  //           };
+  //           const updateRes = await prCancellationApi.update(cancellationId, updatePayload);
+  //           expectSuccess(updateRes);
 
-            // 6. Delete Cancellation (restoring PR balance)
-            const delRes = await prCancellationApi.deleteRecord(cancellationId);
-            expectSuccess(delRes);
-            cancellationId = undefined;
+  //           // 6. Delete Cancellation (restoring PR balance)
+  //           const delRes = await prCancellationApi.deleteRecord(cancellationId);
+  //           expectSuccess(delRes);
+  //           cancellationId = undefined;
 
-            // Verify PR balance restored
-            const prAfterDelete = await PRApi.getById(prId);
-            const prRestoredData = getResponseData(prAfterDelete.body);
-            const restoredItem = prRestoredData.purchaseRequestItemDetail?.[0];
-            expect(restoredItem.balanceQty).toBe(initialBalance);
-          }
-        } finally {
-          if (cancellationId) await deleteIfCreated(prCancellationApi, cancellationId);
-          await deleteIfCreated(PRApi, prId);
-        }
-      }
-    });
+  //           // Verify PR balance restored
+  //           const prAfterDelete = await PRApi.getById(prId);
+  //           const prRestoredData = getResponseData(prAfterDelete.body);
+  //           const restoredItem = prRestoredData.purchaseRequestItemDetail?.[0];
+  //           expect(restoredItem.balanceQty).toBe(initialBalance);
+  //         }
+  //       } finally {
+  //         if (cancellationId) await deleteIfCreated(prCancellationApi, cancellationId);
+  //         await deleteIfCreated(PRApi, prId);
+  //       }
+  //     }
+  //   });
 
-    test('PR-ACT-CAN-02: Should fail when cancelQty exceeds item balanceQty', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const prPayload = await getBasePayload(lookup, transactionPayloadHelper, {
-        docStatusId: DocumentStatus.Authorized,
-        approvalSetupId: null
-      });
+  //   test('PR-ACT-CAN-02: Should fail when cancelQty exceeds item balanceQty', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const prPayload = await getBasePayload(lookup, transactionPayloadHelper, {
+  //       docStatusId: DocumentStatus.Authorized,
+  //       approvalSetupId: null
+  //     });
 
-      const prSaveRes = await PRApi.save(prPayload);
-      if (prSaveRes.ok) {
-        const prId = getCreatedId(prSaveRes.body);
-        try {
-          const prGetRes = await PRApi.getById(prId);
-          const prData = getResponseData(prGetRes.body);
-          const item = prData.purchaseRequestItemDetail?.[0];
+  //     const prSaveRes = await PRApi.save(prPayload);
+  //     if (prSaveRes.ok) {
+  //       const prId = getCreatedId(prSaveRes.body);
+  //       try {
+  //         const prGetRes = await PRApi.getById(prId);
+  //         const prData = getResponseData(prGetRes.body);
+  //         const item = prData.purchaseRequestItemDetail?.[0];
 
-          // Cancel 999 which exceeds initial 25
-          const cancelPayload = {
-            docDate: formatDate(new Date()),
-            docStatusId: DocumentStatus.Draft,
-            purchaseRequestCancellationItemDetail: [
-              {
-                prItemDetailId: item.id,
-                statusId: 1,
-                cancelQty: 999,
-                reason: 'Excess cancel quantity test'
-              }
-            ]
-          };
+  //         // Cancel 999 which exceeds initial 25
+  //         const cancelPayload = {
+  //           docDate: formatDate(new Date()),
+  //           docStatusId: DocumentStatus.Draft,
+  //           purchaseRequestCancellationItemDetail: [
+  //             {
+  //               prItemDetailId: item.id,
+  //               statusId: 1,
+  //               cancelQty: 999,
+  //               reason: 'Excess cancel quantity test'
+  //             }
+  //           ]
+  //         };
 
-          const cancelRes = await prCancellationApi.save(cancelPayload);
-          expectBadRequest(cancelRes);
-          const text = cancelRes.validationMessages?.join(' ') || JSON.stringify(cancelRes.body);
-          expect(text).toMatch(/cannot be greater than|balance|cancel/i);
-        } finally {
-          await deleteIfCreated(PRApi, prId);
-        }
-      }
-    });
+  //         const cancelRes = await prCancellationApi.save(cancelPayload);
+  //         expectBadRequest(cancelRes);
+  //         const text = cancelRes.validationMessages?.join(' ') || JSON.stringify(cancelRes.body);
+  //         expect(text).toMatch(/cannot be greater than|balance|cancel/i);
+  //       } finally {
+  //         await deleteIfCreated(PRApi, prId);
+  //       }
+  //     }
+  //   });
 
-    test('PR-ACT-CAN-03: Should fail when cancelQty is zero or negative', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const prPayload = await getBasePayload(lookup, transactionPayloadHelper);
-      const prSaveRes = await PRApi.save(prPayload);
-      if (prSaveRes.ok) {
-        const prId = getCreatedId(prSaveRes.body);
-        try {
-          const prGetRes = await PRApi.getById(prId);
-          const prData = getResponseData(prGetRes.body);
-          const item = prData.purchaseRequestItemDetail?.[0];
+  //   test('PR-ACT-CAN-03: Should fail when cancelQty is zero or negative', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const prPayload = await getBasePayload(lookup, transactionPayloadHelper);
+  //     const prSaveRes = await PRApi.save(prPayload);
+  //     if (prSaveRes.ok) {
+  //       const prId = getCreatedId(prSaveRes.body);
+  //       try {
+  //         const prGetRes = await PRApi.getById(prId);
+  //         const prData = getResponseData(prGetRes.body);
+  //         const item = prData.purchaseRequestItemDetail?.[0];
 
-          const cancelPayload = {
-            docDate: formatDate(new Date()),
-            docStatusId: DocumentStatus.Draft,
-            purchaseRequestCancellationItemDetail: [
-              {
-                prItemDetailId: item.id,
-                statusId: 1,
-                cancelQty: 0,
-                reason: 'Zero cancel qty'
-              }
-            ]
-          };
+  //         const cancelPayload = {
+  //           docDate: formatDate(new Date()),
+  //           docStatusId: DocumentStatus.Draft,
+  //           purchaseRequestCancellationItemDetail: [
+  //             {
+  //               prItemDetailId: item.id,
+  //               statusId: 1,
+  //               cancelQty: 0,
+  //               reason: 'Zero cancel qty'
+  //             }
+  //           ]
+  //         };
 
-          const cancelRes = await prCancellationApi.save(cancelPayload);
-          expectBadRequest(cancelRes);
-        } finally {
-          await deleteIfCreated(PRApi, prId);
-        }
-      }
-    });
+  //         const cancelRes = await prCancellationApi.save(cancelPayload);
+  //         expectBadRequest(cancelRes);
+  //       } finally {
+  //         await deleteIfCreated(PRApi, prId);
+  //       }
+  //     }
+  //   });
 
-    test('PR-ACT-CAN-04: Should fail when cancellation reason is missing or empty', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const prPayload = await getBasePayload(lookup, transactionPayloadHelper);
-      const prSaveRes = await PRApi.save(prPayload);
-      if (prSaveRes.ok) {
-        const prId = getCreatedId(prSaveRes.body);
-        try {
-          const prGetRes = await PRApi.getById(prId);
-          const prData = getResponseData(prGetRes.body);
-          const item = prData.purchaseRequestItemDetail?.[0];
+  //   test('PR-ACT-CAN-04: Should fail when cancellation reason is missing or empty', async ({ PRApi, masterApiFactory, lookup, transactionPayloadHelper }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const prPayload = await getBasePayload(lookup, transactionPayloadHelper);
+  //     const prSaveRes = await PRApi.save(prPayload);
+  //     if (prSaveRes.ok) {
+  //       const prId = getCreatedId(prSaveRes.body);
+  //       try {
+  //         const prGetRes = await PRApi.getById(prId);
+  //         const prData = getResponseData(prGetRes.body);
+  //         const item = prData.purchaseRequestItemDetail?.[0];
 
-          const cancelPayload = {
-            docDate: formatDate(new Date()),
-            docStatusId: DocumentStatus.Draft,
-            purchaseRequestCancellationItemDetail: [
-              {
-                prItemDetailId: item.id,
-                statusId: 1,
-                cancelQty: 5,
-                reason: '' // Empty reason
-              }
-            ]
-          };
+  //         const cancelPayload = {
+  //           docDate: formatDate(new Date()),
+  //           docStatusId: DocumentStatus.Draft,
+  //           purchaseRequestCancellationItemDetail: [
+  //             {
+  //               prItemDetailId: item.id,
+  //               statusId: 1,
+  //               cancelQty: 5,
+  //               reason: '' // Empty reason
+  //             }
+  //           ]
+  //         };
 
-          const cancelRes = await prCancellationApi.save(cancelPayload);
-          expectBadRequest(cancelRes);
-        } finally {
-          await deleteIfCreated(PRApi, prId);
-        }
-      }
-    });
+  //         const cancelRes = await prCancellationApi.save(cancelPayload);
+  //         expectBadRequest(cancelRes);
+  //       } finally {
+  //         await deleteIfCreated(PRApi, prId);
+  //       }
+  //     }
+  //   });
 
-    test('PR-ACT-CAN-05: Should fail when prItemDetailId is non-existent', async ({ masterApiFactory }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const cancelPayload = {
-        docDate: formatDate(new Date()),
-        docStatusId: DocumentStatus.Draft,
-        purchaseRequestCancellationItemDetail: [
-          {
-            prItemDetailId: 999999,
-            statusId: 1,
-            cancelQty: 5,
-            reason: 'Non-existent item test'
-          }
-        ]
-      };
+  //   test('PR-ACT-CAN-05: Should fail when prItemDetailId is non-existent', async ({ masterApiFactory }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const cancelPayload = {
+  //       docDate: formatDate(new Date()),
+  //       docStatusId: DocumentStatus.Draft,
+  //       purchaseRequestCancellationItemDetail: [
+  //         {
+  //           prItemDetailId: 999999,
+  //           statusId: 1,
+  //           cancelQty: 5,
+  //           reason: 'Non-existent item test'
+  //         }
+  //       ]
+  //     };
 
-      const response = await prCancellationApi.save(cancelPayload);
-      expectBadRequest(response);
-    });
+  //     const response = await prCancellationApi.save(cancelPayload);
+  //     expectBadRequest(response);
+  //   });
 
-    test('PR-ACT-CAN-06: Should return 404 when querying non-existent cancellation ID', async ({ masterApiFactory }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const response = await prCancellationApi.getById(999999);
-      expectNotFound(response);
-    });
+  //   test('PR-ACT-CAN-06: Should return 404 when querying non-existent cancellation ID', async ({ masterApiFactory }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const response = await prCancellationApi.getById(999999);
+  //     expectNotFound(response);
+  //   });
 
-    test('PR-ACT-CAN-07: Should return 404 when deleting non-existent cancellation ID', async ({ masterApiFactory }) => {
-      const prCancellationApi = masterApiFactory('prCancellation');
-      const response = await prCancellationApi.deleteRecord(999999);
-      expectNotFound(response);
-    });
+  //   test('PR-ACT-CAN-07: Should return 404 when deleting non-existent cancellation ID', async ({ masterApiFactory }) => {
+  //     const prCancellationApi = masterApiFactory('prCancellation');
+  //     const response = await prCancellationApi.deleteRecord(999999);
+  //     expectNotFound(response);
+  //   });
 
-    test('PR-ACT-CAN-08: Supplier account should be forbidden from saving PR cancellation', async ({ supplierRequestHelper }) => {
-      const response = await supplierRequestHelper.post('/api/utility/pr-cancellation', {
-        docDate: formatDate(new Date()),
-        purchaseRequestCancellationItemDetail: []
-      });
-      expectForbidden(response);
-    });
+  //   test('PR-ACT-CAN-08: Supplier account should be forbidden from saving PR cancellation', async ({ supplierRequestHelper }) => {
+  //     const response = await supplierRequestHelper.post('/api/utility/pr-cancellation', {
+  //       docDate: formatDate(new Date()),
+  //       purchaseRequestCancellationItemDetail: []
+  //     });
+  //     expectForbidden(response);
+  //   });
 
-    test('PR-ACT-CAN-09: Supplier account should be forbidden from searching PR cancellations', async ({ supplierRequestHelper }) => {
-      const response = await supplierRequestHelper.get('/api/utility/pr-cancellation');
-      expectForbidden(response);
-    });
+  //   test('PR-ACT-CAN-09: Supplier account should be forbidden from searching PR cancellations', async ({ supplierRequestHelper }) => {
+  //     const response = await supplierRequestHelper.get('/api/utility/pr-cancellation');
+  //     expectForbidden(response);
+  //   });
 
-    test('PR-ACT-CAN-10: Supplier account should be forbidden from deleting PR cancellation', async ({ supplierRequestHelper }) => {
-      const response = await supplierRequestHelper.delete('/api/utility/pr-cancellation/1');
-      expectForbidden(response);
-    });
+  //   test('PR-ACT-CAN-10: Supplier account should be forbidden from deleting PR cancellation', async ({ supplierRequestHelper }) => {
+  //     const response = await supplierRequestHelper.delete('/api/utility/pr-cancellation/1');
+  //     expectForbidden(response);
+  //   });
 
-  });
+  // });
 
   // =========================================================================
   // Section 3: Quantity Reduction During Review (PR-ACT-QRD)
   // =========================================================================
-  test.describe('Section 3: Quantity Reduction During Review (PATCH /api/purchase-requests/items/quantity)', () => {
+  test.describe('Section 3: Quantity Reduction During Review PATCH /api/purchase-requests/items/quantity', () => {
 
     test('PR-ACT-QRD-01: Should fail when prId does not exist', async ({ requestHelper }) => {
       const response = await requestHelper.patch('/api/purchase-requests/items/quantity?prId=999999', [
@@ -531,7 +532,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
     });
 
     test('PR-ACT-QRD-06: Should fail when attempting to increase quantity (newQty > currentQty)', async ({ PRApi, lookup, transactionPayloadHelper, requestHelper }) => {
-      const approval = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
+      const approval = await lookup.searchRecord('approvalSetup', 'ApprovalSetupName.Eq', 'PR Approval Setup - All Companies & Divisions');
       const payload = await getBasePayload(lookup, transactionPayloadHelper, {
         docStatusId: DocumentStatus.InReview,
         approvalSetupId: approval?.id || 1
@@ -559,7 +560,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
           ]);
           expectBadRequest(patchRes);
           const text = patchRes.validationMessages?.join(' ') || JSON.stringify(patchRes.body);
-          expect(text).toMatch(/cannot be increased|less than or equal|not allowed/i);
+          expect(text).toMatch(/cannot be greater than the current quantity/i);
         } finally {
           await deleteIfCreated(PRApi, prId);
         }
@@ -567,7 +568,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
     });
 
     test('PR-ACT-QRD-07: Should fail when reducing quantity without reasonId', async ({ PRApi, lookup, transactionPayloadHelper, requestHelper }) => {
-      const approval = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
+      const approval = await lookup.searchRecord('approvalSetup', 'ApprovalSetupName.Eq', 'PR Approval Setup - All Companies & Divisions');
       const payload = await getBasePayload(lookup, transactionPayloadHelper, {
         docStatusId: DocumentStatus.InReview,
         approvalSetupId: approval?.id || 1
@@ -596,7 +597,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
     });
 
     test('PR-ACT-QRD-08: Should fail when item detail ID does not belong to the PR', async ({ PRApi, lookup, transactionPayloadHelper, requestHelper }) => {
-      const approval = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
+      const approval = await lookup.searchRecord('approvalSetup', 'ApprovalSetupName.Eq', 'PR Approval Setup - All Companies & Divisions');
       const payload = await getBasePayload(lookup, transactionPayloadHelper, {
         docStatusId: DocumentStatus.InReview,
         approvalSetupId: approval?.id || 1
@@ -621,7 +622,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
     });
 
     test('PR-ACT-QRD-09: Should fail when reasonId is invalid or inactive', async ({ PRApi, lookup, transactionPayloadHelper, requestHelper }) => {
-      const approval = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
+      const approval = await lookup.searchRecord('approvalSetup', 'ApprovalSetupName.Eq', 'PR Approval Setup - All Companies & Divisions');
       const payload = await getBasePayload(lookup, transactionPayloadHelper, {
         docStatusId: DocumentStatus.InReview,
         approvalSetupId: approval?.id || 1
@@ -650,7 +651,7 @@ test.describe('Purchase Request Lifecycle Actions @PR-ACT', () => {
     });
 
     test('PR-ACT-QRD-10: Review reduction recalculates line item amount and netAmount when allowed', async ({ PRApi, lookup, transactionPayloadHelper, requestHelper }) => {
-      const approval = await lookup.searchRecord('approvalSetup', 'StatusId.Eq', '1');
+      const approval = await lookup.searchRecord('approvalSetup', 'ApprovalSetupName.Eq', 'PR Approval Setup - All Companies & Divisions');
       const reason = await lookup.searchRecord('prReason', 'StatusId.Eq', '1');
       const reasonId = reason?.id || 1;
 

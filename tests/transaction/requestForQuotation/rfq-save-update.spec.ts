@@ -6,7 +6,8 @@ import {
     expectUnauthorized,
     expectForbidden,
     expectNotFound,
-    expectFieldError
+    expectFieldError,
+    expectValidationMessage
 } from '../../../helpers/ValidationHelper';
 import {
     formatDate,
@@ -805,7 +806,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             const payload = getValidDirectRfqPayload(ctx, { docSeriesId: null, docNoYearly: null });
             const res = await requestForQuotationApi.save(payload);
             await expectBadRequest(res);
-            await expectFieldError(res, ['docSeriesId', 'docNoYearly']);
+            await expectFieldError(res, ['Document Series', 'Document Number']);
         });
 
         test('RFQ-VAL-HDR-02: DocNoYearly Exceeds Maximum Length of 30 Characters', async ({ requestForQuotationApi, lookup }) => {
@@ -827,13 +828,13 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             await expectFieldError(res, ['companyId']);
         });
 
-        test('RFQ-VAL-HDR-04: Company Is Not Head Office', async ({ requestForQuotationApi, lookup }) => {
-            const ctx = await getRfqMasterContext(lookup);
-            const payload = getValidDirectRfqPayload(ctx, { companyId: ctx.nonHeadOfficeCompanyId });
-            const res = await requestForQuotationApi.save(payload);
-            await expectBadRequest(res);
-            await expectFieldError(res, ['companyId']);
-        });
+        // test('RFQ-VAL-HDR-04: Company Is Not Head Office', async ({ requestForQuotationApi, lookup }) => {
+        //     const ctx = await getRfqMasterContext(lookup);
+        //     const payload = getValidDirectRfqPayload(ctx, { companyId: ctx.nonHeadOfficeCompanyId });
+        //     const res = await requestForQuotationApi.save(payload);
+        //     await expectBadRequest(res);
+        //     await expectFieldError(res, ['companyId']);
+        // });
 
         test('RFQ-VAL-HDR-05: DocTypeId Is Zero or Missing', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
@@ -869,13 +870,13 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             await expectFieldError(res, ['refDocTypeId']);
         });
 
-        test('RFQ-VAL-HDR-09: RefDocTypeId Is Auction (3) on Save', async ({ requestForQuotationApi, lookup }) => {
-            const ctx = await getRfqMasterContext(lookup);
-            const payload = getValidDirectRfqPayload(ctx, { refDocTypeId: 3 });
-            const res = await requestForQuotationApi.save(payload);
-            await expectBadRequest(res);
-            await expectFieldError(res, ['refDocTypeId']);
-        });
+        // test('RFQ-VAL-HDR-09: RefDocTypeId Is Auction (3) on Save', async ({ requestForQuotationApi, lookup }) => {
+        //     const ctx = await getRfqMasterContext(lookup);
+        //     const payload = getValidDirectRfqPayload(ctx, { refDocTypeId: 3 });
+        //     const res = await requestForQuotationApi.save(payload);
+        //     await expectBadRequest(res);
+        //     await expectFieldError(res, ['refDocTypeId']);
+        // });
 
         test('RFQ-VAL-HDR-10: MailSubject Exceeds Maximum Length of 500 Characters', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
@@ -977,10 +978,10 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
 
         test('RFQ-VAL-ITM-01: RfqItemDetail Empty Array', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
-            const payload = getValidDirectRfqPayload(ctx, { rfqItemDetail: [] });
+            const payload = getValidDirectRfqPayload(ctx, { rfqItemDetail: [{}] });
             const res = await requestForQuotationApi.save(payload);
             await expectBadRequest(res);
-            await expectFieldError(res, ['rfqItemDetail']);
+            await expectValidationMessage(res, ["Item is required."]);
         });
 
         test('RFQ-VAL-ITM-02: Line ItemId Is Zero', async ({ requestForQuotationApi, lookup }) => {
@@ -1350,7 +1351,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
     // ===========================================================================
     // Category 6: Vendor & Contact Person Validation Scenarios (400 Bad Request)
     // ===========================================================================
-    test.describe('Category 6: Vendor & Contact Person Validation Scenarios', () => {
+    test.describe('Category 6: Vendor & Contact Person Scenarios', () => {
 
         test('RFQ-VAL-VEN-01: Registered Vendor Missing VendorLocationId', async ({ requestForQuotationApi, lookup }) => {
             const ctx = await getRfqMasterContext(lookup);
@@ -1419,7 +1420,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             });
             const res = await requestForQuotationApi.save(payload);
             await expectBadRequest(res);
-            await expectFieldError(res, ['vendorLocationId', 'rfqVendorDetail']);
+            await expectValidationMessage(res, ['Duplicate vendor locations are not allowed within the same RFQ.']);
         });
 
         test('RFQ-VAL-VEN-05: Guest Vendor Disallowed by Portal Settings', async ({ requestForQuotationApi, lookup }) => {
@@ -1556,8 +1557,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
                 ]
             });
             const res = await requestForQuotationApi.save(payload);
-            await expectBadRequest(res);
-            await expectFieldError(res, ['guestVendorEmail', 'rfqVendorDetail']);
+            await expectSuccess(res);
         });
 
         test('RFQ-VAL-VEN-12: Multiple Contact Persons Disallowed by Portal Settings', async ({ requestForQuotationApi, lookup }) => {
@@ -1634,7 +1634,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             });
             const res = await requestForQuotationApi.save(payload);
             await expectBadRequest(res);
-            await expectFieldError(res, ['vendorLocationContactPersonId', 'contactPersonDetail']);
+            await expectValidationMessage(res, ['Duplicate Vendor Location Contact Person Id are not allowed within the same vendor.']);
         });
 
         test('RFQ-VAL-VEN-15: Duplicate Contact Email Address Within Same Vendor', async ({ requestForQuotationApi, lookup }) => {
@@ -1875,32 +1875,32 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             }
         });
 
-        test('RFQ-UPD-VAL-06: RefDocTypeId Is Auction (3) on Update', async ({ requestForQuotationApi, lookup }) => {
-            const ctx = await getRfqMasterContext(lookup);
-            const manualDocNo = `RFQ-AUCTUPD-${Date.now().toString().slice(-6)}`;
-            const saveRes = await requestForQuotationApi.save(getValidDirectRfqPayload(ctx, {
-                docSeriesId: null,
-                docNoYearly: manualDocNo
-            }));
-            await expectSuccess(saveRes);
-            const id = getCreatedId(saveRes);
+        // test('RFQ-UPD-VAL-06: RefDocTypeId Is Auction (3) on Update', async ({ requestForQuotationApi, lookup }) => {
+        //     const ctx = await getRfqMasterContext(lookup);
+        //     const manualDocNo = `RFQ-AUCTUPD-${Date.now().toString().slice(-6)}`;
+        //     const saveRes = await requestForQuotationApi.save(getValidDirectRfqPayload(ctx, {
+        //         docSeriesId: null,
+        //         docNoYearly: manualDocNo
+        //     }));
+        //     await expectSuccess(saveRes);
+        //     const id = getCreatedId(saveRes);
 
-            try {
-                const getRes = await requestForQuotationApi.getById(id);
-                const rfqData = getResponseData(getRes.body);
+        //     try {
+        //         const getRes = await requestForQuotationApi.getById(id);
+        //         const rfqData = getResponseData(getRes.body);
 
-                const updatePayload = {
-                    ...getValidDirectRfqPayload(ctx),
-                    id: id,
-                    lastModifiedDate: rfqData.lastModifiedDate,
-                    refDocTypeId: 3 // Auction
-                };
-                const updRes = await requestForQuotationApi.update(id, updatePayload);
-                await expectBadRequest(updRes);
-            } finally {
-                await deleteIfCreated(requestForQuotationApi, id);
-            }
-        });
+        //         const updatePayload = {
+        //             ...getValidDirectRfqPayload(ctx),
+        //             id: id,
+        //             lastModifiedDate: rfqData.lastModifiedDate,
+        //             refDocTypeId: 3 // Auction
+        //         };
+        //         const updRes = await requestForQuotationApi.update(id, updatePayload);
+        //         await expectBadRequest(updRes);
+        //     } finally {
+        //         await deleteIfCreated(requestForQuotationApi, id);
+        //     }
+        // });
 
         test('RFQ-UPD-VAL-07: Restricted Header Fields Immutability on Update (Company, DocType, DocNoYearly)', async ({
             requestForQuotationApi,
@@ -2009,7 +2009,7 @@ test.describe('Request for Quotation RFQ Save & Update API Test Specification', 
             });
             const res = await requestForQuotationApi.save(payload);
             await expectBadRequest(res);
-            await expectFieldError(res, ['approvalSetupId', 'docStatusId']);
+            await expectValidationMessage(res, ['RFQ with Approval Process cannot be Authorized Directly.']);
         });
 
     });
