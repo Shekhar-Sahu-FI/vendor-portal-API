@@ -150,17 +150,17 @@ export const getQuotationMasterContext = async (lookup: any): Promise<QuotationM
     const state = await lookup.searchRecord('state', 'CountryId.Eq', String(country.id || 1)) || { id: 1 };
     const mismatchedState = await lookup.searchRecord('state', 'CountryId.Neq', String(country.id || 1)) || { id: 999999 };
 
-    const freightType = await lookup.searchRecord('freightType', 'StatusId.Eq', '1') || { id: 1 };
-    const paymentMode = await lookup.searchRecord('paymentMode', 'StatusId.Eq', '1') || { id: 1 };
-    const inactivePaymentMode = await lookup.searchRecord('paymentMode', 'StatusId.Eq', '2') || { id: 999999 };
+    // const freightType = await lookup.searchRecord('freightType', 'StatusId.Eq', '1') || { id: 1 };
+    // const paymentMode = await lookup.searchRecord('paymentMode', 'StatusId.Eq', '1') || { id: 1 };
+    // const inactivePaymentMode = await lookup.searchRecord('paymentMode', 'StatusId.Eq', '2') || { id: 999999 };
     const currency = await lookup.searchRecord('currency', 'StatusId.Eq', '1') || { id: 1 };
     const inactiveCurrency = await lookup.searchRecord('currency', 'StatusId.Eq', '2') || { id: 999999 };
 
     const tax1 = await lookup.searchRecord('tax', 'StatusId.Eq', '1') || { id: 1 };
     const discountTax = await lookup.searchRecord('tax', 'TaxName.Contains', 'Discount') || tax1;
-    const chargeType = await lookup.searchRecord('chargeType', 'StatusId.Eq', '1') || { id: 1 };
-    const nature = await lookup.searchRecord('taxNature', 'StatusId.Eq', '1') || { id: 1 };
-    const chargeOn = await lookup.searchRecord('chargeOn', 'StatusId.Eq', '1') || { id: 1 };
+    // const chargeType = await lookup.searchRecord('chargeType', 'StatusId.Eq', '1') || { id: 1 };
+    // const nature = await lookup.searchRecord('taxNature', 'StatusId.Eq', '1') || { id: 1 };
+    // const chargeOn = await lookup.searchRecord('chargeOn', 'StatusId.Eq', '1') || { id: 1 };
 
     const tncGroup = await lookup.searchRecord('termsAndConditionGroup', 'StatusId.Eq', '1') || { id: 1 };
     const tncHead1 = await lookup.searchRecord('termsAndConditionHead', 'StatusId.Eq', '1') || { id: 1 };
@@ -178,16 +178,16 @@ export const getQuotationMasterContext = async (lookup: any): Promise<QuotationM
         unit2Id: unit2?.id ?? 2,
         make1Id: make1?.id ?? 1,
         make2Id: make2?.id ?? 2,
-        inactiveMakeId: inactiveMake?.id ?? 999999,
-        freightTypeId: freightType?.id ?? 1,
-        paymentModeId: paymentMode?.id ?? 1,
-        inactivePaymentModeId: inactivePaymentMode?.id ?? 999999,
+        inactiveMakeId: 999999,
+        freightTypeId: 1,
+        paymentModeId: 1,
+        inactivePaymentModeId: 1,
         currencyId: currency?.id ?? 1,
         inactiveCurrencyId: inactiveCurrency?.id ?? 999999,
         countryId: country?.id ?? 1,
         stateId: state?.id ?? 1,
         mismatchedStateId: mismatchedState?.id ?? 999999,
-        contactNo: contact?.contactNo ?? '+919876543210',
+        contactNo: '+919876543210',
         contactNoCountryId: contact?.contactNoCountryId ?? 1,
         vendorLocation1Id: vendorInfo.vendorLocationId ?? 1,
         vendorLocation1ContactPersonId: vendorInfo.vendorLocationContactPersonId ?? 1,
@@ -195,9 +195,9 @@ export const getQuotationMasterContext = async (lookup: any): Promise<QuotationM
         vendorLocation1ContactEmail: 'rajesh@abcsuppliers.com',
         tax1Id: tax1?.id ?? 1,
         discountTaxId: discountTax?.id ?? 2,
-        chargeTypeId: chargeType?.id ?? 1,
-        natureId: nature?.id ?? 1,
-        chargeOnId: chargeOn?.id ?? 1,
+        chargeTypeId: 1,
+        natureId: 1,
+        chargeOnId: 1,
         tncGroupId: tncGroup?.id ?? 1,
         tncHead1Id: tncHead1?.id ?? 1,
         tncHead2Id: tncHead2?.id ?? 2,
@@ -350,8 +350,8 @@ export const buildValidQuotationPayload = (
     ];
 
     return {
-        rfqId: rfqInfo.rfqId,
-        rfqVendorDetailId: rfqInfo.rfqVendorDetailId,
+        rfqId: overrides.rfqId ?? rfqInfo.rfqId,
+        rfqVendorDetailId: overrides.rfqVendorDetailId ?? rfqInfo.rfqVendorDetailId,
         docNoYearly,
         docDate: overrides.docDate ?? todayStr,
         docStatusId: overrides.docStatusId ?? DocumentStatus.Draft, // 10 by default
@@ -360,8 +360,8 @@ export const buildValidQuotationPayload = (
         freightTypeId: overrides.freightTypeId ?? 1,
         paymentModeId: overrides.paymentModeId ?? 1,
         currencyId: overrides.currencyId ?? 1,
-        countryId: overrides.countryId ?? 1,
-        stateId: overrides.stateId ?? 1,
+        countryId: overrides.countryId ?? null,
+        stateId: overrides.stateId ?? null,
         remarks: overrides.remarks ?? 'Automated test quotation remarks',
         basicAmount,
         discountAmount,

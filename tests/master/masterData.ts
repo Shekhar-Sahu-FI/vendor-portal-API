@@ -453,8 +453,8 @@ export const currencyData = [
         "subunitName": "Penny"
     },
     {
-        "statusId": 1,
-        "statusRemarks": "",
+        "statusId": 2,
+        "statusRemarks": "daasd",
         "currencyName": "Japanese Yen",
         "currencyNotation": "JPY",
         "currencySymbol": "¥",
