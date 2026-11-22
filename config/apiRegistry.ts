@@ -21,6 +21,7 @@ export const API_REGISTRY = {
     country: { url: '/api/master/countries', matchField: 'countryName' },
     csReason: { url: '/api/master/cs-reasons', matchField: 'reasonName' },
     currency: { url: '/api/master/currencies', matchField: 'currencyName' },
+    costCenter: { url: '/api/cost-centers', matchField: 'costCenterName' },
     department: { url: '/api/master/departments', matchField: 'departmentName' },
     division: { url: '/api/master/divisions', matchField: 'divisionName' },
     docType: { url: '/api/master/doc-types', matchField: 'docTypeName' },
