@@ -6,6 +6,7 @@ import { PayloadHelper } from '../helpers/PayloadHelper';
 import { TransactionPayloadHelper } from '../helpers/TransactionPayloadHelper';
 import { MasterApi } from '../services/MasterApi';
 import { ApiWorkflowHelper } from '../helpers/ApiWorkflowHelper';
+import { CollectionVariableHelper } from '../helpers/CollectionVariableHelper';
 
 // Extend base Playwright test type to declare fixtures
 export interface ApiFixtures {
@@ -36,7 +37,8 @@ export interface ApiFixtures {
   verifyBusinessType: (retrieved: any, original: any) => void;
   prReasonApi: MasterApi;
   verifyPrReason: (retrieved: any, original: any) => void;
-
+  finYearApi: MasterApi;
+  verifyFinYear: (retrieved: any, original: any) => void;
   currencyApi: MasterApi;
   verifyCurrency: (retrieved: any, original: any) => void;
   cSReasonApi: MasterApi;
@@ -69,6 +71,11 @@ export interface ApiFixtures {
   verifyExpenseHead: (retrieved: any, original: any) => void;
   vendorAttachmentApi: MasterApi;
   paymentTermsGroupApi: MasterApi;
+  requestForQuotationApi: MasterApi;
+  quotationApi: MasterApi;
+  comparativeStatementApi: MasterApi;
+  csNegotiationApi: MasterApi;
+  purchaseOrderCancellationApi: MasterApi;
 
   supplierAuthManager: AuthManager;
   supplierRequestHelper: RequestHelper;
@@ -83,8 +90,15 @@ export interface ApiFixtures {
   warehouseTypeApi: MasterApi;
   ownershipApi: MasterApi;
   warehouseApi: MasterApi;
+  approvalSetupApi: MasterApi;
+  approvalProcessApi: MasterApi;
+
+  companyUserAuthManager: AuthManager;
+  companyUserRequestHelper: RequestHelper;
+  companyUserMasterApiFactory: (masterName: string) => MasterApi;
 
   workflow: typeof ApiWorkflowHelper;
+  collectionVariables: typeof CollectionVariableHelper;
 }
 
 // Custom test fixture builder
@@ -114,6 +128,20 @@ export const test = base.extend<ApiFixtures>({
     await use(factory);
   },
 
+  companyUserAuthManager: async ({ }, use) => {
+    await use(AuthManager.getInstance('companyUser', { username: 'single_form_user', password: 'QWer12!@' }));
+  },
+
+  companyUserRequestHelper: async ({ request, companyUserAuthManager }, use) => {
+    const helper = new RequestHelper(request, companyUserAuthManager, { 'CompanyId': '1' });
+    await use(helper);
+  },
+
+  companyUserMasterApiFactory: async ({ companyUserRequestHelper }, use) => {
+    const factory = (masterName: string) => new MasterApi(companyUserRequestHelper, masterName);
+    await use(factory);
+  },
+
   lookup: async ({ requestHelper }, use) => {
     // Provide LookupHelper configured with the request helper
     const lookupHelper = new LookupHelper(requestHelper);
@@ -128,6 +156,11 @@ export const test = base.extend<ApiFixtures>({
   transactionPayloadHelper: async ({ }, use) => {
     // Provide TransactionPayloadHelper class reference
     await use(TransactionPayloadHelper);
+  },
+
+  collectionVariables: async ({ }, use) => {
+    // Provide CollectionVariableHelper class reference
+    await use(CollectionVariableHelper);
   },
 
   masterApiFactory: async ({ requestHelper }, use) => {
@@ -296,7 +329,7 @@ export const test = base.extend<ApiFixtures>({
     };
     await use(verifyFn);
   },
-  tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncHead')),
+  tNCHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('termsAndConditionHead')),
   verifyTNCHead: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
       const data = retrieved.data || retrieved;
@@ -307,7 +340,7 @@ export const test = base.extend<ApiFixtures>({
     };
     await use(verifyFn);
   },
-  tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('tncGroup')),
+  tNCGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('termsAndConditionGroup')),
   vendorCategoryApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorCategory')),
   verifyVendorCategory: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -364,7 +397,7 @@ export const test = base.extend<ApiFixtures>({
   roleApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('role')),
   userApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('user')),
   supplierAccountApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('supplierAccount')),
-  vendorMasterApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorMaster')),
+  vendorMasterApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendor')),
   expenseHeadApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('expense')),
   verifyExpenseHead: async ({ }, use) => {
     const verifyFn = (retrieved: any, original: any) => {
@@ -376,9 +409,19 @@ export const test = base.extend<ApiFixtures>({
   },
   vendorAttachmentApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('vendorAttachment')),
   paymentTermsGroupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('paymentTermsGroup')),
+  requestForQuotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('requestForQuotation')),
+  quotationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('quotation')),
+  comparativeStatementApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('comparativeStatement')),
+  csNegotiationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('csNegotiation')),
+  purchaseOrderCancellationApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrderCancellation')),
   warehouseTypeApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/warehouse-types')),
   ownershipApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('globaldata/ownerships')),
   warehouseApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('warehouse')),
+  // PRApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseRequest')),
+  // POApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('purchaseOrder')),
+  finYearApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('financialYear')),
+  approvalSetupApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('approvalSetup')),
+  approvalProcessApi: async ({ masterApiFactory }, use) => await use(masterApiFactory('approvalProcess')),
 
   supplierMakeApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('make')),
   supplierCategoryApi: async ({ supplierMasterApiFactory }, use) => await use(supplierMasterApiFactory('category')),
@@ -394,3 +437,4 @@ export const test = base.extend<ApiFixtures>({
 
 // Re-export standard expect matching Playwright's ecosystem
 export { expect } from '@playwright/test';
+export { CollectionVariableHelper } from '../helpers/CollectionVariableHelper';

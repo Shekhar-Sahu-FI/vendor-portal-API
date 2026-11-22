@@ -23,23 +23,23 @@ export abstract class BaseApi {
     return `${ENV_CONFIG.BASE_URL}${this.basePath}${subPath}`;
   }
 
-  protected async get<T = any>(relativePath: string = '', headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async get<T = any>(relativePath: string = '', headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.requestHelper.get<T>(this.buildUrl(relativePath), headers);
   }
 
-  protected async post<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async post<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.requestHelper.post<T>(this.buildUrl(relativePath), body, headers);
   }
 
-  protected async put<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async put<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.requestHelper.put<T>(this.buildUrl(relativePath), body, headers);
   }
 
-  protected async patch<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  public async patch<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.requestHelper.patch<T>(this.buildUrl(relativePath), body, headers);
   }
 
-  protected async delete<T = any>(relativePath: string = '', headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.requestHelper.delete<T>(this.buildUrl(relativePath), headers);
+  public async delete<T = any>(relativePath: string = '', body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+    return this.requestHelper.delete<T>(this.buildUrl(relativePath), body, headers);
   }
 }

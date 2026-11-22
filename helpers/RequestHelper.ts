@@ -15,7 +15,8 @@ export interface ApiResponse<T = any> {
 export class RequestHelper {
   constructor(
     private readonly requestContext: APIRequestContext,
-    private authManager: AuthManager = AuthManager.getInstance()
+    private authManager: AuthManager = AuthManager.getInstance(),
+    private readonly defaultHeaders: Record<string, string> = {}
   ) { }
 
   public async get<T = any>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
@@ -34,8 +35,8 @@ export class RequestHelper {
     return this.execute<T>('PATCH', url, { headers, body });
   }
 
-  public async delete<T = any>(url: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
-    return this.execute<T>('DELETE', url, { headers });
+  public async delete<T = any>(url: string, body?: any, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+    return this.execute<T>('DELETE', url, { headers, body });
   }
 
   /**
@@ -48,7 +49,7 @@ export class RequestHelper {
     isRetry = false
   ): Promise<ApiResponse<T>> {
     const startTime = Date.now();
-    const finalHeaders = { ...(options.headers || {}) };
+    const finalHeaders = { ...(this.defaultHeaders || {}), ...(options.headers || {}) };
 
     // Skip appending Authorization header for the login endpoint to prevent recursion
     const isLoginRequest = url.endsWith('/api/auth/login');

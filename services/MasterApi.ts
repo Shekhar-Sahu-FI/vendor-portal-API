@@ -23,19 +23,30 @@ export class MasterApi extends BaseApi {
   }
 
   /**
-   * Update an existing master record
-   * PUT /api/<masterName>/<id>
+   * Update an existing record.
+   * If both id and payload are provided: PUT /api/<masterName>/<id>
+   * If only payload is provided: PUT /api/<masterName> (used for transactions where PUT route is at controller root)
    */
-  public async update<T = any>(id: string | number, payload: any): Promise<ApiResponse<T>> {
-    return this.put<T>(`/${id}`, payload);
+  public async update<T = any>(idOrPayload: string | number | any, payload?: any): Promise<ApiResponse<T>> {
+    if (payload !== undefined) {
+      return this.put<T>(`/${idOrPayload}`, payload);
+    }
+    return this.put<T>('', idOrPayload);
+  }
+
+  /**
+   * Update a record where PUT route is at the root endpoint (e.g. PUT /api/purchase-requests)
+   */
+  public async updateRoot<T = any>(payload: any): Promise<ApiResponse<T>> {
+    return this.put<T>('', payload);
   }
 
   /**
    * Delete a master record
    * DELETE /api/<masterName>/<id>
    */
-  public async deleteRecord<T = any>(id: string | number): Promise<ApiResponse<T>> {
-    return this.delete<T>(`/${id}`);
+  public async deleteRecord<T = any>(id: string | number, body?: any): Promise<ApiResponse<T>> {
+    return this.delete<T>(`/${id}`, body);
   }
 
 
@@ -64,12 +75,64 @@ export class MasterApi extends BaseApi {
   }
 
   /**
+   * Retrieve purchase-request items that are available for RFQ processing.
+   */
+  public async getPendingItemsForRfq<T = any>(payload: {
+    prItemDetailIds?: number[];
+    prIds?: number[];
+    expenditureTypeId?: number;
+    tillDate?: string;
+    [key: string]: any;
+  }): Promise<ApiResponse<T>> {
+    return this.post<T>('/pending-item-for-rfq', payload);
+  }
+
+  /**
+   * Retrieve purchase-request items that are available for PO processing.
+   */
+  public async getPendingItemsForPo<T = any>(payload: {
+    prItemDetailIds?: number[];
+    prIds?: number[];
+    companyId?: number;
+    divisionId?: number;
+    tillDate?: string;
+    [key: string]: any;
+  }): Promise<ApiResponse<T>> {
+    return this.post<T>('/pending-item-for-po', payload);
+  }
+
+  /**
    * Retrieve doctypes by form ID
    * GET /api/<masterName>/forms/<formId>
    */
-  public async getDocTypesByFormId<T = any>(formId: string | number): Promise<ApiResponse<T>> {
-    return super.get<T>(`/forms/${formId}`);
+  public async getDocTypesByFormId<T = any>(formId: string | number, doctypeName: string): Promise<ApiResponse<T>> {
+    return super.get<T>(`/form?FormId=${formId}&KeywordSearch=${encodeURIComponent(doctypeName)}`);
   }
+
+  /**
+   * Auto-generate next code
+   * GET /api/<masterName>/next-code or /api/<masterName>/next-code/<id>
+   */
+  public async getNextCode<T = any>(param?: string | number): Promise<ApiResponse<T>> {
+    return super.get<T>(param !== undefined ? `/next-code/${param}` : `/next-code`);
+  }
+
+  /**
+   * Fetch units for item master
+   * GET /api/<masterName>/unit
+   */
+  public async getItemUnits<T = any>(): Promise<ApiResponse<T>> {
+    return super.get<T>('/unit');
+  }
+
+  /**
+   * Fetch makes for item master
+   * GET /api/<masterName>/make
+   */
+  public async getItemMakes<T = any>(): Promise<ApiResponse<T>> {
+    return super.get<T>('/make');
+  }
+
   /**
    * Get a master record by specific operation param
    * GET /api/<masterName>/get?<operationParam>=<value>
@@ -80,6 +143,15 @@ export class MasterApi extends BaseApi {
 
   public async searchByOperation<T = any>(operationParam: string, value: string): Promise<ApiResponse<T>> {
     return super.get<T>(`?${operationParam}=${encodeURIComponent(value)}`);
+  }
+
+  /**
+   * Query active records for dropdown / lookup
+   * GET /api/<masterName>/get
+   */
+  public async getDropdown<T = any>(queryParams?: Record<string, any>): Promise<ApiResponse<T>> {
+    const queryString = queryParams ? `?${this.buildQueryString(queryParams)}` : '';
+    return this.get<T>(`/get${queryString}`);
   }
 
   /**

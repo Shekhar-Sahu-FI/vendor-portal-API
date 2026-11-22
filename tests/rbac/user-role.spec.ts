@@ -1,221 +1,328 @@
 import { test, expect } from '../../fixtures/apiFixtures';
-import { API_REGISTRY } from '../../config/apiRegistry';
+import { AuthManager } from '../../helpers/AuthManager';
+import { RequestHelper } from '../../helpers/RequestHelper';
+import { LookupHelper } from '../../helpers/LookupHelper';
+import { MasterApi } from '../../services/MasterApi';
 
-test.describe('General User Master Data API Tests - Expect 403', () => {
+/**
+ * RBAC Tests for Company User (General User - userTypeId: 2)
+ *
+ * Scenario:
+ * - A Company User has permissions for ONLY ONE form ('Announcement Master').
+ * - For all OTHER forms, the user does NOT have rights.
+ * - Assert that any attempt to perform:
+ *     - canSave (POST)
+ *     - canList (GET)
+ *     - canUpdate (PUT)
+ *     - canDelete (DELETE)
+ *   returns HTTP 403 Forbidden.
+ * - Additionally, assert that the user CAN successfully access the single permitted form.
+ */
 
-    // Helper to assert 403 on both Save and Update for a given master API
-    const assertSupplierAccessDenied = async (api: any, savePayload: any, updatePayload: any, masterName: string) => {
-        // Attempt Save
-        const saveResponse = await api.save(savePayload);
-        expect(saveResponse.status, `Expected 403 Forbidden for Supplier saving ${masterName}`).toBe(403);
+// Configuration for all forms that the user does NOT have rights to
+interface FormEndpointConfig {
+    name: string;
+    masterKey: string;
+    savePayload?: any;
+    updatePayload?: any;
+}
 
-        // Attempt Update (mocking an ID that typically would exist)
-        const updateResponse = await api.update(999999, updatePayload);
-        expect(updateResponse.status, `Expected 403 Forbidden for Supplier updating ${masterName}`).toBe(403);
+const UNAUTHORIZED_FORMS: FormEndpointConfig[] = [
+    // Core Masters
+    { name: 'Approval Setup Master', masterKey: 'approvalSetup', savePayload: { name: 'Test ApprovalSetup' } },
+    { name: 'Business Type Master', masterKey: 'businessType', savePayload: { businessTypeName: 'Test BusinessType' } },
+    { name: 'Category Master', masterKey: 'category', savePayload: { categoryName: 'Test Category' } },
+    { name: 'Channel Provider Configuration Master', masterKey: 'channelProviderConfiguration', savePayload: { name: 'Test ChannelProviderConfiguration' } },
+    { name: 'City Master', masterKey: 'city', savePayload: { cityName: 'Test City' } },
+    { name: 'Company Master', masterKey: 'company', savePayload: { companyName: 'Test Company' } },
+    { name: 'Company Location Master', masterKey: 'companyLocation', savePayload: { location: 'Test CompanyLocation' } },
+    { name: 'Country Master', masterKey: 'country', savePayload: { countryName: 'Test Country' } },
+    { name: 'CS Reason Master', masterKey: 'csReason', savePayload: { reasonName: 'Test CsReason' } },
+    { name: 'Currency Master', masterKey: 'currency', savePayload: { currencyName: 'Test Currency' } },
+    { name: 'Department Master', masterKey: 'department', savePayload: { departmentName: 'Test Department' } },
+    { name: 'Division Master', masterKey: 'division', savePayload: { divisionName: 'Test Division' } },
+    { name: 'Doc Type Master', masterKey: 'docType', savePayload: { docTypeName: 'Test DocType' } },
+    { name: 'ERP Document Serial No Master', masterKey: 'erpDocumentSerialNo', savePayload: { name: 'Test ErpDocumentSerialNo' } },
+    { name: 'Expense Master', masterKey: 'expense', savePayload: { expenseName: 'Test Expense' } },
+    { name: 'Expense Group Master', masterKey: 'expenseGroup', savePayload: { expenseGroupName: 'Test ExpenseGroup' } },
+    { name: 'Financial Year Master', masterKey: 'financialYear', savePayload: { financialYearName: 'Test FinancialYear' } },
+    { name: 'Group Master', masterKey: 'group', savePayload: { groupName: 'Test Group' } },
+    { name: 'Item Master', masterKey: 'item', savePayload: { itemName: 'Test Item' } },
+    { name: 'Location Master', masterKey: 'location', savePayload: { location: 'Test Location' } },
+    { name: 'Make Master', masterKey: 'make', savePayload: { makeName: 'Test Make' } },
+    { name: 'Payment Terms Group Master', masterKey: 'paymentTermsGroup', savePayload: { paymentTermsGroupName: 'Test PaymentTermsGroup' } },
+    { name: 'PO CS Exemption Master', masterKey: 'poCsExemption', savePayload: { name: 'Test PoCsExemption' } },
+    { name: 'Priority Master', masterKey: 'priority', savePayload: { priorityName: 'Test Priority' } },
+    { name: 'PR Reason Master', masterKey: 'prReason', savePayload: { reasonName: 'Test PrReason' } },
+    { name: 'Region Master', masterKey: 'region', savePayload: { regionName: 'Test Region' } },
+    { name: 'Role Master', masterKey: 'role', savePayload: { roleName: 'Test Role' } },
+    { name: 'State Master', masterKey: 'state', savePayload: { stateName: 'Test State' } },
+    { name: 'Subgroup Master', masterKey: 'subgroup', savePayload: { subgroupName: 'Test Subgroup' } },
+    { name: 'Tax Master', masterKey: 'tax', savePayload: { taxName: 'Test Tax' } },
+    { name: 'Tax Group Master', masterKey: 'taxGroup', savePayload: { taxGroupName: 'Test TaxGroup' } },
+    { name: 'Terms And Condition Group Master', masterKey: 'termsAndConditionGroup', savePayload: { tncGroupName: 'Test TermsAndConditionGroup' } },
+    { name: 'Terms And Condition Head Master', masterKey: 'termsAndConditionHead', savePayload: { tncHeadName: 'Test TermsAndConditionHead' } },
+    { name: 'Unit Master', masterKey: 'unit', savePayload: { unitName: 'Test Unit' } },
+    { name: 'Vendor Master', masterKey: 'vendor', savePayload: { vendorName: 'Test Vendor' } },
+    { name: 'Vendor Attachment Master', masterKey: 'vendorAttachment', savePayload: { fileName: 'Test VendorAttachment' } },
+    { name: 'Vendor Category Master', masterKey: 'vendorCategory', savePayload: { vendorCategoryName: 'Test VendorCategory' } },
+    { name: 'Vendor Registration Master', masterKey: 'vendorRegistration', savePayload: { vendorName: 'Test VendorRegistration' } },
+    { name: 'Warehouse Master', masterKey: 'warehouse', savePayload: { warehouseName: 'Test Warehouse' } },
+
+    // Transaction Forms
+    { name: 'Purchase Request', masterKey: 'purchaseRequest', savePayload: { requestNumber: 'PR-TEST' } },
+    { name: 'Request For Quotation', masterKey: 'requestForQuotation', savePayload: { rfqNumber: 'RFQ-TEST' } },
+    { name: 'Quotation', masterKey: 'quotation', savePayload: { quotationNumber: 'QTN-TEST' } },
+    { name: 'Comparative Statement', masterKey: 'comparativeStatement', savePayload: { csNumber: 'CS-TEST' } },
+    { name: 'Purchase Order', masterKey: 'purchaseOrder', savePayload: { poNumber: 'PO-TEST' } }
+];
+
+test.describe('Company User RBAC Single Form Access Tests', () => {
+
+    const SINGLE_FORM_NAME = 'Announcement Master';
+    const SINGLE_FORM_KEY = 'announcement';
+    const TEST_USERNAME = 'single_form_user';
+    const TEST_PASSWORD = 'QWer12!@';
+    const TEST_ROLE_NAME = 'Single Form Access Role';
+
+    // Helper to verify 403 Forbidden across all four CRUD/RBAC operations using soft assertions
+    const assertAllAccessDenied = async (
+        api: MasterApi,
+        formName: string,
+        savePayload: any = { name: `Test ${formName}` },
+        updatePayload: any = { name: `Test ${formName}` },
+        failureList?: { form: string; operation: string; status?: number; error?: string }[]
+    ) => {
+        // 1. canSave (POST) -> Expect 403 Forbidden
+        try {
+            const saveResponse = await api.save(savePayload);
+            if (saveResponse.status !== 403) {
+                failureList?.push({ form: formName, operation: 'canSave', status: saveResponse.status });
+            }
+            expect.soft(
+                saveResponse.status,
+                `Expected 403 Forbidden for canSave on ${formName}, but got ${saveResponse.status}`
+            ).toBe(403);
+        } catch (err: any) {
+            failureList?.push({ form: formName, operation: 'canSave', error: err.message });
+            expect.soft(false, `Error executing canSave on ${formName}: ${err.message}`).toBe(true);
+        }
+
+        // 2. canList (GET) -> Expect 403 Forbidden
+        try {
+            const listResponse = await api.list();
+            if (listResponse.status !== 403) {
+                failureList?.push({ form: formName, operation: 'canList', status: listResponse.status });
+            }
+            expect.soft(
+                listResponse.status,
+                `Expected 403 Forbidden for canList on ${formName}, but got ${listResponse.status}`
+            ).toBe(403);
+        } catch (err: any) {
+            failureList?.push({ form: formName, operation: 'canList', error: err.message });
+            expect.soft(false, `Error executing canList on ${formName}: ${err.message}`).toBe(true);
+        }
+
+        // 3. canUpdate (PUT) -> Expect 403 Forbidden
+        try {
+            const updateResponse = await api.update(999999, updatePayload);
+            if (updateResponse.status !== 403) {
+                failureList?.push({ form: formName, operation: 'canUpdate', status: updateResponse.status });
+            }
+            expect.soft(
+                updateResponse.status,
+                `Expected 403 Forbidden for canUpdate on ${formName}, but got ${updateResponse.status}`
+            ).toBe(403);
+        } catch (err: any) {
+            failureList?.push({ form: formName, operation: 'canUpdate', error: err.message });
+            expect.soft(false, `Error executing canUpdate on ${formName}: ${err.message}`).toBe(true);
+        }
+
+        // 4. canDelete (DELETE) -> Expect 403 Forbidden
+        try {
+            const deleteResponse = await api.deleteRecord(999999);
+            if (deleteResponse.status !== 403) {
+                failureList?.push({ form: formName, operation: 'canDelete', status: deleteResponse.status });
+            }
+            expect.soft(
+                deleteResponse.status,
+                `Expected 403 Forbidden for canDelete on ${formName}, but got ${deleteResponse.status}`
+            ).toBe(403);
+        } catch (err: any) {
+            failureList?.push({ form: formName, operation: 'canDelete', error: err.message });
+            expect.soft(false, `Error executing canDelete on ${formName}: ${err.message}`).toBe(true);
+        }
     };
 
-    // ==========================================
-    // Core Masters
-    // ==========================================
+    /**
+     * Provision or verify the test role and test company user exist before running the tests.
+     */
+    test.beforeAll(async ({ request }) => {
+        const adminAuth = AuthManager.getInstance('admin');
+        const adminRequestHelper = new RequestHelper(request, adminAuth);
+        const lookup = new LookupHelper(adminRequestHelper);
+        const roleApi = new MasterApi(adminRequestHelper, 'role');
+        const userApi = new MasterApi(adminRequestHelper, 'user');
 
-    test('Supplier should get 403 on Save/Update Announcement Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('announcement');
-        await assertSupplierAccessDenied(api, { title: 'Test Announcement' }, { title: 'Test Announcement' }, 'Announcement');
+        // Resolve Company One
+        let companyId = 1;
+        try {
+            const company = await lookup.getRecord('company', 'Company One');
+            if (company?.id) companyId = company.id;
+        } catch {
+            // fallback to default company ID 1
+        }
+
+        // Resolve single permitted form ID (Announcement Master: FormMaster enum 98)
+        let singleFormId = 98;
+        try {
+            const form = await lookup.getGlobalRecord('forms', SINGLE_FORM_NAME);
+            if (form?.id) singleFormId = form.id;
+        } catch {
+            // fallback to 98
+        }
+
+        // 1. Ensure Role with rights to ONLY ONE form exists
+        let roleId: number | null = null;
+        try {
+            const roleSearch = await roleApi.getKeywordSearch(TEST_ROLE_NAME);
+            const items = Array.isArray(roleSearch.body)
+                ? roleSearch.body
+                : (roleSearch.body?.data || []);
+            const matchedRole = items.find((r: any) => r.roleName === TEST_ROLE_NAME);
+            if (matchedRole) {
+                roleId = matchedRole.id;
+            }
+        } catch {
+            // Role lookup miss
+        }
+
+        if (!roleId) {
+            const rolePayload = {
+                roleName: TEST_ROLE_NAME,
+                statusId: 1,
+                statusRemarks: '',
+                formRights: [
+                    {
+                        formId: singleFormId,
+                        canSave: true,
+                        canUpdate: true,
+                        canOpen: true, // sets CanList in backend
+                        canDelete: true,
+                        canPrint: true,
+                        canPrintPreview: true,
+                        canAuthorize: true,
+                        canViewReport: true
+                    }
+                ],
+                reportRights: []
+            };
+            const createRoleRes = await roleApi.save(rolePayload);
+            roleId = createRoleRes.body?.id || createRoleRes.body?.data?.id || 1;
+        }
+
+        // 2. Ensure Company User assigned to that Role exists
+        let userExists = false;
+        try {
+            const userSearch = await userApi.getKeywordSearch(TEST_USERNAME);
+            const userItems = Array.isArray(userSearch.body)
+                ? userSearch.body
+                : (userSearch.body?.data || []);
+            const matchedUser = userItems.find((u: any) => u.username === TEST_USERNAME);
+            if (matchedUser) {
+                userExists = true;
+            }
+        } catch {
+            // User lookup miss
+        }
+
+        if (!userExists) {
+            const userPayload = {
+                statusId: 1,
+                statusRemarks: '',
+                userTypeId: 2, // CompanyGeneral
+                supplierAccountId: null,
+                username: TEST_USERNAME,
+                displayName: 'Single Form Company User',
+                contactNo: null,
+                countryName: null,
+                contactNoCountryId: null,
+                timeZonesId: 1,
+                email: 'singleformuser@company.com',
+                divisionTypeId: null,
+                departmentTypeId: null,
+                userRoleDetail: [
+                    { roleId: roleId, companyId: companyId }
+                ],
+                userDivisionDetail: [],
+                userDepartmentDetail: [],
+                password: TEST_PASSWORD
+            };
+            await userApi.save(userPayload);
+        }
+
+        // Pre-warm Company User token cache
+        const companyUserAuth = AuthManager.getInstance('companyUser', {
+            username: TEST_USERNAME,
+            password: TEST_PASSWORD
+        });
+        await companyUserAuth.getToken(request);
     });
 
-    test('Supplier should get 403 on Save/Update Approval Setup Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('approvalSetup');
-        await assertSupplierAccessDenied(api, { name: 'Test ApprovalSetup' }, { name: 'Test ApprovalSetup' }, 'ApprovalSetup');
+    // =========================================================================
+    // Positive Verification: Company User CAN access their permitted form
+    // =========================================================================
+
+    test('Company User should be ALLOWED access to the single permitted form (Announcement Master)', async ({ companyUserMasterApiFactory }) => {
+        const api = companyUserMasterApiFactory(SINGLE_FORM_KEY);
+
+        // canList on the permitted form should NOT return 403 Forbidden
+        const listResponse = await api.list();
+        expect(
+            listResponse.status,
+            `Expected 200 OK for canList on permitted form ${SINGLE_FORM_NAME}`
+        ).toBe(200);
     });
 
-    test('Supplier should get 403 on Save/Update Business Type Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('businessType');
-        await assertSupplierAccessDenied(api, { businessTypeName: 'Test BusinessType' }, { businessTypeName: 'Test BusinessType' }, 'BusinessType');
+    // =========================================================================
+    // Comprehensive Verification: Check 403 Forbidden across all unauthorized forms
+    // for canSave, canList, canUpdate, and canDelete
+    // =========================================================================
+
+    test('Company User should get 403 Forbidden on all unauthorized forms for canSave, canList, canUpdate, canDelete', async ({ companyUserMasterApiFactory }) => {
+        const failures: { form: string; operation: string; status?: number; error?: string }[] = [];
+
+        for (const form of UNAUTHORIZED_FORMS) {
+            await test.step(`Assert 403 on unauthorized form: ${form.name}`, async () => {
+                try {
+                    const api = companyUserMasterApiFactory(form.masterKey);
+                    await assertAllAccessDenied(api, form.name, form.savePayload, form.savePayload, failures);
+                } catch (err: any) {
+                    failures.push({ form: form.name, operation: 'ALL', error: err.message });
+                    expect.soft(false, `Unexpected error checking ${form.name}: ${err.message}`).toBe(true);
+                }
+            });
+        }
+
+        if (failures.length > 0) {
+            console.error('\n===============================================================');
+            console.error(`  RBAC 403 VALIDATION FAILURES SUMMARY (${failures.length} failure(s))`);
+            console.error('===============================================================');
+            for (const f of failures) {
+                console.error(` - [${f.form}] ${f.operation} => Status: ${f.status ?? 'N/A'}${f.error ? ' | Error: ' + f.error : ''}`);
+            }
+            console.error('===============================================================\n');
+        }
     });
 
-    test('Supplier should get 403 on Save/Update Category Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('category');
-        await assertSupplierAccessDenied(api, { categoryName: 'Test Category' }, { categoryName: 'Test Category' }, 'Category');
-    });
-
-    test('Supplier should get 403 on Save/Update Channel Provider Configuration Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('channelProviderConfiguration');
-        await assertSupplierAccessDenied(api, { name: 'Test ChannelProviderConfiguration' }, { name: 'Test ChannelProviderConfiguration' }, 'ChannelProviderConfiguration');
-    });
-
-    test('Supplier should get 403 on Save/Update City Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('city');
-        await assertSupplierAccessDenied(api, { cityName: 'Test City' }, { cityName: 'Test City' }, 'City');
-    });
-
-    test('Supplier should get 403 on Save/Update Company Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('company');
-        await assertSupplierAccessDenied(api, { companyName: 'Test Company' }, { companyName: 'Test Company' }, 'Company');
-    });
-
-    test('Supplier should get 403 on Save/Update Company Location Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('companyLocation');
-        await assertSupplierAccessDenied(api, { location: 'Test CompanyLocation' }, { location: 'Test CompanyLocation' }, 'CompanyLocation');
-    });
-
-    test('Supplier should get 403 on Save/Update Country Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('country');
-        await assertSupplierAccessDenied(api, { countryName: 'Test Country' }, { countryName: 'Test Country' }, 'Country');
-    });
-
-    test('Supplier should get 403 on Save/Update CS Reason Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('csReason');
-        await assertSupplierAccessDenied(api, { reasonName: 'Test CsReason' }, { reasonName: 'Test CsReason' }, 'CsReason');
-    });
-
-    test('Supplier should get 403 on Save/Update Currency Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('currency');
-        await assertSupplierAccessDenied(api, { currencyName: 'Test Currency' }, { currencyName: 'Test Currency' }, 'Currency');
-    });
-
-    test('Supplier should get 403 on Save/Update Department Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('department');
-        await assertSupplierAccessDenied(api, { departmentName: 'Test Department' }, { departmentName: 'Test Department' }, 'Department');
-    });
-
-    test('Supplier should get 403 on Save/Update Division Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('division');
-        await assertSupplierAccessDenied(api, { divisionName: 'Test Division' }, { divisionName: 'Test Division' }, 'Division');
-    });
-
-    test('Supplier should get 403 on Save/Update Doc Type Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('docType');
-        await assertSupplierAccessDenied(api, { docTypeName: 'Test DocType' }, { docTypeName: 'Test DocType' }, 'DocType');
-    });
-
-    test('Supplier should get 403 on Save/Update ERP Document Serial No Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('erpDocumentSerialNo');
-        await assertSupplierAccessDenied(api, { name: 'Test ErpDocumentSerialNo' }, { name: 'Test ErpDocumentSerialNo' }, 'ErpDocumentSerialNo');
-    });
-
-    test('Supplier should get 403 on Save/Update Expense Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('expense');
-        await assertSupplierAccessDenied(api, { expenseName: 'Test Expense' }, { expenseName: 'Test Expense' }, 'Expense');
-    });
-
-    test('Supplier should get 403 on Save/Update Expense Group Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('expenseGroup');
-        await assertSupplierAccessDenied(api, { expenseGroupName: 'Test ExpenseGroup' }, { expenseGroupName: 'Test ExpenseGroup' }, 'ExpenseGroup');
-    });
-
-    test('Supplier should get 403 on Save/Update Financial Year Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('financialYear');
-        await assertSupplierAccessDenied(api, { financialYearName: 'Test FinancialYear' }, { financialYearName: 'Test FinancialYear' }, 'FinancialYear');
-    });
-
-    test('Supplier should get 403 on Save/Update Group Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('group');
-        await assertSupplierAccessDenied(api, { groupName: 'Test Group' }, { groupName: 'Test Group' }, 'Group');
-    });
-
-    test('Supplier should get 403 on Save/Update Item Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('item');
-        await assertSupplierAccessDenied(api, { itemName: 'Test Item' }, { itemName: 'Test Item' }, 'Item');
-    });
-
-    test('Supplier should get 403 on Save/Update Location Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('location');
-        await assertSupplierAccessDenied(api, { location: 'Test Location' }, { location: 'Test Location' }, 'Location');
-    });
-
-    test('Supplier should get 403 on Save/Update Make Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('make');
-        await assertSupplierAccessDenied(api, { makeName: 'Test Make' }, { makeName: 'Test Make' }, 'Make');
-    });
-
-    test('Supplier should get 403 on Save/Update Payment Terms Group Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('paymentTermsGroup');
-        await assertSupplierAccessDenied(api, { paymentTermsGroupName: 'Test PaymentTermsGroup' }, { paymentTermsGroupName: 'Test PaymentTermsGroup' }, 'PaymentTermsGroup');
-    });
-
-    test('Supplier should get 403 on Save/Update PO CS Exemption Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('poCsExemption');
-        await assertSupplierAccessDenied(api, { name: 'Test PoCsExemption' }, { name: 'Test PoCsExemption' }, 'PoCsExemption');
-    });
-
-    test('Supplier should get 403 on Save/Update Priority Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('priority');
-        await assertSupplierAccessDenied(api, { priorityName: 'Test Priority' }, { priorityName: 'Test Priority' }, 'Priority');
-    });
-
-    test('Supplier should get 403 on Save/Update PR Reason Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('prReason');
-        await assertSupplierAccessDenied(api, { reasonName: 'Test PrReason' }, { reasonName: 'Test PrReason' }, 'PrReason');
-    });
-
-    test('Supplier should get 403 on Save/Update Region Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('region');
-        await assertSupplierAccessDenied(api, { regionName: 'Test Region' }, { regionName: 'Test Region' }, 'Region');
-    });
-
-    test('Supplier should get 403 on Save/Update Role Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('role');
-        await assertSupplierAccessDenied(api, { roleName: 'Test Role' }, { roleName: 'Test Role' }, 'Role');
-    });
-
-    test('Supplier should get 403 on Save/Update State Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('state');
-        await assertSupplierAccessDenied(api, { stateName: 'Test State' }, { stateName: 'Test State' }, 'State');
-    });
-
-    test('Supplier should get 403 on Save/Update Subgroup Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('subgroup');
-        await assertSupplierAccessDenied(api, { subgroupName: 'Test Subgroup' }, { subgroupName: 'Test Subgroup' }, 'Subgroup');
-    });
-
-    test('Supplier should get 403 on Save/Update Tax Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('tax');
-        await assertSupplierAccessDenied(api, { taxName: 'Test Tax' }, { taxName: 'Test Tax' }, 'Tax');
-    });
-
-    test('Supplier should get 403 on Save/Update Tax Group Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('taxGroup');
-        await assertSupplierAccessDenied(api, { taxGroupName: 'Test TaxGroup' }, { taxGroupName: 'Test TaxGroup' }, 'TaxGroup');
-    });
-
-    test('Supplier should get 403 on Save/Update Terms And Condition Group Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('termsAndConditionGroup');
-        await assertSupplierAccessDenied(api, { tncGroupName: 'Test TermsAndConditionGroup' }, { tncGroupName: 'Test TermsAndConditionGroup' }, 'TermsAndConditionGroup');
-    });
-
-    test('Supplier should get 403 on Save/Update Terms And Condition Head Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('termsAndConditionHead');
-        await assertSupplierAccessDenied(api, { tncHeadName: 'Test TermsAndConditionHead' }, { tncHeadName: 'Test TermsAndConditionHead' }, 'TermsAndConditionHead');
-    });
-
-    test('Supplier should get 403 on Save/Update Unit Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('unit');
-        await assertSupplierAccessDenied(api, { unitName: 'Test Unit' }, { unitName: 'Test Unit' }, 'Unit');
-    });
-
-    test('Supplier should get 403 on Save/Update Vendor Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('vendor');
-        await assertSupplierAccessDenied(api, { vendorName: 'Test Vendor' }, { vendorName: 'Test Vendor' }, 'Vendor');
-    });
-
-    test('Supplier should get 403 on Save/Update Vendor Attachment Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('vendorAttachment');
-        await assertSupplierAccessDenied(api, { fileName: 'Test VendorAttachment' }, { fileName: 'Test VendorAttachment' }, 'VendorAttachment');
-    });
-
-    test('Supplier should get 403 on Save/Update Vendor Category Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('vendorCategory');
-        await assertSupplierAccessDenied(api, { vendorCategoryName: 'Test VendorCategory' }, { vendorCategoryName: 'Test VendorCategory' }, 'VendorCategory');
-    });
-
-    test('Supplier should get 403 on Save/Update Vendor Registration Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('vendorRegistration');
-        await assertSupplierAccessDenied(api, { vendorName: 'Test VendorRegistration' }, { vendorName: 'Test VendorRegistration' }, 'VendorRegistration');
-    });
-
-    test('Supplier should get 403 on Save/Update Warehouse Master', async ({ supplierMasterApiFactory }) => {
-        const api = supplierMasterApiFactory('warehouse');
-        await assertSupplierAccessDenied(api, { warehouseName: 'Test Warehouse' }, { warehouseName: 'Test Warehouse' }, 'Warehouse');
+    // Individual test cases for granular test runner tracking
+    test.describe('Granular 403 Validation by Form', () => {
+        for (const form of UNAUTHORIZED_FORMS) {
+            test(`Company User should get 403 on ${form.name} (canSave, canList, canUpdate, canDelete)`, async ({ companyUserMasterApiFactory }) => {
+                const api = companyUserMasterApiFactory(form.masterKey);
+                await assertAllAccessDenied(api, form.name, form.savePayload, form.savePayload);
+            });
+        }
     });
 
 });

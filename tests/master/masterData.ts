@@ -1,3 +1,5 @@
+import { DocumentStatus, RefDocType } from '../../helpers/globalEnums';
+
 // export const unitData = [
 //     {
 //         "statusId": 1,
@@ -451,8 +453,8 @@ export const currencyData = [
         "subunitName": "Penny"
     },
     {
-        "statusId": 1,
-        "statusRemarks": "",
+        "statusId": 2,
+        "statusRemarks": "daasd",
         "currencyName": "Japanese Yen",
         "currencyNotation": "JPY",
         "currencySymbol": "¥",
@@ -933,7 +935,7 @@ export const itemData = [
         "gstCategoryId": 3,
         "subgroupName": "Subgroup Two One",
         "hsnSacCode": "7210",
-        "makeMgmtTypeId": 3,
+        "makeMgmtTypeId": 1,
         "remarks": "",
         "unitConversionDetail": [],
         "itemSelectedMakeDetail": []
@@ -2844,10 +2846,10 @@ export const roleData = [
             { "formName": "Comparative Statement", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Purchase Order", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Role Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "User Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Role", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "User", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Approval Setup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "IP Whitelist", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true }
         ],
         "reportRights": [
@@ -2865,10 +2867,10 @@ export const roleData = [
             { "formName": "Comparative Statement", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
             { "formName": "Purchase Order", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "PO Cancellation", "canSave": true, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
-            { "formName": "PO CS Exemption", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
+            { "formName": "Cancel Purchase Order", "canSave": true, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
+            { "formName": "PO-CS Exemption", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": false },
             { "formName": "Item Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true }
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true }
         ],
         "reportRights": [
             { "reportId": 1 }, { "reportId": 2 }, { "reportId": 5 }, { "reportId": 6 }
@@ -2911,7 +2913,7 @@ export const roleData = [
             { "formName": "Request For Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Quotation", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Purchase Order", "canSave": false, "canUpdate": false, "canOpen": true, "canDelete": false, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Add Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": false, "canViewReport": false }
+            { "formName": "Vendor Registration Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": false, "canViewReport": false }
         ],
         "reportRights": []
     },
@@ -2920,9 +2922,9 @@ export const roleData = [
         "statusRemarks": "",
         "roleName": "Master Data Entry Clerk",
         "formRights": [
-            { "formName": "Category Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Group Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Subgroup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Category Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Group Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
+            { "formName": "Item Subgroup Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Item Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Unit Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
             { "formName": "Make Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
@@ -2939,11 +2941,11 @@ export const roleData = [
         "statusRemarks": "",
         "roleName": "Supplier Account Administrator",
         "formRights": [
-            { "formName": "Supplier Account Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
-            { "formName": "Vendor Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Supplier Account", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
+            { "formName": "Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": true, "canViewReport": true },
             { "formName": "Vendor Location Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": true, "canPrintPreview": true, "canAuthorize": false, "canViewReport": true },
             { "formName": "Vendor Attachment Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": true, "canPrint": false, "canPrintPreview": true, "canAuthorize": false, "canViewReport": false },
-            { "formName": "Add Vendor", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": true, "canViewReport": false }
+            { "formName": "Vendor Registration Master", "canSave": true, "canUpdate": true, "canOpen": true, "canDelete": false, "canPrint": false, "canPrintPreview": false, "canAuthorize": true, "canViewReport": false }
         ],
         "reportRights": [
             { "reportId": 7 }
@@ -2976,77 +2978,77 @@ export const roleData = [
 ];
 
 export const userData = [
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 1,
-        "supplierAccountId": null,
-        "username": "UN1",
-        "displayName": "System Administrator",
-        "countryName": "India",
-        "contactNo": "+9876500001",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "admin@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": null,
-        "departmentTypeId": null,
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 1,
+    //     "supplierAccountId": null,
+    //     "username": "UN1",
+    //     "displayName": "System Administrator",
+    //     "countryName": "India",
+    //     "contactNo": "+9876500001",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "admin@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": null,
+    //     "departmentTypeId": null,
 
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN2",
-        "displayName": "Rajesh Verma",
-        "contactNo": "9876500002",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "rajesh.verma@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": 1,
-        "departmentTypeId": 1,
-        "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Company One" }
-        ],
-        "userDivisionDetail": [
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN2",
+    //     "displayName": "Rajesh Verma",
+    //     "contactNo": "9876500002",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "rajesh.verma@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 1,
+    //     "departmentTypeId": 1,
+    //     "userRoleDetail": [
+    //         { "roleName": "Purchase Manager", "companyName": "Company One" }
+    //     ],
+    //     "userDivisionDetail": [
 
-        ],
-        "userDepartmentDetail": [
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN3",
-        "displayName": "Sanjay Kulkarni",
-        "contactNo": "9876500003",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "sanjay.kulkarni@metroengg.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Approving Authority", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" },
-            { "divisionName": "Division Two Company Two Three" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
-        ],
-        "password": "QWer12!@"
-    },
+    //     ],
+    //     "userDepartmentDetail": [
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN3",
+    //     "displayName": "Sanjay Kulkarni",
+    //     "contactNo": "9876500003",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "sanjay.kulkarni@metroengg.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Approving Authority", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division One Company One Two Three" },
+    //         { "divisionName": "Division Two Company Two Three" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department One Division One Two Three" },
+    //         { "departmentName": "Department Two Division Two Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
     {
         "statusId": 1,
         "statusRemarks": "",
@@ -3054,7 +3056,7 @@ export const userData = [
         "supplierAccountId": null,
         "username": "UN4",
         "displayName": "Priya Iyer",
-        "contactNo": "9876500004",
+        "contactNo": "9876595004",
         "contactNoCountryId": 1,
         "countryName": "India",
         "timeZonesId": 1,
@@ -3099,89 +3101,89 @@ export const userData = [
         "userDepartmentDetail": [],
         "password": "QWer12!@"
     },
-    {
-        "statusId": 2,
-        "statusRemarks": "inactive user - relieved from organization",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN6",
-        "displayName": "Anil Deshmukh",
-        "contactNo": "9876500006",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "anil.deshmukh@metroengg.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Four Company Two Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Five Division Two" }
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN9",
-        "displayName": "Nabanita Chatterjee",
-        "contactNo": "9876500007",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "nabanita.chatterjee@shaktiindustrial.com",
-        "erpUserId": "ERPUSR-3345",
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division One Company One Two Three" },
-            { "divisionName": "Division Two Company Two Three" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department One Division One Two Three" },
-            { "departmentName": "Department Two Division Two Three" }
-        ],
-        "password": "QWer12!@"
-    },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN7",
-        "displayName": "Kiran Reddy",
-        "contactNo": "9876500008",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "kiran.reddy@shaktiindustrial.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Purchase Manager", "companyName": "Company Three" },
-            { "roleName": "Compliance Auditor", "companyName": "Company Three" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Two Company Two Three" },
-            { "divisionName": "Division Four Company Three Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Two Division Two Three" },
-            { "departmentName": "Department Four Division Three" }
-        ],
-        "password": "QWer12!@"
-    },
+    // {
+    //     "statusId": 2,
+    //     "statusRemarks": "inactive user - relieved from organization",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN6",
+    //     "displayName": "Anil Deshmukh",
+    //     "contactNo": "9876500006",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "anil.deshmukh@metroengg.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Legacy Procurement Officer", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Four Company Two Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Five Division Two" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN9",
+    //     "displayName": "Nabanita Chatterjee",
+    //     "contactNo": "9876500007",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "nabanita.chatterjee@shaktiindustrial.com",
+    //     "erpUserId": "ERPUSR-3345",
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Read-Only Viewer", "companyName": "Company Two" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division One Company One Two Three" },
+    //         { "divisionName": "Division Two Company Two Three" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department One Division One Two Three" },
+    //         { "departmentName": "Department Two Division Two Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN7",
+    //     "displayName": "Kiran Reddy",
+    //     "contactNo": "9876500008",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "kiran.reddy@shaktiindustrial.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Purchase Manager", "companyName": "Company Three" },
+    //         { "roleName": "Compliance Auditor", "companyName": "Company Three" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Two Company Two Three" },
+    //         { "divisionName": "Division Four Company Three Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Two Division Two Three" },
+    //         { "departmentName": "Department Four Division Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // },
     {
         "statusId": 1,
         "statusRemarks": "",
@@ -3189,7 +3191,7 @@ export const userData = [
         "supplierAccountId": null,
         "username": "UN8",
         "displayName": "Jonathan Miller",
-        "contactNo": "7135550142",
+        "contactNo": "7188550142",
         "countryName": "India",
         "contactNoCountryId": 2,
         "timeZonesId": 2,
@@ -3210,80 +3212,80 @@ export const userData = [
         ],
         "password": "QWer12!@"
     },
-    {
-        "statusId": 1,
-        "statusRemarks": "",
-        "userTypeId": 2,
-        "supplierAccountId": null,
-        "username": "UN10",
-        "displayName": "Sunita Pillai",
-        "contactNo": "9876500009",
-        "countryName": "India",
-        "contactNoCountryId": 1,
-        "timeZonesId": 1,
-        "email": "sunita.pillai@bharatpetrochem.com",
-        "erpUserId": null,
-        "divisionTypeId": 2,
-        "departmentTypeId": 2,
-        "userRoleDetail": [
-            { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
-        ],
-        "userDivisionDetail": [
-            { "divisionName": "Division Four Company Three Only" }
-        ],
-        "userDepartmentDetail": [
-            { "departmentName": "Department Four Division Three" }
-        ],
-        "password": "QWer12!@"
-    }
+    // {
+    //     "statusId": 1,
+    //     "statusRemarks": "",
+    //     "userTypeId": 2,
+    //     "supplierAccountId": null,
+    //     "username": "UN10",
+    //     "displayName": "Sunita Pillai",
+    //     "contactNo": "9876500009",
+    //     "countryName": "India",
+    //     "contactNoCountryId": 1,
+    //     "timeZonesId": 1,
+    //     "email": "sunita.pillai@bharatpetrochem.com",
+    //     "erpUserId": null,
+    //     "divisionTypeId": 2,
+    //     "departmentTypeId": 2,
+    //     "userRoleDetail": [
+    //         { "roleName": "Read-Only Viewer", "companyName": "Company Three" }
+    //     ],
+    //     "userDivisionDetail": [
+    //         { "divisionName": "Division Four Company Three Only" }
+    //     ],
+    //     "userDepartmentDetail": [
+    //         { "departmentName": "Department Four Division Three" }
+    //     ],
+    //     "password": "QWer12!@"
+    // }
 ];
 
 export const supplierAccountData = [
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Shakti Industrial Suppliers",
+        "supplierAccountName": "ABC Suppliers",
         "description": "Raw material and industrial equipment supplier based in Raipur, Chhattisgarh",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Raipur - Urla Industrial Area",
-                "vendorName": "Shakti Industrial Suppliers"
+                "vendorLocationName": "Plot 21, Industrial Area",
+                "vendorName": "ABC Suppliers"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Metro Engineering Traders",
+        "supplierAccountName": "QWE Engineering Traders",
         "description": "Industrial tools and spare parts supplier based in Mumbai, Maharashtra",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Mumbai - Andheri East (MIDC Estate)",
-                "vendorName": "Metro Engineering Traders"
+                "vendorLocationName": "MIDC Estate",
+                "vendorName": "QWE Engineering Traders"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Bharat Chemical Solutions",
+        "supplierAccountName": "NMO CHemicals",
         "description": "Industrial chemicals manufacturer and service provider based in Ahmedabad, Gujarat",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Ahmedabad - GIDC Estate Phase II",
-                "vendorName": "Bharat Chemical Solutions"
+                "vendorLocationName": "GIDC Estate",
+                "vendorName": "NMO CHemicals"
             }
         ]
     },
     {
         "statusId": 1,
         "statusRemarks": "",
-        "supplierAccountName": "Global Manufacturing Inc",
-        "description": "International manufacturing, engineering services and contracting based in Houston, Texas, USA",
+        "supplierAccountName": "XYZ Manufacturing Inc",
+        "description": "International manufacturing, engineering services and contracting based in Mumbai, Maharashtra, India",
         "vendorLocationDetail": [
             {
-                "vendorLocationName": "Houston - Industrial Drive (USA)",
-                "vendorName": "Global Manufacturing Inc"
+                "vendorLocationName": "1200 Industrial Drive",
+                "vendorName": "XYZ Manufacturing Inc"
             }
         ]
     }
@@ -3291,8 +3293,8 @@ export const supplierAccountData = [
 
 export const vendorMasterData = [
     {
-        "vendorName": "Shakti Industrial Suppliers",
-        "legalName": "Shakti Industrial Suppliers Pvt Ltd",
+        "vendorName": "ABC Suppliers",
+        "legalName": "ABC Suppliers Pvt Ltd",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3301,13 +3303,13 @@ export const vendorMasterData = [
                 "addressLine1": "Plot 21, Industrial Area",
                 "addressLine2": "Urla",
                 "addressLine3": "",
-                "email": "info@shaktiispl.com",
+                "email": "info@abc.com",
                 "website": "https://www.shaktiispl.com",
                 "countryName": "India",
                 "stateName": "Chhattisgarh",
                 "cityName": "Raipur",
                 "pincode": "492001",
-                "vendorCategoryName": "Raw Material Supplier",
+                "vendorCategoryName": "Category One",
                 "panNo": "AABCS1234K",
                 "gstRegTypeId": 1,
                 "gstinNo": "22AABCS1234K1Z5",
@@ -3328,10 +3330,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Steel Materials"
+                        "itemGroupName": "Group One One"
                     },
                     {
-                        "itemGroupName": "Cables and Wires"
+                        "itemGroupName": "Group One Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3349,8 +3351,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Metro Engineering Traders",
-        "legalName": "Metro Engineering Traders Pvt Ltd",
+        "vendorName": "QWE Engineering Traders",
+        "legalName": "QWE Engineering Traders Pvt Ltd",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3365,7 +3367,7 @@ export const vendorMasterData = [
                 "stateName": "Maharashtra",
                 "cityName": "Mumbai",
                 "pincode": "400093",
-                "vendorCategoryName": "Equipment Supplier",
+                "vendorCategoryName": "Category Two",
                 "panNo": "AACCM5678P",
                 "gstRegTypeId": 1,
                 "gstinNo": "27AACCM5678P1Z3",
@@ -3386,10 +3388,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Cables and Wires"
+                        "itemGroupName": "Group Two One"
                     },
                     {
-                        "itemGroupName": "Bearings and Bushes"
+                        "itemGroupName": "Group Two Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3407,8 +3409,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Bharat Chemical Solutions",
-        "legalName": "Bharat Chemical Solutions Ltd",
+        "vendorName": "NMO CHemicals",
+        "legalName": "NMO Chemicals",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3417,13 +3419,13 @@ export const vendorMasterData = [
                 "addressLine1": "GIDC Estate",
                 "addressLine2": "Phase II",
                 "addressLine3": "",
-                "email": "info@bharatchem.com",
-                "website": "https://www.bharatchem.com",
+                "email": "info@nom.com",
+                "website": "https://www.nmo.com",
                 "countryName": "India",
                 "stateName": "Gujarat",
                 "cityName": "Ahmedabad",
                 "pincode": "380001",
-                "vendorCategoryName": "Service Provider",
+                "vendorCategoryName": "Category Three",
                 "panNo": "AADCB9876R",
                 "gstRegTypeId": 1,
                 "gstinNo": "24AADCB9876R1Z8",
@@ -3444,7 +3446,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Industrial Solvents"
+                        "itemGroupName": "Group Three One"
+                    },
+                    {
+                        "itemGroupName": "Group Three Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3462,8 +3467,8 @@ export const vendorMasterData = [
         ]
     },
     {
-        "vendorName": "Global Manufacturing Inc",
-        "legalName": "Global Manufacturing Inc",
+        "vendorName": "XYZ Manufacturing Inc",
+        "legalName": "XYZ Manufacturing Inc",
         "bpTypeId": 1,
         "vendorLocationDetail": [
             {
@@ -3472,18 +3477,18 @@ export const vendorMasterData = [
                 "addressLine1": "1200 Industrial Drive",
                 "addressLine2": "",
                 "addressLine3": "",
-                "email": "sales@globalmfg.com",
-                "website": "https://www.globalmfg.com",
-                "countryName": "United States",
-                "stateName": "Texas",
-                "cityName": "Houston",
-                "pincode": "77001",
-                "vendorCategoryName": "Contractor",
-                "panNo": "",
-                "gstRegTypeId": 3,
-                "gstinNo": "",
+                "email": "sales@xyz.com",
+                "website": "https://www.xyz.com",
+                "countryName": "India",
+                "stateName": "Maharashtra",
+                "cityName": "Mumbai",
+                "pincode": "400001",
+                "vendorCategoryName": "Category Four",
+                "panNo": "AAACX9999K",
+                "gstRegTypeId": 1,
+                "gstinNo": "27AAACX9999K1Z2",
                 "regionId": 4,
-                "businessTypeId": 4,
+                "businessTypeId": 1,
                 "businessDescription": "International manufacturing and engineering services",
                 "msmeTypeId": 2,
                 "msmeNo": "",
@@ -3499,10 +3504,10 @@ export const vendorMasterData = [
                 ],
                 "vendorLocationItemGroupDetail": [
                     {
-                        "itemGroupName": "Personal Protective Equipment"
+                        "itemGroupName": "Group Four One"
                     },
                     {
-                        "itemGroupName": "Corrugated Packaging"
+                        "itemGroupName": "Group Four Two"
                     }
                 ],
                 "vendorLocationBankDetail": [
@@ -3683,7 +3688,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Purchase Request" }
+            { "formName": "MMPR01" }
         ],
         "documentSeriesCompanyDetail": [
             { "companyName": "Company One", "statusId": 1 },
@@ -3713,7 +3718,7 @@ export const documentSeriesData = [
         "numberStartFrom": 100,
         "effectiveDate": "2026-02-01",
         "documentSeriesFormDetail": [
-            { "formName": "Purchase Order" }
+            { "formName": "PMPO01" }
         ],
         "documentSeriesCompanyDetail": [
             { "companyName": "Company One", "statusId": 1 },
@@ -3743,7 +3748,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1000,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Request For Quotation" }
+            { "formName": "PRFQ01" }
         ],
         "documentSeriesDocTypeDetail": [
             { "docTypeName": "RFQ - Standard - Division One Company One Two Three", "statusId": 1 },
@@ -3762,7 +3767,7 @@ export const documentSeriesData = [
         "numberStartFrom": 1,
         "effectiveDate": "2026-06-01",
         "documentSeriesFormDetail": [
-            { "formName": "Comparative Statement" }
+            { "formName": "PMCS01" }
         ],
         "documentSeriesDocTypeDetail": [
             { "docTypeName": "CS - Standard - Division One Company One Two Three", "statusId": 1 },
@@ -3920,3 +3925,287 @@ export const paymentTermsGroupData = [
         ]
     }
 ];
+
+export const requestForQuotationData = [
+    {
+        "companyName": "Company One",
+        "divisionName": "Division One Company One Two Three",
+        "departmentName": "Department One Division One Two Three",
+        "docSeriesPattern": "RFQ/{{FY2}}/{{MMM}}/{{N}}",
+        "docNoYearly": "RFQ/27/Aug/_ _ _ _ _ ",
+        "docDate": "2026-08-23",
+        "docStatusId": DocumentStatus.Authorized,
+        "docTypeName": "RFQ - Standard - Division One Company One Two Three",
+        "refDocTypeId": RefDocType.DirectRFQ,
+        "dueDate": "2026-09-30T07:55:00.000Z",
+        "isPriceList": false,
+        "mailSubject": "Request for quotation of [02 CHANNEL AUDIO PA AMPLIFIER SYSTEM, 02 CHANNEL AUDIO PA AMPLIFIER SYSTEM]",
+        "contactName": "Shekhar Sahu",
+        "contactNo": "+919998884774",
+        "contactNoCountryName": "India",
+        "contactEmail": "tnoypy@mailto.plus",
+        "remarks": "This is remarks.",
+        "tncGroupName": "TNC Group One",
+        "approvalSetupId": null,
+        "attachment": [],
+        "lastModifiedDate": null,
+        "rfqItemDetail": [
+            {
+                "itemName": "Item Two Multi Unit Make One Two Three",
+                "makeName": "Make One",
+                "techSpecification": "asdfsf",
+                "unitName": "Unit Two",
+                "qty": "150",
+                "remarks": "dsfa",
+                "hsnCode": null,
+                "attachment": [],
+                "rfqPrItemDetail": []
+            },
+            {
+                "itemName": "Item Three No Multi Unit All Make",
+                "makeName": "Make Two",
+                "techSpecification": "sdfsdfs",
+                "unitName": "Unit Two",
+                "qty": "152.212",
+                "remarks": "sdfas",
+                "hsnCode": null,
+                "attachment": [],
+                "rfqPrItemDetail": []
+            }
+        ],
+        "rfqVendorDetail": [
+            {
+                "isGuestVendor": false,
+                "vendorName": "ABC Suppliers",
+                "vendorLocationName": "Plot 21, Industrial Area",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Rajesh Sharma",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            },
+            {
+                "isGuestVendor": false,
+                "vendorName": "QWE Engineering Traders",
+                "vendorLocationName": "MIDC Estate",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Amit Verma",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            },
+            {
+                "isGuestVendor": false,
+                "vendorName": "NMO CHemicals",
+                "vendorLocationName": "GIDC Estate",
+                "guestVendorEmail": null,
+                "guestVendorName": null,
+                "contactPersonDetail": [
+                    {
+                        "contactPersonName": "Neha Patel",
+                        "contactEmail": null,
+                        "contactNo": null,
+                        "contactNoCountryId": null
+                    }
+                ]
+            }
+        ],
+        "rfqTncDetail": []
+    }
+];
+
+export const finYearData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2022-23",
+        "alias": "FY22-23",
+        "shortAlias": "22-23",
+        "startDate": "2022-04-01",
+        "endDate": "2023-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2023-24",
+        "alias": "FY23-24",
+        "shortAlias": "23-24",
+        "startDate": "2023-04-01",
+        "endDate": "2024-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2024-25",
+        "alias": "FY24-25",
+        "shortAlias": "24-25",
+        "startDate": "2024-04-01",
+        "endDate": "2025-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2025-26",
+        "alias": "FY25-26",
+        "shortAlias": "25-26",
+        "startDate": "2025-04-01",
+        "endDate": "2026-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "finYearName": "2026-27",
+        "alias": "FY26-27",
+        "shortAlias": "26-27",
+        "startDate": "2026-04-01",
+        "endDate": "2027-03-31",
+        "previousFinYearId": null,
+        "nextFinYearId": null
+    }
+];
+
+export const approvalSetupData = [
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "formName": "Purchase Request",
+        "approvalScopeName": "CompanyDivisionDepartmentWise",
+        "approvalSetupName": "PR Approval Setup - All Companies & Divisions",
+        "minNetAmount": null,
+        "maxNetAmount": null,
+        "description": "Approval setup for Purchase Request across all companies, divisions, and PR document types",
+        "isAudit": false,
+        "fromDate": null,
+        "toDate": null,
+        "isAuditApplyToExistingDocuments": false,
+        "levelDetail": [
+            {
+                "levelNo": 1,
+                "printingCaption": "First Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "admin",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            },
+            {
+                "levelNo": 2,
+                "printingCaption": "Second Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "UN1",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            }
+        ],
+        "orgUnitDetail": [
+            { "companyName": "Company One", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company One", "divisionName": "Division Three Company One Only", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Five Company Two Only", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Four Company Three Only", "departmentName": null }
+        ],
+        "docTypeDetail": [
+            { "docTypeName": "PR - Standard - Division One Company One Two Three" },
+            { "docTypeName": "PR - Engineering - Division One Company One Two Three" },
+            { "docTypeName": "PR - Chemical - Division Four Company Three Only" },
+            { "docTypeName": "PR - Supply Chain - Division One Company One Two Three" },
+            { "docTypeName": "PR - Export - Division Four Company Three Only" }
+        ]
+    },
+    {
+        "statusId": 1,
+        "statusRemarks": "",
+        "formName": "Purchase Order",
+        "approvalScopeName": "CompanyDivisionDepartmentWise",
+        "approvalSetupName": "PO Approval Setup - All Companies & Divisions",
+        "minNetAmount": 1,
+        "maxNetAmount": 9999999,
+        "description": "Approval setup for Purchase Order across all companies, divisions, and PO document types",
+        "isAudit": false,
+        "fromDate": null,
+        "toDate": null,
+        "isAuditApplyToExistingDocuments": false,
+        "levelDetail": [
+            {
+                "levelNo": 1,
+                "printingCaption": "First Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "admin",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            },
+            {
+                "levelNo": 2,
+                "printingCaption": "Second Level",
+                "approvalRuleId": 2,
+                "isNextLevelSelectionAllowed": false,
+                "maxApprovalTime": 0,
+                "userDetail": [
+                    {
+                        "userName": "UN1",
+                        "roleName": null,
+                        "isDefault": false
+                    }
+                ]
+            }
+        ],
+        "orgUnitDetail": [
+            { "companyName": "Company One", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company One", "divisionName": "Division Three Company One Only", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Two", "divisionName": "Division Five Company Two Only", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division One Company One Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Two Company Two Three", "departmentName": null },
+            { "companyName": "Company Three", "divisionName": "Division Four Company Three Only", "departmentName": null }
+        ],
+        "docTypeDetail": [
+            { "docTypeName": "PO - Standard - Division One Company One Two Three" },
+            { "docTypeName": "PO - Engineering - Division One Company One Two Three" },
+            { "docTypeName": "PO - Chemical - Division Four Company Three Only" },
+            { "docTypeName": "PO - Supply Chain - Division One Company One Two Three" },
+            { "docTypeName": "PO - Export - Division Four Company Three Only" }
+        ]
+    }
+];
+
+
+

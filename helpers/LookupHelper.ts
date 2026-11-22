@@ -2,12 +2,13 @@ import { RequestHelper } from './RequestHelper';
 import { MasterApi } from '../services/MasterApi';
 import { Logger } from './Logger';
 import { API_REGISTRY } from '../config/apiRegistry';
+import { CollectionVariableHelper } from './CollectionVariableHelper';
 
 export class LookupHelper {
   // Cache format: Map<masterName, Map<recordName, any>>
   private recordCache: Map<string, Map<string, any>> = new Map();
 
-  constructor(private readonly requestHelper: RequestHelper) { }
+  constructor(public readonly requestHelper: RequestHelper) { }
 
   /**
    * Resolves a human-readable name to its corresponding full record data for any Master API.
@@ -56,7 +57,7 @@ export class LookupHelper {
     let matchedItem: any = null;
     const matchField = masterApi.matchField;
     for (const item of items) {
-      const nameVal = item[matchField] || item.name || item.Name;
+      const nameVal = item[matchField] || item.name || item.Name || item.pattern || item.Pattern || item.code || item.Code || item.seriesName;
       if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
         matchedItem = item;
         break;
@@ -96,6 +97,21 @@ export class LookupHelper {
     }
 
     return id;
+  }
+
+  /**
+   * Resolves a master record directly from collection variables file without making network/API calls.
+   * Supported masters: unit, make, category, group, subgroup.
+   */
+  public getFromCollection(masterName: any, recordName: string): any {
+    return CollectionVariableHelper.fetchRecord(masterName, recordName);
+  }
+
+  /**
+   * Resolves a master ID directly from collection variables file without making network/API calls.
+   */
+  public getIdFromCollection(masterName: any, recordName: string): number | string {
+    return CollectionVariableHelper.fetchId(masterName, recordName);
   }
 
   /**
@@ -261,7 +277,8 @@ export class LookupHelper {
    * Resolves a human-readable name to its corresponding full record data for any Global Data API.
    * Caches results to prevent redundant API queries.
    */
-  public async getGlobalRecord(globalName: string, recordName: string): Promise<any> {
+  public async getGlobalRecord(globalName: string, recordName: string, queryParam?: string | null = null): Promise<any> {
+    console.log("global@123", globalName, recordName, queryParam)
     const normalizedGlobal = globalName.toLowerCase().trim();
     const normalizedRecord = recordName.toLowerCase().trim();
 
@@ -283,7 +300,14 @@ export class LookupHelper {
     }
 
     // Global data is retrieved by passing KeywordSearch query param
-    const endpoint = `${config.url}?KeywordSearch=${encodeURIComponent(recordName)}`;
+    let endpoint = '';
+
+    if (queryParam) {
+      endpoint = `${config.url}?${queryParam}=${encodeURIComponent(recordName)}`;
+    }
+    else {
+      endpoint = `${config.url}?$Keyword=${encodeURIComponent(recordName)}`;
+    }
     const response = await this.requestHelper.get<any>(endpoint);
 
     if (!response.ok) {
@@ -338,16 +362,17 @@ export class LookupHelper {
   /**
    * Resolves contact number and country ID based on country name.
    */
-  public async getContactNoAndCountryId(countryName: string = "India", index: number = 8): Promise<{ contactNo: string | null; contactNoCountryId: number | null }> {
+  public async getContactNoAndCountryId(countryName: string = "India", index: number = 8): Promise<{ contactNo: string | null; contactNoCountryId: number | null, phoneCode: string | null }> {
 
     const country = await this.getRecord("country", countryName);
     if (!country) {
-      return { contactNo: null, contactNoCountryId: null };
+      return { phoneCode: country.phoneCode || null, contactNo: null, contactNoCountryId: null };
     }
     const phoneCodeStr = String(country.phoneCode || "");
     const repeatCount = Math.max(0, Number(country.minContactNoLength || 10) - phoneCodeStr.length);
     const contactNo = country.phoneCode + String(index).repeat(repeatCount) || null;
     return {
+      phoneCode: country.phoneCode || null,
       contactNo,
       contactNoCountryId: country.id
     };
@@ -388,17 +413,17 @@ export class LookupHelper {
     const normalizedRecord = docTypeName.toLowerCase().trim();
     const cacheKey = "docType_" + formId;
 
-    if (this.recordCache.has(cacheKey)) {
-      const masterCache = this.recordCache.get(cacheKey)!;
-      if (masterCache.has(normalizedRecord)) {
-        Logger.info(`[CACHE HIT] Lookup for docType '${docTypeName}' with formId '${formId}' resolved`);
-        return masterCache.get(normalizedRecord);
-      }
-    }
+    // if (this.recordCache.has(cacheKey)) {
+    //   const masterCache = this.recordCache.get(cacheKey)!;
+    //   if (masterCache.has(normalizedRecord)) {
+    //     Logger.info(`[CACHE HIT] Lookup for docType '${docTypeName}' with formId '${formId}' resolved`);
+    //     return masterCache.get(normalizedRecord);
+    //   }
+    // }
 
     Logger.info(`[CACHE MISS] Lookup for docType '${docTypeName}' with formId '${formId}'. Initiating query...`);
     const masterApi = new MasterApi(this.requestHelper, masterName);
-    const response = await masterApi.getDocTypesByFormId(formId);
+    const response = await masterApi.getDocTypesByFormId(formId, docTypeName);
 
     if (!response.ok) {
       throw new Error(`Lookup failed for docType '${docTypeName}' and formId '${formId}'. API status: ${response.status}`);
@@ -484,7 +509,7 @@ export class LookupHelper {
     let matchedItem: any = null;
     const matchField = masterApi.matchField;
     for (const item of items) {
-      const nameVal = item[matchField] || item.name || item.Name;
+      const nameVal = item[matchField] || item.name || item.Name || item.pattern || item.Pattern || item.code || item.Code || item.seriesName;
       if (nameVal && String(nameVal).toLowerCase().trim() === normalizedRecord) {
         matchedItem = item;
         break;
@@ -508,6 +533,98 @@ export class LookupHelper {
 
     Logger.success(`[RESOLVED] Master '${masterName}': '${recordName}' -> Record resolved`);
     return matchedItem;
+  }
+
+  /**
+   * Resolves Vendor, Vendor Location ID, and Vendor Location Contact Person ID.
+   * 1. Fetches Vendor by vendorName to get vendorId.
+   * 2. Calls GET /api/master/vendor-master/locations/Get?VendorId={vendorId} to locate the matching locationId.
+   * 3. Calls GET /api/master/vendor-locations/{locationId} to retrieve full location details & contact persons.
+   * 4. Returns resolved IDs and records.
+   */
+  public async getVendorLocationAndContactPerson(
+    vendorName: string,
+    vendorLocationName: string,
+    contactPersonName?: string
+  ): Promise<{
+    vendor: any;
+    vendorId: number | string;
+    vendorLocation: any;
+    vendorLocationId: number | string;
+    contactPerson: any;
+    vendorLocationContactPersonId: number | string | null;
+  }> {
+    // Step 1: Get Vendor record to obtain vendorId
+    const vendor = await this.getRecord("vendorMaster", vendorName);
+    const vendorId = vendor.id || vendor.Id;
+
+    // Step 2: Get Vendor Locations via GET /api/master/vendor-master/locations/Get?VendorId={vendorId}
+    const locationsEndpoint = `/api/master/vendor-master/locations/Get?VendorId=${encodeURIComponent(vendorId)}`;
+    const locsResponse = await this.requestHelper.get<any>(locationsEndpoint);
+
+    const locations = Array.isArray(locsResponse.body)
+      ? locsResponse.body
+      : (locsResponse.body && typeof locsResponse.body === 'object' && Array.isArray((locsResponse.body as any).data))
+        ? (locsResponse.body as any).data
+        : vendor?.vendorLocationDetail || [];
+
+    const normalizedLocName = vendorLocationName.toLowerCase().trim();
+    let matchedLocation = locations.find((l: any) =>
+      (l.addressLine1 && String(l.addressLine1).toLowerCase().trim().includes(normalizedLocName))
+    );
+
+    if (!matchedLocation && locations.length > 0) {
+      matchedLocation = locations[0];
+    }
+
+    const locationId = matchedLocation?.id || matchedLocation?.Id || matchedLocation?.vendorLocationId;
+
+    if (!locationId) {
+      throw new Error(`Failed to resolve locationId for vendor '${vendorName}' and location '${vendorLocationName}'`);
+    }
+
+    // Step 3: Call GET /api/master/vendor-locations/{locationId}
+    const locationDetailEndpoint = `/api/master/vendor-locations/${locationId}`;
+    const locationDetailResponse = await this.requestHelper.get<any>(locationDetailEndpoint);
+
+    const locationDetail = locationDetailResponse.body?.data || locationDetailResponse.body || matchedLocation;
+
+    // Step 4: Resolve Contact Person Detail from vendorLocationContactPersonDetail array
+    let contactPerson: any = null;
+    const contactPersons = locationDetail?.vendorLocationContactPersonDetail || locationDetail?.contactPersonDetail || [];
+
+    if (contactPersonName && contactPersons.length > 0) {
+      const normalizedCpName = contactPersonName.toLowerCase().trim();
+      contactPerson = contactPersons.find((cp: any) =>
+        cp.contactPersonName && String(cp.contactPersonName).toLowerCase().trim() === normalizedCpName
+      );
+    }
+
+    if (!contactPerson && contactPersons.length > 0) {
+      contactPerson = contactPersons[0];
+    }
+
+    const contactPersonId = contactPerson?.id ?? contactPerson?.Id ?? contactPerson?.vendorLocationContactPersonId ?? null;
+
+    return {
+      vendor,
+      vendorId,
+      vendorLocation: locationDetail,
+      vendorLocationId: locationDetail?.id || locationId,
+      contactPerson,
+      vendorLocationContactPersonId: contactPersonId
+    };
+  }
+
+  /**
+   * Fetches TNC Group details (heads & values) by calling GET /api/master/terms-and-condition-groups/{tncGroupId}
+   */
+  public async getTncGroupDetails(tncGroupId: number | string): Promise<any[]> {
+    const endpoint = `/api/master/terms-and-condition-groups/details/${tncGroupId}`;
+    const response = await this.requestHelper.get<any>(endpoint);
+    const data = response.body?.data || response.body;
+    console.log("tncgroup data", data);
+    return Array.isArray(data) ? data : [];
   }
 }
 
